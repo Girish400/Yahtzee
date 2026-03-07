@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Yahtzee Live</title>
+<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{
+  --bg:#1a1a2e;--surface:#16213e;--card:#0f3460;--accent:#e94560;
+  --gold:#f5c842;--green:#34d97b;--red:#f0504d;--blue:#4f8ef7;
+  --text:#f0f0f5;--muted:#6e7a9a;--border:#1e2d50;--r:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html{scroll-behavior:smooth;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+
+/* BG pattern */
+body::before{content:'';position:fixed;inset:0;
+  background-image:radial-gradient(circle at 20% 20%,rgba(233,69,96,.08) 0,transparent 50%),
+                   radial-gradient(circle at 80% 80%,rgba(79,142,247,.08) 0,transparent 50%);
+  pointer-events:none;z-index:0;}
+
+.app{position:relative;z-index:1;max-width:520px;margin:0 auto;padding:16px 12px 100px;}
+
+/* ── HEADER ── */
+.hdr{text-align:center;padding:20px 0 12px;}
+.logo{font-family:'Permanent Marker',cursive;font-size:clamp(2.4rem,10vw,3.4rem);
+  color:var(--gold);text-shadow:3px 3px 0 rgba(0,0,0,.4),0 0 30px rgba(245,200,66,.4);
+  letter-spacing:2px;line-height:1;}
+.logo span{color:var(--accent);}
+.meta-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;
+  font-size:.78rem;color:var(--muted);margin-top:8px;}
+.meta-row span{display:flex;align-items:center;gap:4px;}
+
+/* ── CONN ── */
+.conn{display:flex;align-items:center;gap:7px;background:var(--surface);
+  border:1px solid var(--border);border-radius:50px;padding:6px 14px;
+  margin:10px auto;width:fit-content;font-size:.76rem;color:var(--muted);}
+.cdot{width:7px;height:7px;border-radius:50%;background:var(--muted);transition:background .4s;}
+.cdot.on{background:var(--green);}
+.cdot.off{background:var(--red);}
+
+/* ── SETUP SCREEN ── */
+.setup-screen{background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);padding:24px 20px;margin-bottom:20px;}
+.setup-screen h2{font-family:'Permanent Marker',cursive;color:var(--gold);
+  font-size:1.3rem;margin-bottom:16px;text-align:center;}
+.player-inputs{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+.pi-row{display:flex;align-items:center;gap:8px;}
+.pi-row input{flex:1;background:var(--card);border:1.5px solid var(--border);
+  color:var(--text);border-radius:10px;padding:10px 14px;font-family:'Nunito',sans-serif;
+  font-size:.95rem;font-weight:700;outline:none;transition:border-color .2s;}
+.pi-row input:focus{border-color:var(--gold);}
+.pi-row input::placeholder{color:var(--muted);font-weight:400;}
+.pi-del{background:none;border:1px solid var(--border);color:var(--muted);
+  width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;transition:all .2s;}
+.pi-del:hover{background:var(--red);border-color:var(--red);color:#fff;}
+.color-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
+.setup-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+
+/* ── BUTTONS ── */
+.btn{padding:10px 22px;border:none;border-radius:50px;cursor:pointer;
+  font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:800;
+  display:inline-flex;align-items:center;gap:6px;transition:all .2s;letter-spacing:.3px;}
+.btn:hover{transform:translateY(-2px);filter:brightness(1.1);}
+.btn:active{transform:scale(.95);}
+.btn-gold{background:var(--gold);color:#000;}
+.btn-green{background:var(--green);color:#000;}
+.btn-red{background:var(--accent);color:#fff;}
+.btn-blue{background:var(--blue);color:#fff;}
+.btn-ghost{background:var(--surface);border:1.5px solid var(--border);color:var(--text);}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold);}
+.btn-sm{padding:7px 16px;font-size:.8rem;}
+
+/* ── DICE SECTION ── */
+.dice-section{background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);padding:18px 16px;margin-bottom:16px;}
+.dice-label{font-size:.72rem;text-transform:uppercase;letter-spacing:2px;
+  color:var(--muted);margin-bottom:12px;text-align:center;}
+.dice-row{display:flex;justify-content:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+
+/* 3D Dice */
+.die-wrap{display:flex;flex-direction:column;align-items:center;gap:6px;}
+.die{width:54px;height:54px;border-radius:10px;background:var(--card);
+  border:2px solid var(--border);position:relative;cursor:pointer;
+  transition:transform .15s,border-color .2s,box-shadow .2s;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 12px rgba(0,0,0,.4);}
+.die:hover{transform:scale(1.08);}
+.die.held{border-color:var(--gold);background:rgba(245,200,66,.15);
+  box-shadow:0 0 18px rgba(245,200,66,.5);}
+.die.held::after{content:'HELD';position:absolute;bottom:-20px;left:50%;
+  transform:translateX(-50%);font-size:.55rem;font-weight:900;color:var(--gold);
+  letter-spacing:1.5px;white-space:nowrap;}
+.die.rolling{animation:diceRoll .5s ease-in-out;}
+@keyframes diceRoll{
+  0%{transform:rotate(0deg) scale(1);}
+  25%{transform:rotate(15deg) scale(1.15);}
+  50%{transform:rotate(-10deg) scale(.9);}
+  75%{transform:rotate(5deg) scale(1.1);}
+  100%{transform:rotate(0deg) scale(1);}
+}
+/* Pip layout */
+.pip-grid{display:grid;width:38px;height:38px;padding:3px;}
+.pip{width:7px;height:7px;border-radius:50%;background:var(--text);}
+/* 1 */
+.p1{grid-template-columns:1fr 1fr 1fr;grid-template-rows:1fr 1fr 1fr;}
+.p1 .pip{grid-column:2;grid-row:2;}
+/* 2 */
+.p2{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;}
+.p2 .pip:nth-child(1){grid-column:1;grid-row:1;align-self:start;}
+.p2 .pip:nth-child(2){grid-column:2;grid-row:2;align-self:end;justify-self:end;}
+/* 3 */
+.p3{grid-template-columns:1fr 1fr 1fr;grid-template-rows:1fr 1fr 1fr;}
+.p3 .pip:nth-child(1){grid-column:1;grid-row:1;}
+.p3 .pip:nth-child(2){grid-column:2;grid-row:2;}
+.p3 .pip:nth-child(3){grid-column:3;grid-row:3;}
+/* 4 */
+.p4{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;}
+/* 5 */
+.p5{grid-template-columns:1fr 1fr 1fr;grid-template-rows:1fr 1fr 1fr;}
+.p5 .pip:nth-child(1){grid-column:1;grid-row:1;}
+.p5 .pip:nth-child(2){grid-column:3;grid-row:1;}
+.p5 .pip:nth-child(3){grid-column:2;grid-row:2;}
+.p5 .pip:nth-child(4){grid-column:1;grid-row:3;}
+.p5 .pip:nth-child(5){grid-column:3;grid-row:3;}
+/* 6 */
+.p6{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr 1fr;}
+
+.dice-info{text-align:center;font-size:.78rem;color:var(--muted);margin-bottom:12px;}
+.dice-info strong{color:var(--gold);}
+.dice-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+.roll-count{font-family:'Permanent Marker',cursive;font-size:1.1rem;color:var(--gold);}
+
+/* ── SCORECARD ── */
+.scorecard-wrap{margin-bottom:16px;}
+.sc-tabs{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:4px;}
+.sc-tab{background:var(--surface);border:1.5px solid var(--border);
+  border-radius:50px;padding:8px 16px;font-size:.8rem;font-weight:800;
+  cursor:pointer;white-space:nowrap;transition:all .2s;flex-shrink:0;}
+.sc-tab.active{border-color:var(--gold);color:var(--gold);}
+.sc-tab .tab-score{font-size:.7rem;display:block;color:var(--muted);}
+
+.scorecard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
+
+/* Header row */
+.sc-head{display:grid;background:var(--card);border-bottom:1px solid var(--border);padding:10px 12px;}
+.sc-head-cat{font-size:.65rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:700;}
+.sc-head-name{font-size:.82rem;font-weight:900;color:var(--text);text-align:center;}
+.sc-head-name.me{color:var(--gold);}
+
+/* Score row */
+.sc-row{display:grid;border-bottom:1px solid var(--border);transition:background .2s;}
+.sc-row:last-child{border-bottom:none;}
+.sc-row:hover{background:rgba(255,255,255,.02);}
+.sc-row.section-header{background:rgba(233,69,96,.12);border-bottom:2px solid rgba(233,69,96,.3);}
+.sc-row.section-header .cat-name{font-size:.7rem;text-transform:uppercase;letter-spacing:2px;color:var(--accent);font-weight:900;}
+.sc-row.total-row{background:rgba(245,200,66,.06);}
+.sc-row.total-row .cat-name{font-weight:900;color:var(--gold);}
+.sc-row.bonus-row{background:rgba(52,217,123,.06);}
+
+.cat-cell{padding:10px 12px;display:flex;flex-direction:column;justify-content:center;}
+.cat-name{font-size:.82rem;font-weight:700;color:var(--text);line-height:1.2;}
+.cat-hint{font-size:.62rem;color:var(--muted);line-height:1.3;margin-top:2px;}
+
+.score-cell{padding:6px 4px;display:flex;align-items:center;justify-content:center;}
+.score-btn{width:100%;min-height:38px;border-radius:8px;border:1.5px solid var(--border);
+  background:var(--card);color:var(--text);font-family:'Nunito',sans-serif;
+  font-size:.9rem;font-weight:800;cursor:pointer;transition:all .2s;text-align:center;}
+.score-btn:hover:not(:disabled){background:rgba(245,200,66,.1);border-color:var(--gold);color:var(--gold);}
+.score-btn.filled{background:transparent;border-color:transparent;cursor:default;color:var(--text);}
+.score-btn.filled.mine{color:var(--gold);}
+.score-btn.suggested{background:rgba(52,217,123,.15);border-color:var(--green);color:var(--green);animation:suggest .8s ease-in-out infinite alternate;}
+@keyframes suggest{from{box-shadow:0 0 0 rgba(52,217,123,0)}to{box-shadow:0 0 10px rgba(52,217,123,.5)}}
+.score-btn.total-val{background:transparent;border-color:transparent;color:var(--gold);font-size:1rem;cursor:default;}
+.score-btn.bonus-val{color:var(--green);}
+.score-btn:disabled:not(.filled):not(.total-val):not(.bonus-val){opacity:.4;cursor:default;}
+
+/* ── PLAYER BADGES ── */
+.players-bar{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px;}
+.player-badge{background:var(--surface);border:1.5px solid var(--border);
+  border-radius:12px;padding:8px 14px;font-size:.8rem;font-weight:700;
+  white-space:nowrap;flex-shrink:0;transition:border-color .2s;}
+.player-badge.active{border-color:var(--gold);color:var(--gold);}
+.player-badge .pb-score{font-size:.7rem;color:var(--muted);display:block;}
+
+/* ── ACTION BAR ── */
+.action-bar{position:fixed;bottom:0;left:0;right:0;z-index:100;
+  background:rgba(26,26,46,.95);backdrop-filter:blur(12px);
+  border-top:1px solid var(--border);padding:10px 16px 20px;
+  display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+
+/* ── QR MODAL ── */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.8);display:flex;
+  align-items:center;justify-content:center;z-index:200;
+  opacity:0;pointer-events:none;transition:opacity .3s;}
+.modal-bg.show{opacity:1;pointer-events:all;}
+.modal{background:var(--surface);border:1px solid var(--border);
+  border-radius:20px;padding:28px 24px;text-align:center;max-width:320px;width:90%;}
+.modal h3{font-family:'Permanent Marker',cursive;color:var(--gold);font-size:1.5rem;margin-bottom:6px;}
+.modal p{font-size:.8rem;color:var(--muted);margin-bottom:18px;}
+#qr-box{display:flex;justify-content:center;margin-bottom:14px;}
+#qr-box canvas,#qr-box img{border-radius:10px;}
+.qr-url{font-size:.68rem;color:var(--muted);word-break:break-all;
+  padding:7px 10px;background:var(--card);border-radius:8px;margin-bottom:16px;}
+
+/* ── YAHTZEE CELEBRATION ── */
+.ytz-blast{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  z-index:500;pointer-events:none;opacity:0;transition:opacity .3s;}
+.ytz-blast.show{opacity:1;}
+.ytz-text{font-family:'Permanent Marker',cursive;font-size:min(20vw,120px);
+  color:var(--gold);text-shadow:0 0 60px rgba(245,200,66,.8),4px 4px 0 var(--accent);
+  animation:ytzPop .6s cubic-bezier(.175,.885,.32,1.275);}
+@keyframes ytzPop{0%{transform:scale(0) rotate(-10deg)}60%{transform:scale(1.15) rotate(3deg)}100%{transform:scale(1) rotate(0)}}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(60px);
+  background:var(--green);color:#000;font-weight:800;padding:10px 22px;
+  border-radius:50px;font-size:.85rem;z-index:300;transition:transform .3s;pointer-events:none;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+/* ── GAME OVER ── */
+.gameover-screen{background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);padding:28px 20px;text-align:center;margin-bottom:20px;}
+.gameover-screen h2{font-family:'Permanent Marker',cursive;color:var(--gold);font-size:2rem;margin-bottom:20px;}
+.winner-name{font-family:'Permanent Marker',cursive;font-size:1.6rem;color:var(--accent);margin-bottom:6px;}
+.final-scores{display:flex;flex-direction:column;gap:8px;margin:16px 0;}
+.fs-row{display:flex;justify-content:space-between;align-items:center;
+  background:var(--card);border-radius:10px;padding:10px 16px;}
+.fs-name{font-weight:800;}
+.fs-score{font-family:'Permanent Marker',cursive;font-size:1.2rem;color:var(--gold);}
+
+/* ── RESPONSIVE ── */
+@media(max-width:400px){
+  .die{width:46px;height:46px;}
+  .pip-grid{width:32px;height:32px;}
+  .pip{width:6px;height:6px;}
+}
+.err-banner{background:rgba(240,80,77,.15);border:1px solid var(--red);
+  border-radius:10px;padding:12px 16px;margin-bottom:14px;font-size:.82rem;
+  color:#f9b0af;display:none;}
+.err-banner.show{display:block;}
+</style>
+</head>
+<body>
+
+<!-- Yahtzee celebration -->
+<div class="ytz-blast" id="ytz-blast"><div class="ytz-text">YAHTZEE!</div></div>
+
+<!-- QR Modal -->
+<div class="modal-bg" id="qr-modal">
+  <div class="modal">
+    <h3>&#128242; Join Game</h3>
+    <p>Scan to join and see live scores on your device</p>
+    <div id="qr-box"></div>
+    <div class="qr-url" id="qr-url"></div>
+    <button class="btn btn-ghost btn-sm" onclick="closeQR()">Close</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="err-banner" id="err-banner"></div>
+
+<div class="app">
+  <div class="hdr">
+    <div class="logo">Yah<span>tzee</span></div>
+    <div class="meta-row">
+      <span>&#128197; <span id="date-disp"></span></span>
+      <span>&#128336; <span id="time-disp"></span></span>
+    </div>
+  </div>
+
+  <div class="conn">
+    <div class="cdot" id="cdot"></div>
+    <span id="ctext">Connecting…</span>
+  </div>
+
+  <!-- SETUP SCREEN -->
+  <div class="setup-screen" id="setup-screen">
+    <h2>&#127922; New Game</h2>
+    <div class="player-inputs" id="player-inputs"></div>
+    <div class="setup-btns">
+      <button class="btn btn-ghost btn-sm" onclick="addPlayerInput()">+ Add Player</button>
+      <button class="btn btn-gold" onclick="startGame()">&#9654; Start Game</button>
+    </div>
+  </div>
+
+  <!-- GAME AREA (hidden until started) -->
+  <div id="game-area" style="display:none">
+
+    <!-- Players bar -->
+    <div class="players-bar" id="players-bar"></div>
+
+    <!-- Dice section -->
+    <div class="dice-section">
+      <div class="dice-label">&#127922; <span id="turn-label">Your Turn</span></div>
+      <div class="dice-row" id="dice-row"></div>
+      <div class="dice-info" id="dice-info">Tap dice to <strong>hold</strong> them, then roll again</div>
+      <div class="dice-btns">
+        <button class="btn btn-red" id="roll-btn" onclick="rollDice()">&#127922; Roll Dice</button>
+        <span class="roll-count" id="roll-count"></span>
+      </div>
+    </div>
+
+    <!-- Scorecard tabs -->
+    <div class="scorecard-wrap">
+      <div class="sc-tabs" id="sc-tabs"></div>
+      <div class="scorecard" id="scorecard"></div>
+    </div>
+
+  </div>
+
+  <!-- Game Over screen -->
+  <div id="gameover-area" style="display:none">
+    <div class="gameover-screen">
+      <h2>&#127942; Game Over!</h2>
+      <div class="winner-name" id="winner-name"></div>
+      <div id="final-scores"></div>
+      <button class="btn btn-gold" onclick="newGame()" style="margin-top:12px">&#127922; Play Again</button>
+    </div>
+  </div>
+</div>
+
+<!-- Fixed action bar -->
+<div class="action-bar">
+  <button class="btn btn-blue btn-sm" onclick="openQR()">&#128242; QR Code</button>
+  <button class="btn btn-ghost btn-sm" id="new-game-btn" onclick="newGame()">&#8635; New Game</button>
+</div>
+
+<script type="module">
+import { initializeApp }        from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getDatabase, ref, set, update, onValue } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+
+// ══ FIREBASE ══
+const app = initializeApp({ databaseURL:'https://scoreboard-1677c-default-rtdb.firebaseio.com/' });
+const db  = getDatabase(app);
+const ROOT = 'yahtzee';
+
+// ══ AUDIO ══
+let audioCtx = null;
+function ac(){ return audioCtx || (audioCtx = new(window.AudioContext||window.webkitAudioContext)()); }
+function playDing(){
+  try{const c=ac(),o=c.createOscillator(),g=c.createGain();
+    o.connect(g);g.connect(c.destination);
+    o.type='sine';o.frequency.setValueAtTime(880,c.currentTime);
+    o.frequency.exponentialRampToValueAtTime(1320,c.currentTime+.1);
+    g.gain.setValueAtTime(.35,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.4);
+    o.start();o.stop(c.currentTime+.4);}catch(e){}
+}
+function playRoll(){
+  try{const c=ac();
+    [0,.05,.1,.15,.2].forEach(t=>{
+      const o=c.createOscillator(),g=c.createGain();
+      o.connect(g);g.connect(c.destination);o.type='triangle';
+      o.frequency.setValueAtTime(200+Math.random()*400,c.currentTime+t);
+      g.gain.setValueAtTime(.15,c.currentTime+t);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+t+.08);
+      o.start(c.currentTime+t);o.stop(c.currentTime+t+.1);});}catch(e){}
+}
+function playYahtzee(){
+  try{const c=ac(),notes=[523,659,784,1047,1319];
+    notes.forEach((f,i)=>{
+      const o=c.createOscillator(),g=c.createGain();
+      o.connect(g);g.connect(c.destination);o.type='triangle';
+      const t=c.currentTime+i*.15;
+      o.frequency.setValueAtTime(f,t);
+      g.gain.setValueAtTime(.4,t);g.gain.exponentialRampToValueAtTime(.001,t+.4);
+      o.start(t);o.stop(t+.45);});}catch(e){}
+}
+
+// ══ CONSTANTS ══
+const PLAYER_COLORS=['#f5c842','#34d97b','#f07844','#4f8ef7','#a78bfa','#f0504d','#22d3ee'];
+const CATEGORIES = [
+  // Upper
+  {id:'aces',    name:'Aces',         hint:'Count ● = 1',   section:'upper',max:5},
+  {id:'twos',    name:'Twos',         hint:'Count ●● = 2',  section:'upper',max:10},
+  {id:'threes',  name:'Threes',       hint:'Count ●●● = 3', section:'upper',max:15},
+  {id:'fours',   name:'Fours',        hint:'Count ●●●● = 4',section:'upper',max:20},
+  {id:'fives',   name:'Fives',        hint:'Count ●●●●● = 5',section:'upper',max:25},
+  {id:'sixes',   name:'Sixes',        hint:'Count ●●●●●● = 6',section:'upper',max:30},
+  // Lower
+  {id:'threeKind',name:'3 of a Kind', hint:'Add all dice',  section:'lower',max:30},
+  {id:'fourKind', name:'4 of a Kind', hint:'Add all dice',  section:'lower',max:30},
+  {id:'fullHouse',name:'Full House',  hint:'Score 25',      section:'lower',max:25,fixed:25},
+  {id:'smStraight',name:'Sm. Straight',hint:'Score 30',    section:'lower',max:30,fixed:30},
+  {id:'lgStraight',name:'Lg. Straight',hint:'Score 40',    section:'lower',max:40,fixed:40},
+  {id:'yahtzee',  name:'YAHTZEE',     hint:'Score 50',      section:'lower',max:50,fixed:50},
+  {id:'chance',   name:'Chance',      hint:'Add all dice',  section:'lower',max:30},
+  {id:'yahtzeeBonusCount',name:'Yahtzee Bonus',hint:'✓ each extra (×100)',section:'lower',max:300},
+];
+
+// ══ STATE ══
+let players     = [];       // [{id,name,color,scores:{},rollsLeft,dice,held}]
+let myPlayerId  = null;
+let currentTurnIdx = 0;
+let gameStarted = false;
+let gameOver    = false;
+let ignoreRemote= false;
+let qrDone      = false;
+let viewingPlayer = null;  // which player's scorecard we're viewing
+let setupInputs = [];      // local setup names
+
+// ══ INIT ══
+updateClock(); setInterval(updateClock,1000);
+initSetup();
+setupFirebase();
+
+// ══ FIREBASE ══
+function setupFirebase(){
+  onValue(ref(db,'.info/connected'),s=>{
+    const on=s.val();
+    document.getElementById('cdot').className='cdot '+(on?'on':'off');
+    document.getElementById('ctext').textContent=on?'Connected':'Offline…';
+  });
+  onValue(ref(db,ROOT),s=>{
+    if(ignoreRemote)return;
+    const d=s.val();
+    if(!d)return;
+    applyRemote(d);
+  },e=>showErr(e.message));
+}
+function push(partial){
+  ignoreRemote=true;
+  update(ref(db,ROOT),partial).finally(()=>setTimeout(()=>ignoreRemote=false,400));
+}
+function pushAll(){
+  ignoreRemote=true;
+  set(ref(db,ROOT),{players,currentTurnIdx,gameStarted,gameOver}).finally(()=>setTimeout(()=>ignoreRemote=false,400));
+}
+function applyRemote(d){
+  if(d.players) players=d.players;
+  if(d.currentTurnIdx!==undefined) currentTurnIdx=d.currentTurnIdx;
+  if(d.gameStarted!==undefined) gameStarted=d.gameStarted;
+  if(d.gameOver!==undefined) gameOver=d.gameOver;
+  if(gameStarted){
+    document.getElementById('setup-screen').style.display='none';
+    document.getElementById('game-area').style.display='block';
+    renderGame();
+  }
+  if(gameOver) showGameOver();
+}
+
+// ══ SETUP ══
+function initSetup(){
+  setupInputs=[{name:'',color:PLAYER_COLORS[0]},{name:'',color:PLAYER_COLORS[1]}];
+  renderSetupInputs();
+}
+function renderSetupInputs(){
+  const c=document.getElementById('player-inputs');
+  c.innerHTML='';
+  setupInputs.forEach((p,i)=>{
+    const row=document.createElement('div');row.className='pi-row';
+    row.innerHTML=`
+      <div class="color-dot" style="background:${p.color}"></div>
+      <input type="text" placeholder="Player ${i+1} name" value="${p.name}"
+        oninput="window._setSetupName(${i},this.value)" maxlength="16">
+      ${setupInputs.length>1?`<button class="pi-del" onclick="window._delSetupPlayer(${i})">×</button>`:''}
+    `;
+    c.appendChild(row);
+  });
+}
+window._setSetupName=(i,v)=>{ setupInputs[i].name=v; };
+window._delSetupPlayer=i=>{ setupInputs.splice(i,1); renderSetupInputs(); };
+window.addPlayerInput=()=>{
+  if(setupInputs.length>=6)return showToast('Max 6 players');
+  setupInputs.push({name:'',color:PLAYER_COLORS[setupInputs.length%PLAYER_COLORS.length]});
+  renderSetupInputs();
+};
+
+window.startGame=()=>{
+  const names=setupInputs.map((p,i)=>p.name.trim()||`Player ${i+1}`);
+  players=names.map((n,i)=>({
+    id:'p'+i, name:n, color:PLAYER_COLORS[i%PLAYER_COLORS.length],
+    scores:{}, rollsLeft:3, dice:[1,1,1,1,1], held:[false,false,false,false,false]
+  }));
+  myPlayerId=players[0].id; // first to start is "me" on this device
+  viewingPlayer=players[0].id;
+  currentTurnIdx=0; gameStarted=true; gameOver=false;
+  document.getElementById('setup-screen').style.display='none';
+  document.getElementById('game-area').style.display='block';
+  pushAll();
+  renderGame();
+};
+
+// ══ RENDER GAME ══
+function renderGame(){
+  renderPlayersBar();
+  renderDice();
+  renderScorecard();
+  updateTurnLabel();
+}
+
+function renderPlayersBar(){
+  const bar=document.getElementById('players-bar');
+  const tabs=document.getElementById('sc-tabs');
+  bar.innerHTML=''; tabs.innerHTML='';
+  players.forEach((p,i)=>{
+    const total=calcGrandTotal(p.scores);
+    const isActive=i===currentTurnIdx;
+    const isView=p.id===viewingPlayer;
+    // Badge
+    const b=document.createElement('div');
+    b.className='player-badge'+(isActive?' active':'');
+    b.style.borderColor=isActive?p.color:'';
+    b.style.color=isActive?p.color:'';
+    b.innerHTML=`${p.name}<span class="pb-score">${total} pts</span>`;
+    bar.appendChild(b);
+    // Tab
+    const t=document.createElement('div');
+    t.className='sc-tab'+(isView?' active':'');
+    t.style.borderColor=isView?p.color:'';
+    t.style.color=isView?p.color:'';
+    const done=countFilled(p.scores);
+    t.innerHTML=`${p.name}<span class="tab-score">${total} pts · ${done}/${CATEGORIES.length}</span>`;
+    t.onclick=()=>{ viewingPlayer=p.id; renderScorecard(); renderPlayersBar(); };
+    tabs.appendChild(t);
+  });
+}
+
+function updateTurnLabel(){
+  const cp=players[currentTurnIdx];
+  if(!cp)return;
+  const isMyTurn=cp.id===myPlayerId||true; // all players on same/different devices
+  document.getElementById('turn-label').textContent=`${cp.name}'s Turn`;
+  const rollBtn=document.getElementById('roll-btn');
+  rollBtn.disabled=cp.rollsLeft<=0;
+  document.getElementById('roll-count').textContent=cp.rollsLeft>0?`${cp.rollsLeft} roll${cp.rollsLeft!==1?'s':''} left`:'No rolls left';
+}
+
+// ══ DICE ══
+function renderDice(){
+  const cp=players[currentTurnIdx];
+  if(!cp)return;
+  const row=document.getElementById('dice-row');
+  row.innerHTML='';
+  cp.dice.forEach((val,i)=>{
+    const wrap=document.createElement('div');wrap.className='die-wrap';
+    const die=document.createElement('div');
+    die.className='die'+(cp.held[i]?' held':'');
+    die.appendChild(makePips(val));
+    die.onclick=()=>toggleHold(i);
+    wrap.appendChild(die);
+    row.appendChild(wrap);
+  });
+  // Suggestions
+  highlightSuggestions();
+}
+
+function makePips(val){
+  const g=document.createElement('div');
+  g.className=`pip-grid p${val}`;
+  for(let i=0;i<val;i++){const p=document.createElement('div');p.className='pip';g.appendChild(p);}
+  return g;
+}
+
+function toggleHold(i){
+  const cp=players[currentTurnIdx];
+  if(cp.rollsLeft===3)return; // must roll once first
+  cp.held[i]=!cp.held[i];
+  renderDice();
+  push({players});
+}
+
+window.rollDice=()=>{
+  const cp=players[currentTurnIdx];
+  if(!cp||cp.rollsLeft<=0)return;
+  playRoll();
+  // Animate
+  const dice=document.querySelectorAll('.die');
+  dice.forEach((d,i)=>{ if(!cp.held[i])d.classList.add('rolling'); });
+  setTimeout(()=>dice.forEach(d=>d.classList.remove('rolling')),520);
+  // Roll un-held dice
+  cp.dice=cp.dice.map((v,i)=>cp.held[i]?v:Math.ceil(Math.random()*6));
+  cp.rollsLeft--;
+  if(cp.rollsLeft===0){
+    document.getElementById('dice-info').innerHTML='<strong style="color:var(--accent)">Pick a score category!</strong>';
+  } else {
+    document.getElementById('dice-info').innerHTML=`Tap dice to <strong>hold</strong> them, then roll again`;
+  }
+  setTimeout(()=>{ renderDice(); updateTurnLabel(); push({players}); },50);
+};
+
+// ══ SCORE SUGGESTIONS ══
+function highlightSuggestions(){
+  // called after renderScorecard builds buttons - defer
+  setTimeout(()=>{
+    const cp=players[currentTurnIdx];
+    if(!cp||cp.rollsLeft===3)return; // haven't rolled yet
+    CATEGORIES.forEach(cat=>{
+      const btn=document.querySelector(`[data-cat="${cat.id}"][data-pid="${cp.id}"]`);
+      if(!btn||btn.classList.contains('filled'))return;
+      const suggested=calcScore(cat.id,cp.dice);
+      if(suggested>0) btn.classList.add('suggested');
+      btn.textContent=suggested>0?`+${suggested}`:'0';
+    });
+  },10);
+}
+
+// ══ SCORECARD ══
+function renderScorecard(){
+  const sc=document.getElementById('scorecard');
+  const vp=players.find(p=>p.id===viewingPlayer)||players[0];
+  if(!vp){sc.innerHTML='';return;}
+
+  const colStyle=`grid-template-columns: 1fr 90px;`;
+
+  let html='';
+
+  // Upper Section
+  html+=`<div class="sc-row section-header" style="${colStyle}">
+    <div class="cat-cell"><div class="cat-name">UPPER SECTION</div></div>
+    <div class="score-cell" style="font-size:.65rem;color:var(--muted);text-align:center;padding:8px 4px;">Score</div>
+  </div>`;
+
+  CATEGORIES.filter(c=>c.section==='upper').forEach(cat=>{
+    const score=vp.scores[cat.id];
+    const filled=score!==undefined;
+    const cp=players[currentTurnIdx];
+    const isMyTurn=cp&&cp.id===vp.id&&cp.rollsLeft<3;
+    const suggested=!filled&&isMyTurn?calcScore(cat.id,cp.dice):null;
+    html+=scoreRow(cat,vp,filled,score,suggested,colStyle);
+  });
+
+  // Upper totals
+  const upperRaw=calcUpperRaw(vp.scores);
+  const bonus=upperRaw>=63?35:0;
+  const upperTotal=upperRaw+bonus;
+  html+=`<div class="sc-row total-row" style="${colStyle}">
+    <div class="cat-cell"><div class="cat-name">Upper Total</div><div class="cat-hint">Need 63 for +35 bonus</div></div>
+    <div class="score-cell"><button class="score-btn total-val">${upperRaw}</button></div>
+  </div>
+  <div class="sc-row bonus-row" style="${colStyle}">
+    <div class="cat-cell"><div class="cat-name">Bonus</div><div class="cat-hint">+35 if ≥ 63</div></div>
+    <div class="score-cell"><button class="score-btn total-val bonus-val">${bonus?'+35':'—'}</button></div>
+  </div>`;
+
+  // Lower Section
+  html+=`<div class="sc-row section-header" style="${colStyle}">
+    <div class="cat-cell"><div class="cat-name">LOWER SECTION</div></div>
+    <div class="score-cell"></div>
+  </div>`;
+  CATEGORIES.filter(c=>c.section==='lower').forEach(cat=>{
+    const score=vp.scores[cat.id];
+    const filled=score!==undefined;
+    const cp=players[currentTurnIdx];
+    const isMyTurn=cp&&cp.id===vp.id&&cp.rollsLeft<3;
+    const suggested=!filled&&isMyTurn?calcScore(cat.id,cp.dice):null;
+    html+=scoreRow(cat,vp,filled,score,suggested,colStyle);
+  });
+
+  // Grand total
+  const grand=calcGrandTotal(vp.scores);
+  html+=`<div class="sc-row total-row" style="${colStyle}">
+    <div class="cat-cell"><div class="cat-name">GRAND TOTAL</div></div>
+    <div class="score-cell"><button class="score-btn total-val" style="font-size:1.1rem">${grand}</button></div>
+  </div>`;
+
+  sc.innerHTML=html;
+
+  // Attach click handlers
+  sc.querySelectorAll('.score-btn[data-cat]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const catId=btn.dataset.cat;
+      const pid=btn.dataset.pid;
+      scoreCategory(pid,catId);
+    });
+  });
+}
+
+function scoreRow(cat,vp,filled,score,suggested,colStyle){
+  const cp=players[currentTurnIdx];
+  const isActiveTurn=cp&&cp.id===vp.id;
+  const canScore=!filled&&isActiveTurn&&cp.rollsLeft<3;
+  const dispScore=filled?score:(suggested!==null?suggested:null);
+  const cls='score-btn'+(filled?' filled mine':'')+(suggested&&!filled?' suggested':'');
+  const dis=(!canScore&&!filled)?'disabled':'';
+  const txt=filled?(score===0?'—':score):(suggested!==null&&!filled?`+${suggested}`:'');
+  return `<div class="sc-row" style="${colStyle}">
+    <div class="cat-cell"><div class="cat-name">${cat.name}</div><div class="cat-hint">${cat.hint}</div></div>
+    <div class="score-cell">
+      <button class="${cls}" data-cat="${cat.id}" data-pid="${vp.id}" ${dis} ${filled?'disabled':''}>
+        ${txt}
+      </button>
+    </div>
+  </div>`;
+}
+
+// ══ SCORING ══
+function scoreCategory(pid,catId){
+  const p=players.find(x=>x.id===pid);
+  const cp=players[currentTurnIdx];
+  if(!p||!cp||cp.id!==pid)return; // only current player can score
+  if(p.scores[catId]!==undefined)return;
+  if(cp.rollsLeft===3)return; // must roll first
+
+  const score=calcScore(catId,cp.dice);
+  p.scores[catId]=score;
+  playDing();
+
+  if(catId==='yahtzee'&&score===50){ playYahtzee(); showYahtzeeBlast(); }
+  // Yahtzee bonus
+  if(catId!=='yahtzee'&&cp.dice.every(d=>d===cp.dice[0])&&p.scores.yahtzee===50){
+    p.scores.yahtzeeBonusCount=(p.scores.yahtzeeBonusCount||0)+100;
+    playYahtzee();
+  }
+
+  // Reset for next turn
+  cp.rollsLeft=3;
+  cp.held=[false,false,false,false,false];
+  document.getElementById('dice-info').innerHTML='Tap dice to <strong>hold</strong> them, then roll again';
+
+  // Advance turn
+  currentTurnIdx=(currentTurnIdx+1)%players.length;
+  viewingPlayer=players[currentTurnIdx].id;
+
+  // Check game over
+  const allDone=players.every(p=>countFilled(p.scores)>=CATEGORIES.length);
+  if(allDone){ gameOver=true; pushAll(); showGameOver(); return; }
+
+  pushAll();
+  renderGame();
+  showToast(`${p.name} scored ${score} for ${catId}!`);
+}
+
+// ══ SCORE CALCULATION ══
+function calcScore(catId,dice){
+  const counts=Array(7).fill(0);
+  dice.forEach(d=>counts[d]++);
+  const sum=dice.reduce((a,b)=>a+b,0);
+  const vals=[...new Set(dice)].sort();
+  switch(catId){
+    case 'aces':   return dice.filter(d=>d===1).reduce((a,b)=>a+b,0);
+    case 'twos':   return dice.filter(d=>d===2).reduce((a,b)=>a+b,0);
+    case 'threes': return dice.filter(d=>d===3).reduce((a,b)=>a+b,0);
+    case 'fours':  return dice.filter(d=>d===4).reduce((a,b)=>a+b,0);
+    case 'fives':  return dice.filter(d=>d===5).reduce((a,b)=>a+b,0);
+    case 'sixes':  return dice.filter(d=>d===6).reduce((a,b)=>a+b,0);
+    case 'threeKind': return counts.some(c=>c>=3)?sum:0;
+    case 'fourKind':  return counts.some(c=>c>=4)?sum:0;
+    case 'fullHouse': return(counts.includes(3)&&counts.includes(2))||counts.filter(c=>c>0).length===1&&counts.some(c=>c===5)?25:0;
+    case 'smStraight':{
+      const u=[...new Set(dice)].sort((a,b)=>a-b).join('');
+      return(['1234','2345','3456','12345','23456','123456'].some(s=>s.includes(u.slice(0,4)))||
+             [1,2,3,4].every(v=>dice.includes(v))||[2,3,4,5].every(v=>dice.includes(v))||[3,4,5,6].every(v=>dice.includes(v)))?30:0;
+    }
+    case 'lgStraight':{
+      const s=[...new Set(dice)].sort((a,b)=>a-b);
+      return(s.length===5&&s[4]-s[0]===4)?40:0;
+    }
+    case 'yahtzee': return counts.some(c=>c===5)?50:0;
+    case 'chance':  return sum;
+    case 'yahtzeeBonusCount': return 0; // handled separately
+    default: return 0;
+  }
+}
+
+function calcUpperRaw(scores){
+  return ['aces','twos','threes','fours','fives','sixes'].reduce((a,c)=>a+(scores[c]||0),0);
+}
+function calcGrandTotal(scores){
+  const upper=calcUpperRaw(scores);
+  const bonus=upper>=63?35:0;
+  const lower=['threeKind','fourKind','fullHouse','smStraight','lgStraight','yahtzee','chance','yahtzeeBonusCount']
+    .reduce((a,c)=>a+(scores[c]||0),0);
+  return upper+bonus+lower;
+}
+function countFilled(scores){ return Object.keys(scores).filter(k=>k!=='yahtzeeBonusCount').length; }
+
+// ══ GAME OVER ══
+function showGameOver(){
+  document.getElementById('game-area').style.display='none';
+  document.getElementById('gameover-area').style.display='block';
+  const sorted=[...players].sort((a,b)=>calcGrandTotal(b.scores)-calcGrandTotal(a.scores));
+  document.getElementById('winner-name').textContent='🏆 '+sorted[0].name+' wins!';
+  document.getElementById('final-scores').innerHTML=sorted.map((p,i)=>`
+    <div class="fs-row">
+      <span class="fs-name" style="color:${p.color}">${i===0?'🥇':i===1?'🥈':'🥉'} ${p.name}</span>
+      <span class="fs-score">${calcGrandTotal(p.scores)}</span>
+    </div>`).join('');
+}
+
+window.newGame=()=>{
+  gameStarted=false; gameOver=false;
+  document.getElementById('game-area').style.display='none';
+  document.getElementById('gameover-area').style.display='none';
+  document.getElementById('setup-screen').style.display='block';
+  initSetup();
+  push({gameStarted:false,gameOver:false});
+};
+
+// ══ YAHTZEE BLAST ══
+function showYahtzeeBlast(){
+  const el=document.getElementById('ytz-blast');
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),1800);
+}
+
+// ══ QR ══
+window.openQR=()=>{
+  const url=window.location.href;
+  document.getElementById('qr-url').textContent=url;
+  if(!qrDone){
+    document.getElementById('qr-box').innerHTML='';
+    new QRCode(document.getElementById('qr-box'),{
+      text:url,width:200,height:200,
+      colorDark:'#f5c842',colorLight:'#16213e',
+      correctLevel:QRCode.CorrectLevel.H
+    });
+    qrDone=true;
+  }
+  document.getElementById('qr-modal').classList.add('show');
+};
+window.closeQR=()=>document.getElementById('qr-modal').classList.remove('show');
+document.getElementById('qr-modal').addEventListener('click',e=>{
+  if(e.target===document.getElementById('qr-modal'))window.closeQR();
+});
+
+// ══ CLOCK ══
+function updateClock(){
+  const n=new Date();
+  document.getElementById('date-disp').textContent=
+    n.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+  document.getElementById('time-disp').textContent=
+    n.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
+}
+
+// ══ UTILS ══
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2400);
+}
+function showErr(msg){
+  const b=document.getElementById('err-banner');
+  b.textContent='⚠️ '+msg;b.classList.add('show');
+}
+window.autoSize=el=>{el.style.width='10px';el.style.width=(el.scrollWidth+6)+'px';};
+
+</script>
+</body>
+</html>
