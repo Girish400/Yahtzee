@@ -7,293 +7,430 @@
 <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
+/* ═══════════════ TOKENS ═══════════════ */
 :root{
-  --ink:#222;--bg:#fff;--hbg:#f2f2f2;--card:#fafafa;
-  --gold:#d4a017;--green:#15803d;--red:#cc0000;
-  --sbg:#dcfce7;--zbg:#fee2e2;
-  --fxs:clamp(.52rem,1.4vw,.72rem);
-  --fsm:clamp(.62rem,1.7vw,.82rem);
-  --fmd:clamp(.72rem,2vw,.95rem);
-  --die:clamp(40px,9.5vw,68px);
-  --pip:clamp(5px,1.2vw,9px);
-  --pad:clamp(6px,2vw,16px);
-  --gap:clamp(3px,.9vw,8px);
-  --row:clamp(20px,3.8vw,30px);
+  --ink:#1a1a1a; --bg:#fff; --hbg:#f0f0f0; --card:#f9f9f9;
+  --gold:#c8920a; --green:#166534; --red:#b91c1c;
+  --sbg:#dcfce7;  --zbg:#fee2e2;
+
+  /* FONT SIZES — all bumped up */
+  --fxs: clamp(.72rem, 1.8vw, .88rem);
+  --fsm: clamp(.82rem, 2.1vw, 1rem);
+  --fmd: clamp(.92rem, 2.4vw, 1.12rem);
+  --flg: clamp(1rem,   2.8vw, 1.25rem);
+
+  /* layout */
+  --die: clamp(44px, 10vw, 72px);
+  --pip: clamp(6px,  1.4vw, 10px);
+  --pad: clamp(8px,  2.2vw, 18px);
+  --gap: clamp(4px,  1vw,   10px);
+  --row: clamp(24px, 4.2vw, 34px);
 }
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0;}
+
+*{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; margin:0; padding:0; }
+
 body{
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  background:#ddd;min-height:100vh;
-  display:flex;justify-content:center;align-items:flex-start;
-  padding:clamp(4px,1.5vw,20px);
+  background:#ccc; min-height:100vh;
+  display:flex; justify-content:center; align-items:flex-start;
+  padding:clamp(6px,2vw,22px);
 }
+
+/* ═══════════════ CARD ═══════════════ */
 .card{
-  width:100%;max-width:min(98vw,660px);
-  background:var(--bg);border:2px solid var(--ink);
-  padding:var(--pad);box-shadow:0 4px 16px rgba(0,0,0,.12);
+  width:100%; max-width:min(98vw,660px);
+  background:var(--bg); border:2px solid var(--ink);
+  padding:var(--pad); box-shadow:0 4px 20px rgba(0,0,0,.14);
 }
-/* TABS */
-.tabs{display:flex;gap:2px;margin-bottom:var(--gap);overflow-x:auto;padding-bottom:1px;}
+
+/* ═══════════════ TABS ═══════════════ */
+.tabs{ display:flex; gap:2px; margin-bottom:var(--gap); overflow-x:auto; padding-bottom:2px; }
 .tab{
-  background:#f0f0f0;border:1px solid #bbb;border-bottom:none;
-  border-radius:3px 3px 0 0;
-  padding:clamp(2px,.6vw,5px) clamp(6px,1.6vw,14px);
-  font-size:var(--fxs);font-weight:700;cursor:pointer;white-space:nowrap;
-  flex-shrink:0;color:#777;transition:all .15s;line-height:1.3;
+  background:#ebebeb; border:1px solid #bbb; border-bottom:none;
+  border-radius:4px 4px 0 0;
+  padding:clamp(3px,.8vw,7px) clamp(8px,2vw,16px);
+  font-size:var(--fxs); font-weight:700; cursor:pointer;
+  white-space:nowrap; flex-shrink:0; color:#777;
+  transition:all .15s; line-height:1.35;
 }
-.tab.active{background:var(--bg);border-color:var(--ink);color:var(--ink);}
-.tab.myturn::after{content:' 🎲';font-size:var(--fxs);}
-.tab-pts{font-size:calc(var(--fxs) - .06rem);color:#999;font-weight:400;}
-/* NAME BAR */
+.tab.active{ background:var(--bg); border-color:var(--ink); color:var(--ink); }
+.tab.myturn::after{ content:' 🎲'; }
+.tab-pts{ font-size:var(--fxs); color:#999; font-weight:400; }
+
+/* ═══════════════ NAME BAR ═══════════════ */
 .namebar{
-  display:flex;align-items:center;gap:var(--gap);
-  border-bottom:1px solid #ccc;margin-bottom:var(--gap);
-  padding-bottom:clamp(2px,.5vw,5px);
+  display:flex; align-items:center; gap:var(--gap);
+  border-bottom:1px solid #ccc; margin-bottom:var(--gap);
+  padding-bottom:clamp(3px,.7vw,7px);
 }
-.nb-label{font-size:var(--fsm);font-weight:800;white-space:nowrap;}
-.nb-name{font-size:var(--fsm);font-weight:700;flex:1;}
-.nb-score{font-size:var(--fxs);color:#555;white-space:nowrap;}
-.dot{width:clamp(6px,1.2vw,9px);height:clamp(6px,1.2vw,9px);
-  border-radius:50%;background:#aaa;flex-shrink:0;transition:background .3s;}
-.dot.on{background:var(--green);}.dot.off{background:var(--red);}
-/* DICE PANEL */
+.nb-label{ font-size:var(--fsm); font-weight:800; white-space:nowrap; }
+.nb-name { font-size:var(--fsm); font-weight:700; flex:1; }
+.nb-score{ font-size:var(--fxs); color:#555; white-space:nowrap; }
+.dot{
+  width:clamp(7px,1.4vw,10px); height:clamp(7px,1.4vw,10px);
+  border-radius:50%; background:#bbb; flex-shrink:0; transition:background .3s;
+}
+.dot.on{ background:var(--green); } .dot.off{ background:var(--red); }
+
+/* ═══════════════ DICE PANEL ═══════════════ */
 .dice-panel{
-  background:#f6f6f6;border:1px solid #ccc;border-radius:4px;
-  padding:var(--gap);margin-bottom:var(--gap);
+  background:#f4f4f4; border:1px solid #ccc; border-radius:6px;
+  padding:var(--gap); margin-bottom:var(--gap);
 }
-.dice-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--gap);}
-.turn-lbl{font-size:var(--fmd);font-weight:800;}
-.roll-lbl{font-size:var(--fxs);color:#555;}
-.dice-row{display:flex;justify-content:space-evenly;margin-bottom:var(--gap);}
-.die-wrap{display:flex;flex-direction:column;align-items:center;gap:1px;}
+.dice-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--gap); }
+.turn-lbl{ font-size:var(--flg); font-weight:800; }
+.roll-lbl{ font-size:var(--fsm); color:#555; }
+.dice-row{ display:flex; justify-content:space-evenly; margin-bottom:var(--gap); }
+.die-wrap{ display:flex; flex-direction:column; align-items:center; gap:2px; }
 .die{
-  width:var(--die);height:var(--die);
-  border-radius:clamp(5px,1.2vw,10px);background:#fff;
-  border:1.5px solid #555;
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:2px 2px 0 #aaa;transition:border-color .12s,background .12s;
+  width:var(--die); height:var(--die);
+  border-radius:clamp(6px,1.4vw,11px); background:#fff;
+  border:2px solid #555;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:2px 2px 0 #aaa; transition:border-color .12s,background .12s;
 }
-.die.held{background:#fffbeb;border:2px solid var(--gold);box-shadow:2px 2px 0 var(--gold);}
-.die.rolling{animation:shake .36s ease-in-out;}
+.die.mine{ cursor:pointer; }
+.die.mine:hover{ box-shadow:3px 3px 0 #777; transform:translateY(-1px); }
+.die.held{ background:#fffbeb; border-color:var(--gold); box-shadow:2px 2px 0 var(--gold); }
+.die.rolling{ animation:shake .38s ease-in-out; }
 @keyframes shake{
-  0%,100%{transform:rotate(0)scale(1)}
-  20%{transform:rotate(-12deg)scale(1.08)}
-  40%{transform:rotate(9deg)scale(.93)}
-  60%{transform:rotate(-6deg)scale(1.06)}
-  80%{transform:rotate(4deg)scale(.97)}
+  0%,100%{ transform:rotate(0) scale(1) }
+  20%{ transform:rotate(-13deg) scale(1.1) }
+  40%{ transform:rotate(10deg) scale(.92) }
+  60%{ transform:rotate(-7deg) scale(1.07) }
+  80%{ transform:rotate(5deg) scale(.96) }
 }
-.held-lbl{font-size:clamp(.42rem,1vw,.56rem);font-weight:900;
-  color:var(--gold);text-transform:uppercase;height:clamp(7px,1.2vw,10px);line-height:1;}
+.held-lbl{
+  font-size:clamp(.48rem,1.1vw,.62rem); font-weight:900;
+  color:var(--gold); text-transform:uppercase;
+  height:clamp(8px,1.4vw,12px); line-height:1;
+}
+
 /* PIPS */
-.pg{display:grid;padding:clamp(2px,.5vw,4px);gap:clamp(1px,.3vw,3px);
-  width:calc(var(--die)*.74);height:calc(var(--die)*.74);}
-.pip{width:var(--pip);height:var(--pip);border-radius:50%;background:#111;}
-.p1{grid-template:repeat(3,1fr)/repeat(3,1fr);}
-.p1 .pip{grid-column:2;grid-row:2;align-self:center;justify-self:center;}
-.p2{grid-template:repeat(2,1fr)/repeat(2,1fr);}
-.p2 .pip:nth-child(1){grid-column:1;grid-row:1;align-self:start;justify-self:start;}
-.p2 .pip:nth-child(2){grid-column:2;grid-row:2;align-self:end;justify-self:end;}
-.p3{grid-template:repeat(3,1fr)/repeat(3,1fr);}
-.p3 .pip:nth-child(1){grid-column:1;grid-row:1;}
-.p3 .pip:nth-child(2){grid-column:2;grid-row:2;align-self:center;justify-self:center;}
-.p3 .pip:nth-child(3){grid-column:3;grid-row:3;}
-.p4{grid-template:repeat(2,1fr)/repeat(2,1fr);}
-.p5{grid-template:repeat(3,1fr)/repeat(3,1fr);}
-.p5 .pip:nth-child(1){grid-column:1;grid-row:1;}
-.p5 .pip:nth-child(2){grid-column:3;grid-row:1;}
-.p5 .pip:nth-child(3){grid-column:2;grid-row:2;align-self:center;justify-self:center;}
-.p5 .pip:nth-child(4){grid-column:1;grid-row:3;}
-.p5 .pip:nth-child(5){grid-column:3;grid-row:3;}
-.p6{grid-template:repeat(3,1fr)/repeat(2,1fr);}
-.dice-btns{display:flex;align-items:center;gap:var(--gap);}
-.dice-hint{font-size:var(--fxs);color:#666;flex:1;line-height:1.3;}
-.dice-hint b{color:var(--red);}
-/* BUTTONS */
+.pg{ display:grid; padding:clamp(2px,.5vw,5px); gap:clamp(1px,.3vw,3px);
+     width:calc(var(--die)*.74); height:calc(var(--die)*.74); }
+.pip{ width:var(--pip); height:var(--pip); border-radius:50%; background:#111; }
+.p1{ grid-template:repeat(3,1fr)/repeat(3,1fr); }
+.p1 .pip{ grid-column:2; grid-row:2; align-self:center; justify-self:center; }
+.p2{ grid-template:repeat(2,1fr)/repeat(2,1fr); }
+.p2 .pip:nth-child(1){ grid-column:1; grid-row:1; align-self:start; justify-self:start; }
+.p2 .pip:nth-child(2){ grid-column:2; grid-row:2; align-self:end; justify-self:end; }
+.p3{ grid-template:repeat(3,1fr)/repeat(3,1fr); }
+.p3 .pip:nth-child(1){ grid-column:1; grid-row:1; }
+.p3 .pip:nth-child(2){ grid-column:2; grid-row:2; align-self:center; justify-self:center; }
+.p3 .pip:nth-child(3){ grid-column:3; grid-row:3; }
+.p4{ grid-template:repeat(2,1fr)/repeat(2,1fr); }
+.p5{ grid-template:repeat(3,1fr)/repeat(3,1fr); }
+.p5 .pip:nth-child(1){ grid-column:1; grid-row:1; }
+.p5 .pip:nth-child(2){ grid-column:3; grid-row:1; }
+.p5 .pip:nth-child(3){ grid-column:2; grid-row:2; align-self:center; justify-self:center; }
+.p5 .pip:nth-child(4){ grid-column:1; grid-row:3; }
+.p5 .pip:nth-child(5){ grid-column:3; grid-row:3; }
+.p6{ grid-template:repeat(3,1fr)/repeat(2,1fr); }
+
+.dice-btns{ display:flex; align-items:center; gap:var(--gap); }
+.dice-hint{ font-size:var(--fsm); color:#555; flex:1; line-height:1.35; }
+.dice-hint b{ color:var(--red); }
+
+/* ═══════════════ BUTTONS ═══════════════ */
 .btn{
-  padding:clamp(4px,.9vw,8px) clamp(8px,2.2vw,18px);
-  border:1.5px solid var(--ink);border-radius:3px;
-  cursor:pointer;font-size:var(--fsm);font-weight:700;
-  font-family:inherit;display:inline-flex;align-items:center;
-  gap:3px;transition:all .12s;white-space:nowrap;
+  padding:clamp(5px,1.1vw,10px) clamp(10px,2.4vw,20px);
+  border:2px solid var(--ink); border-radius:4px;
+  cursor:pointer; font-size:var(--fsm); font-weight:700;
+  font-family:inherit; display:inline-flex; align-items:center;
+  gap:4px; transition:all .12s; white-space:nowrap; line-height:1;
 }
-.btn:hover{filter:brightness(.9);}
-.btn:active{transform:scale(.96);}
-.btn-red{background:var(--red);color:#fff;border-color:var(--red);}
-.btn-gray{background:#efefef;color:#333;border-color:#999;
-  font-size:var(--fxs);padding:clamp(3px,.6vw,6px) clamp(6px,1.4vw,12px);}
-.btn:disabled{opacity:.35;cursor:not-allowed;transform:none!important;}
-/* TABLE */
-table{width:100%;border-collapse:collapse;font-size:var(--fsm);table-layout:fixed;}
-th,td{border:1px solid var(--ink);text-align:center;
-  padding:clamp(2px,.5vw,4px);height:var(--row);}
-.la{text-align:left;padding-left:clamp(3px,.6vw,6px);}
-thead th{background:var(--hbg);font-size:var(--fxs);text-transform:uppercase;}
-.sh{background:#eee;font-weight:800;text-transform:uppercase;font-size:var(--fsm);}
-.tr{font-weight:800;background:#f6f6f6;}
-.sb{background:var(--card);}
-.col-c{width:34%;}
-.col-h{width:28%;}
-.col-s{width:38%;}
-/* SCORE BUTTONS */
-.sb-btn{
-  width:100%;height:100%;min-height:clamp(18px,3vw,26px);
-  border:none;background:transparent;text-align:center;
-  font-size:var(--fmd);font-weight:700;cursor:pointer;
-  font-family:inherit;border-radius:1px;transition:all .14s;color:var(--ink);
+.btn:hover{ filter:brightness(.88); }
+.btn:active{ transform:scale(.96); }
+.btn-red { background:var(--red);  color:#fff; border-color:var(--red); }
+.btn-gray{ background:#ececec; color:#333; border-color:#999;
+           font-size:var(--fxs); padding:clamp(4px,.8vw,8px) clamp(8px,1.8vw,14px); }
+.btn-grn { background:var(--green); color:#fff; border-color:var(--green); }
+.btn:disabled{ opacity:.32; cursor:not-allowed; transform:none!important; }
+
+/* ═══════════════ TABLE ═══════════════ */
+table{ width:100%; border-collapse:collapse; font-size:var(--fsm); table-layout:fixed; }
+th,td{
+  border:1px solid var(--ink); text-align:center;
+  padding:clamp(2px,.6vw,5px); height:var(--row);
 }
-.sb-btn:hover:not(:disabled):not(.filled){background:#e8f4ff;}
-.sb-btn.filled{cursor:default;}
-.sb-btn.sug{background:var(--sbg);color:var(--green);font-weight:800;
-  animation:pulse .9s ease-in-out infinite alternate;}
-@keyframes pulse{from{box-shadow:none}to{box-shadow:inset 0 0 6px rgba(21,128,61,.4)}}
-.sb-btn.zsug{background:var(--zbg);color:var(--red);}
-.sb-btn.stat{cursor:default;}
-.sb-btn.bon{color:var(--green);font-weight:800;}
-.sb-btn:disabled:not(.filled):not(.stat){opacity:.28;cursor:not-allowed;}
-/* TOOLBAR */
-.toolbar{display:flex;gap:var(--gap);justify-content:center;flex-wrap:wrap;
-  margin-top:var(--gap);padding-top:var(--gap);border-top:1px solid #ddd;}
-/* OVERLAYS */
-.overlay{
-  position:fixed;inset:0;z-index:500;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  opacity:0;pointer-events:none;transition:opacity .22s;
+.la{ text-align:left; padding-left:clamp(4px,.8vw,8px); }
+thead th{ background:var(--hbg); font-size:var(--fxs); text-transform:uppercase; }
+.sh{ background:#e8e8e8; font-weight:800; text-transform:uppercase; font-size:var(--fsm); }
+.tr{ font-weight:800; background:#f4f4f4; }
+.sb{ background:var(--card); }
+.col-c{ width:34%; } .col-h{ width:28%; } .col-s{ width:38%; }
+
+/* score cell buttons */
+.sbb{
+  width:100%; height:100%; min-height:clamp(22px,3.5vw,30px);
+  border:none; background:transparent; text-align:center;
+  font-size:var(--fmd); font-weight:700; cursor:pointer;
+  font-family:inherit; border-radius:2px; transition:all .14s; color:var(--ink);
 }
-.overlay.vis{opacity:1;pointer-events:all;}
-/* SETUP */
-#ov-setup{background:#ddd;z-index:700;}
+.sbb:hover:not(:disabled):not(.filled){ background:#dbeafe; }
+.sbb.filled{ cursor:default; }
+.sbb.sug{
+  background:var(--sbg); color:var(--green); font-weight:800;
+  animation:pulse .9s ease-in-out infinite alternate;
+}
+@keyframes pulse{ from{box-shadow:none} to{box-shadow:inset 0 0 7px rgba(22,101,52,.45)} }
+.sbb.zsug{ background:var(--zbg); color:var(--red); }
+.sbb.stat{ cursor:default; }
+.sbb.bon { color:var(--green); font-weight:800; }
+.sbb:disabled:not(.filled):not(.stat){ opacity:.25; cursor:not-allowed; }
+
+/* ═══════════════ TOOLBAR ═══════════════ */
+.toolbar{
+  display:flex; gap:var(--gap); justify-content:center; flex-wrap:wrap;
+  margin-top:var(--gap); padding-top:var(--gap); border-top:1px solid #ddd;
+}
+
+/* ═══════════════ OVERLAYS ═══════════════ */
+.ov{
+  position:fixed; inset:0; z-index:500;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none; transition:opacity .22s;
+  padding:clamp(12px,3vw,28px);
+}
+.ov.vis{ opacity:1; pointer-events:all; }
+
+/* HOST SETUP */
+#ov-host{ background:#ccc; z-index:700; }
 .setup-box{
-  background:#fff;border:2px solid var(--ink);border-radius:4px;
-  padding:clamp(14px,3vw,24px);width:100%;max-width:min(96vw,420px);
-  box-shadow:4px 4px 0 rgba(0,0,0,.18);
+  background:#fff; border:2px solid var(--ink); border-radius:6px;
+  padding:clamp(16px,3.5vw,28px); width:100%; max-width:min(96vw,440px);
+  box-shadow:5px 5px 0 rgba(0,0,0,.18);
 }
-.setup-box h2{font-family:'Permanent Marker',cursive;
-  font-size:clamp(1.3rem,5vw,1.9rem);margin-bottom:10px;}
-.setup-sub{font-size:var(--fxs);color:#666;margin-bottom:10px;}
-.setup-list{display:flex;flex-direction:column;gap:clamp(6px,1.2vw,10px);margin-bottom:12px;}
-.setup-row{display:flex;align-items:center;gap:var(--gap);}
-.cdot{width:11px;height:11px;border-radius:50%;border:1px solid #aaa;flex-shrink:0;}
-.setup-row input{flex:1;border:1px solid #ccc;border-radius:2px;
-  padding:clamp(5px,1vw,8px) clamp(6px,1.2vw,10px);
-  font-size:var(--fmd);font-family:inherit;}
-.del-btn{background:none;border:1px solid #ccc;color:#aaa;
-  width:clamp(22px,4vw,28px);height:clamp(22px,4vw,28px);
-  border-radius:50%;cursor:pointer;font-size:.85rem;flex-shrink:0;}
-.del-btn:hover{background:var(--red);border-color:var(--red);color:#fff;}
-.setup-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+.setup-box h2{
+  font-family:'Permanent Marker',cursive;
+  font-size:clamp(1.5rem,5.5vw,2.1rem); margin-bottom:10px;
+}
+.setup-sub{ font-size:var(--fsm); color:#555; margin-bottom:12px; }
+.setup-list{ display:flex; flex-direction:column; gap:clamp(7px,1.5vw,12px); margin-bottom:14px; }
+.setup-row{ display:flex; align-items:center; gap:var(--gap); }
+.cdot{ width:12px; height:12px; border-radius:50%; border:1px solid #aaa; flex-shrink:0; }
+.setup-row input{
+  flex:1; border:1.5px solid #ccc; border-radius:4px;
+  padding:clamp(6px,1.2vw,10px) clamp(8px,1.6vw,12px);
+  font-size:var(--fmd); font-family:inherit;
+}
+.setup-row input:focus{ outline:none; border-color:var(--ink); }
+.del-btn{
+  background:none; border:1.5px solid #ccc; color:#aaa;
+  width:clamp(24px,4.5vw,32px); height:clamp(24px,4.5vw,32px);
+  border-radius:50%; cursor:pointer; font-size:.9rem; flex-shrink:0;
+}
+.del-btn:hover{ background:var(--red); border-color:var(--red); color:#fff; }
+.setup-btns{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+
+/* JOIN SCREEN */
+#ov-join{ background:#ccc; z-index:700; }
+.join-box{
+  background:#fff; border:2px solid var(--ink); border-radius:6px;
+  padding:clamp(16px,3.5vw,28px); width:100%; max-width:min(96vw,380px);
+  box-shadow:5px 5px 0 rgba(0,0,0,.18); text-align:center;
+}
+.join-box h2{
+  font-family:'Permanent Marker',cursive;
+  font-size:clamp(1.4rem,5vw,2rem); margin-bottom:8px;
+}
+.join-box p{ font-size:var(--fsm); color:#555; margin-bottom:14px; }
+.code-input{
+  width:100%; border:2px solid var(--ink); border-radius:4px;
+  padding:clamp(8px,1.8vw,14px); text-align:center;
+  font-size:clamp(1.4rem,4vw,2rem); font-weight:900; letter-spacing:8px;
+  font-family:'Permanent Marker',cursive; text-transform:uppercase;
+  margin-bottom:12px;
+}
+.code-input:focus{ outline:none; border-color:var(--green); }
+.join-name-input{
+  width:100%; border:1.5px solid #ccc; border-radius:4px;
+  padding:clamp(6px,1.2vw,10px); font-size:var(--fmd);
+  font-family:inherit; margin-bottom:12px;
+}
+.join-name-input:focus{ outline:none; border-color:var(--ink); }
+.join-err{ font-size:var(--fsm); color:var(--red); min-height:1.4em; margin-bottom:8px; }
+.join-btns{ display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
+
+/* GAME CODE BADGE */
+.code-badge{
+  display:inline-flex; align-items:center; gap:6px;
+  background:#f0f0f0; border:1.5px solid #aaa; border-radius:4px;
+  padding:3px 10px; font-size:var(--fsm); font-weight:800;
+  letter-spacing:3px; font-family:'Permanent Marker',cursive;
+  cursor:pointer; user-select:all;
+}
+.code-badge span{ font-size:var(--fxs); font-weight:400; letter-spacing:0;
+  font-family:inherit; color:#777; }
+
 /* YAHTZEE BLAST */
-#ov-ytz{background:rgba(0,0,0,.55);z-index:600;}
-.ytz-word{font-family:'Permanent Marker',cursive;
-  font-size:clamp(3rem,15vw,7rem);color:#fff;
-  text-shadow:4px 4px 0 var(--red),0 0 40px rgba(255,200,0,.8);
-  animation:pop .5s cubic-bezier(.175,.885,.32,1.275) forwards;}
-@keyframes pop{0%{transform:scale(0)rotate(-8deg)}60%{transform:scale(1.18)rotate(2deg)}100%{transform:scale(1)rotate(0)}}
-.ytz-sub{color:#ffe;font-size:clamp(.75rem,2.2vw,1.1rem);font-weight:700;
-  letter-spacing:2px;text-transform:uppercase;margin-top:8px;}
+#ov-ytz{ background:rgba(0,0,0,.6); z-index:600; }
+.ytz-word{
+  font-family:'Permanent Marker',cursive;
+  font-size:clamp(3.2rem,16vw,8rem); color:#fff;
+  text-shadow:4px 4px 0 var(--red),0 0 45px rgba(255,200,0,.9);
+  animation:pop .5s cubic-bezier(.175,.885,.32,1.275) forwards;
+}
+@keyframes pop{
+  0%{ transform:scale(0) rotate(-8deg) }
+  60%{ transform:scale(1.18) rotate(2deg) }
+  100%{ transform:scale(1) rotate(0) }
+}
+.ytz-sub{
+  color:#ffe; font-size:clamp(.85rem,2.5vw,1.2rem); font-weight:700;
+  letter-spacing:3px; text-transform:uppercase; margin-top:10px;
+}
+
 /* QR */
-#ov-qr{background:rgba(0,0,0,.7);z-index:500;}
-.qr-box{background:#fff;border:2px solid var(--ink);border-radius:4px;
-  padding:clamp(14px,3vw,22px);text-align:center;
-  width:clamp(240px,80vw,320px);box-shadow:4px 4px 0 rgba(0,0,0,.28);}
-.qr-box h3{font-style:italic;font-size:clamp(1rem,3vw,1.4rem);margin-bottom:4px;}
-.qr-box p{font-size:var(--fxs);color:#666;margin-bottom:10px;}
-#qr-render{display:flex;justify-content:center;margin-bottom:8px;}
-.qr-url{font-size:var(--fxs);color:#888;word-break:break-all;
-  background:#f2f2f2;padding:5px;border-radius:2px;margin-bottom:12px;}
+#ov-qr{ background:rgba(0,0,0,.72); z-index:500; }
+.qr-box{
+  background:#fff; border:2px solid var(--ink); border-radius:6px;
+  padding:clamp(16px,3.5vw,26px); text-align:center;
+  width:clamp(260px,82vw,340px); box-shadow:5px 5px 0 rgba(0,0,0,.3);
+}
+.qr-box h3{ font-style:italic; font-size:clamp(1.1rem,3.5vw,1.5rem); margin-bottom:4px; }
+.qr-box p{ font-size:var(--fsm); color:#555; margin-bottom:10px; }
+#qr-render{ display:flex; justify-content:center; margin-bottom:10px; }
+.qr-code-lbl{
+  font-family:'Permanent Marker',cursive; font-size:1.5rem;
+  letter-spacing:6px; color:var(--ink); margin-bottom:4px;
+}
+.qr-url{ font-size:var(--fxs); color:#999; word-break:break-all;
+  background:#f4f4f4; padding:5px; border-radius:3px; margin-bottom:12px; }
+
 /* GAME OVER */
-#ov-over{background:rgba(255,255,255,.96);z-index:400;
-  padding:clamp(12px,3vw,28px);text-align:center;}
-#ov-over h2{font-family:'Permanent Marker',cursive;
-  font-size:clamp(1.5rem,5.5vw,2.6rem);color:var(--red);margin-bottom:8px;}
-.go-winner{font-size:clamp(.85rem,2.5vw,1.1rem);font-weight:700;margin-bottom:12px;}
-.go-tbl{width:100%;max-width:min(96vw,500px);border-collapse:collapse;
-  font-size:var(--fsm);margin-bottom:14px;}
-.go-tbl th{background:#333;color:#fff;padding:clamp(4px,1vw,7px);
-  font-size:var(--fxs);text-transform:uppercase;}
-.go-tbl td{padding:clamp(5px,1.2vw,9px);border-bottom:1px solid #ddd;text-align:center;}
+#ov-over{ background:rgba(255,255,255,.97); z-index:400; text-align:center; }
+#ov-over h2{
+  font-family:'Permanent Marker',cursive;
+  font-size:clamp(1.6rem,6vw,2.8rem); color:var(--red); margin-bottom:10px;
+}
+.go-winner{ font-size:clamp(.95rem,2.8vw,1.2rem); font-weight:700; margin-bottom:14px; }
+.go-tbl{ width:100%; max-width:min(96vw,520px); border-collapse:collapse;
+  font-size:var(--fsm); margin-bottom:16px; }
+.go-tbl th{ background:#222; color:#fff; padding:clamp(5px,1.2vw,8px);
+  font-size:var(--fxs); text-transform:uppercase; }
+.go-tbl td{ padding:clamp(6px,1.4vw,10px); border-bottom:1px solid #ddd; text-align:center; }
+
 /* TOAST */
-.toast{position:fixed;bottom:clamp(12px,2.5vw,22px);left:50%;
-  transform:translateX(-50%)translateY(60px);
-  background:#222;color:#fff;
-  padding:clamp(5px,1vw,9px) clamp(12px,2.5vw,20px);
-  border-radius:3px;font-size:var(--fsm);font-weight:700;z-index:900;
-  transition:transform .26s;pointer-events:none;white-space:nowrap;}
-.toast.show{transform:translateX(-50%)translateY(0);}
-/* RESPONSIVE */
+.toast{
+  position:fixed; bottom:clamp(14px,3vw,24px); left:50%;
+  transform:translateX(-50%) translateY(70px);
+  background:#1a1a1a; color:#fff;
+  padding:clamp(6px,1.2vw,10px) clamp(14px,3vw,22px);
+  border-radius:4px; font-size:var(--fsm); font-weight:700;
+  z-index:900; transition:transform .26s; pointer-events:none; white-space:nowrap;
+}
+.toast.show{ transform:translateX(-50%) translateY(0); }
+
+/* ═══════════════ RESPONSIVE ═══════════════ */
 @media(max-width:374px){
-  :root{--die:36px;--pip:5px;--fxs:.5rem;--fsm:.58rem;--fmd:.65rem;--row:18px;}
+  :root{
+    --fxs:.68rem; --fsm:.76rem; --fmd:.86rem; --flg:.95rem;
+    --die:38px; --pip:5px; --row:20px;
+  }
 }
 @media(max-height:480px) and (orientation:landscape){
-  :root{--die:34px;--pip:4px;--fxs:.48rem;--fsm:.56rem;--fmd:.63rem;--row:16px;--gap:2px;--pad:4px;}
-  body{padding:3px;}
-  .dice-panel{margin-bottom:3px;}
+  :root{
+    --fxs:.62rem; --fsm:.7rem; --fmd:.8rem; --flg:.88rem;
+    --die:34px; --pip:4px; --row:17px; --gap:2px; --pad:4px;
+  }
+  body{ padding:3px; }
+  .dice-panel{ margin-bottom:3px; }
 }
 @media(min-width:600px){
-  :root{--die:56px;--pip:9px;--fxs:.65rem;--fsm:.78rem;--fmd:.9rem;--row:27px;--pad:14px;}
-  body{padding:16px;}
+  :root{
+    --fxs:.82rem; --fsm:.96rem; --fmd:1.06rem; --flg:1.18rem;
+    --die:58px; --pip:9px; --row:29px; --pad:16px;
+  }
+  body{ padding:18px; }
 }
 @media(min-width:900px){
-  :root{--die:66px;--pip:10px;--fxs:.7rem;--fsm:.83rem;--fmd:.97rem;--row:31px;--pad:18px;}
-  body{align-items:center;padding:24px;}
-  .card{box-shadow:0 8px 32px rgba(0,0,0,.16);}
+  :root{
+    --fxs:.86rem; --fsm:1rem; --fmd:1.1rem; --flg:1.24rem;
+    --die:68px; --pip:10px; --row:33px; --pad:20px;
+  }
+  body{ align-items:center; padding:28px; }
+  .card{ box-shadow:0 10px 36px rgba(0,0,0,.18); }
 }
-@media(min-width:1200px){body{background:#c8c8c8;}}
+@media(min-width:1200px){ body{ background:#aaa; } }
 </style>
 </head>
 <body>
 
-<!-- SETUP -->
-<div class="overlay vis" id="ov-setup">
+<!-- ══ HOST SETUP ══ -->
+<div class="ov vis" id="ov-host">
   <div class="setup-box">
     <h2>🎲 Yahtzee</h2>
-    <div class="setup-sub">Enter player names (2–6 players)</div>
+    <div class="setup-sub">Add players, then share the game code</div>
     <div class="setup-list" id="setup-list"></div>
     <div class="setup-btns">
-      <button class="btn btn-gray" id="btn-add">+ Add Player</button>
-      <button class="btn btn-red" id="btn-start">▶ Start Game</button>
+      <button class="btn btn-gray" id="btn-add">+ Player</button>
+      <button class="btn btn-red"  id="btn-start">▶ Start Game</button>
     </div>
   </div>
 </div>
 
-<!-- YAHTZEE BLAST -->
-<div class="overlay" id="ov-ytz">
+<!-- ══ JOIN SCREEN ══ -->
+<div class="ov" id="ov-join">
+  <div class="join-box">
+    <h2>🎲 Join Game</h2>
+    <p>Enter the 6-letter game code from the host</p>
+    <input class="code-input" id="join-code" maxlength="6" placeholder="ABCDEF" autocomplete="off" spellcheck="false">
+    <input class="join-name-input" id="join-name" maxlength="14" placeholder="Your name">
+    <div class="join-err" id="join-err"></div>
+    <div class="join-btns">
+      <button class="btn btn-gray" id="btn-join-back">← Back</button>
+      <button class="btn btn-grn"  id="btn-join-go">Join →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ YAHTZEE BLAST ══ -->
+<div class="ov" id="ov-ytz">
   <div class="ytz-word">YAHTZEE!</div>
   <div class="ytz-sub" id="ytz-sub">5 OF A KIND</div>
 </div>
 
-<!-- QR -->
-<div class="overlay" id="ov-qr">
+<!-- ══ QR MODAL ══ -->
+<div class="ov" id="ov-qr">
   <div class="qr-box">
-    <h3>🎲 Join Game</h3>
-    <p>Scan to play on your device</p>
+    <h3>📲 Share Game</h3>
+    <p>Scan QR <em>or</em> enter code manually</p>
     <div id="qr-render"></div>
+    <div class="qr-code-lbl" id="qr-code-lbl"></div>
     <div class="qr-url" id="qr-url"></div>
     <button class="btn btn-gray" id="btn-close-qr">✕ Close</button>
   </div>
 </div>
 
-<!-- GAME OVER -->
-<div class="overlay" id="ov-over">
+<!-- ══ GAME OVER ══ -->
+<div class="ov" id="ov-over">
   <h2>🏆 Game Over!</h2>
   <div class="go-winner" id="go-winner"></div>
   <table class="go-tbl">
     <thead><tr><th>#</th><th>Player</th><th>Upper</th><th>Bonus</th><th>Lower</th><th>Total</th></tr></thead>
     <tbody id="go-body"></tbody>
   </table>
-  <button class="btn btn-red" id="btn-again">🎲 Play Again</button>
+  <button class="btn btn-red" id="btn-again">🎲 New Game</button>
 </div>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<!-- MAIN CARD -->
+<!-- ══ MAIN CARD ══ -->
 <div class="card" id="main-card" style="display:none">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--gap);">
+    <div class="code-badge" id="code-badge" title="Game code — tap to copy">
+      <span>CODE</span> <span id="code-display"></span>
+    </div>
+    <div class="dot" id="conn-dot"></div>
+  </div>
   <div class="tabs" id="tabs"></div>
   <div class="namebar">
     <span class="nb-label">NAME:</span>
-    <span class="nb-name" id="vname"></span>
+    <span class="nb-name"  id="vname"></span>
     <span class="nb-score" id="vscore"></span>
-    <div class="dot" id="conn-dot"></div>
   </div>
   <div class="dice-panel">
     <div class="dice-top">
@@ -302,8 +439,8 @@ thead th{background:var(--hbg);font-size:var(--fxs);text-transform:uppercase;}
     </div>
     <div class="dice-row" id="dice-row"></div>
     <div class="dice-btns">
-      <div class="dice-hint" id="dice-hint">Roll to start your turn</div>
-      <button class="btn btn-red" id="btn-roll">🎲 Roll</button>
+      <div class="dice-hint" id="dice-hint">Waiting…</div>
+      <button class="btn btn-red" id="btn-roll" disabled>🎲 Roll</button>
     </div>
   </div>
   <table>
@@ -317,29 +454,32 @@ thead th{background:var(--hbg);font-size:var(--fxs);text-transform:uppercase;}
     <tbody id="sc-body"></tbody>
   </table>
   <div class="toolbar">
-    <button class="btn btn-gray" id="btn-qr">📲 QR Code</button>
+    <button class="btn btn-gray" id="btn-qr">📲 Share</button>
     <button class="btn btn-gray" id="btn-new">↺ New Game</button>
   </div>
 </div>
 
+<!-- ══════════════════════════════════════════════════════
+     GAME LOGIC
+══════════════════════════════════════════════════════ -->
 <script type="module">
-import{initializeApp}from'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import{getDatabase,ref,set,onValue}from'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+import{initializeApp}  from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import{getDatabase,ref,set,get,update,onValue}
+  from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
 
-/* ══ FIREBASE ══════════════════════════════════════════ */
-const app=initializeApp({databaseURL:'https://scoreboard-1677c-default-rtdb.firebaseio.com/'});
-const db=getDatabase(app);
-const ROOT='ytz5';
+/* ── Firebase ───────────────────────────── */
+const app = initializeApp({databaseURL:'https://scoreboard-1677c-default-rtdb.firebaseio.com/'});
+const DB  = getDatabase(app);
 
-/* ══ AUDIO ══════════════════════════════════════════════ */
+/* ── Audio ──────────────────────────────── */
 let _ac=null;
 const AC=()=>_ac||(_ac=new(window.AudioContext||window.webkitAudioContext)());
-function ding(){try{const c=AC(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sine';o.frequency.setValueAtTime(880,c.currentTime);o.frequency.exponentialRampToValueAtTime(1320,c.currentTime+.1);g.gain.setValueAtTime(.25,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.3);o.start();o.stop(c.currentTime+.32);}catch(e){}}
-function rollSnd(){try{const c=AC();[0,.04,.08,.12,.16].forEach(t=>{const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='triangle';o.frequency.setValueAtTime(80+Math.random()*260,c.currentTime+t);g.gain.setValueAtTime(.08,c.currentTime+t);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+t+.06);o.start(c.currentTime+t);o.stop(c.currentTime+t+.07);});}catch(e){}}
-function fanfare(){try{const c=AC();[[523,0],[659,.12],[784,.24],[1047,.38],[1319,.5],[1047,.6],[1319,.7],[1568,.8]].forEach(([f,t])=>{const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='triangle';const ct=c.currentTime+t;o.frequency.setValueAtTime(f,ct);g.gain.setValueAtTime(.25,ct);g.gain.exponentialRampToValueAtTime(.001,ct+.2);o.start(ct);o.stop(ct+.22);});}catch(e){}}
+function ding(){try{const c=AC(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sine';o.frequency.setValueAtTime(880,c.currentTime);o.frequency.exponentialRampToValueAtTime(1320,c.currentTime+.1);g.gain.setValueAtTime(.25,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.3);o.start();o.stop(c.currentTime+.35);}catch(e){}}
+function rollSnd(){try{const c=AC();[0,.04,.08,.12,.16].forEach(t=>{const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='triangle';o.frequency.setValueAtTime(90+Math.random()*260,c.currentTime+t);g.gain.setValueAtTime(.08,c.currentTime+t);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+t+.06);o.start(c.currentTime+t);o.stop(c.currentTime+t+.08);});}catch(e){}}
+function fanfare(){try{const c=AC();[[523,0],[659,.13],[784,.26],[1047,.4],[1319,.52],[1047,.62],[1319,.72],[1568,.83]].forEach(([f,t])=>{const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='triangle';const ct=c.currentTime+t;o.frequency.setValueAtTime(f,ct);g.gain.setValueAtTime(.24,ct);g.gain.exponentialRampToValueAtTime(.001,ct+.2);o.start(ct);o.stop(ct+.22);});}catch(e){}}
 
-/* ══ CONSTANTS ══════════════════════════════════════════ */
-const COLORS=['#c2410c','#1d4ed8','#15803d','#7e22ce','#b45309','#be185d'];
+/* ── Constants ──────────────────────────── */
+const COLORS=['#b91c1c','#1d4ed8','#166534','#7c3aed','#b45309','#be185d'];
 const CATS=[
   {id:'aces',   name:'Aces',        hint:'Add 1s',        sec:'U'},
   {id:'twos',   name:'Twos',        hint:'Add 2s',        sec:'U'},
@@ -347,8 +487,8 @@ const CATS=[
   {id:'fours',  name:'Fours',       hint:'Add 4s',        sec:'U'},
   {id:'fives',  name:'Fives',       hint:'Add 5s',        sec:'U'},
   {id:'sixes',  name:'Sixes',       hint:'Add 6s',        sec:'U'},
-  {id:'threeK', name:'3 of a kind', hint:'Total all dice',sec:'L'},
-  {id:'fourK',  name:'4 of a kind', hint:'Total all dice',sec:'L'},
+  {id:'threeK', name:'3 of a kind', hint:'Total all',     sec:'L'},
+  {id:'fourK',  name:'4 of a kind', hint:'Total all',     sec:'L'},
   {id:'fullH',  name:'Full House',  hint:'Score 25',      sec:'L'},
   {id:'smStr',  name:'Sm. Straight',hint:'Score 30',      sec:'L'},
   {id:'lgStr',  name:'Lg. Straight',hint:'Score 40',      sec:'L'},
@@ -359,50 +499,34 @@ const U_IDS=CATS.filter(c=>c.sec==='U').map(c=>c.id);
 const L_IDS=CATS.filter(c=>c.sec==='L').map(c=>c.id);
 const ALL_IDS=CATS.map(c=>c.id);
 
-/* ══ STATE ══════════════════════════════════════════════
-   `state`   = mirror of Firebase (shared by all devices)
-   `viewPid` = LOCAL — which player's scorecard I'm viewing
-   `myPid`   = LOCAL — which player I am on this device
-                       (set at game start, persisted in sessionStorage)
-   ══════════════════════════════════════════════════════ */
-let state={players:[],curIdx:0,started:false,over:false};
-let viewPid=null;
-let myPid=null;
-let setupRows=[];
-let qrDone=false;
-let pushing=false;
+/* ── Session state ──────────────────────────────────────────────
+   gameCode  : 6-letter code identifying this game in Firebase
+   myPid     : the player id that THIS device controls
+   state     : full game state mirrored from Firebase
+   viewPid   : which player's scorecard this device is viewing (local)
+   ──────────────────────────────────────────────────────────────── */
+let gameCode = null;
+let myPid    = null;
+let state    = null;
+let viewPid  = null;
+let setupRows= [];
+let qrDone   = false;
+let unsub    = null; // firebase listener unsubscribe
 
-/* Restore identity if page was refreshed */
-try{myPid=sessionStorage.getItem('ytz_myPid');}catch(e){}
+/* Restore session across page refresh */
+try{
+  const s=JSON.parse(sessionStorage.getItem('ytz_session')||'null');
+  if(s){gameCode=s.gameCode;myPid=s.myPid;}
+}catch(e){}
 
-/* ══ FIREBASE PUSH ══════════════════════════════════════
-   No ignoreRemote flag — we simply accept every Firebase
-   update as the truth. Local optimistic updates + Firebase
-   echo = idempotent and always consistent.
-   ══════════════════════════════════════════════════════ */
-function push(s){
-  pushing=true;
-  set(ref(db,ROOT),JSON.parse(JSON.stringify(s)))
-    .catch(e=>toast('Sync error: '+e.message))
-    .finally(()=>pushing=false);
+/* ── Firebase helpers ───────────────────── */
+function dbRef(path){ return ref(DB,'ytz6/'+gameCode+(path?'/'+path:'')); }
+
+function pushState(s){
+  return set(dbRef(),JSON.parse(JSON.stringify(s)));
 }
 
-/* Firebase connection status */
-onValue(ref(db,'.info/connected'),snap=>{
-  const on=!!snap.val();
-  const d=document.getElementById('conn-dot');
-  if(d)d.className='dot '+(on?'on':'off');
-});
-
-/* Main listener — fires on every change from any device */
-onValue(ref(db,ROOT),snap=>{
-  const raw=snap.val();
-  if(!raw)return;
-  state=normalize(raw);   // fix Firebase array-as-object issue
-  onStateChange();
-},e=>toast('DB: '+e.message));
-
-/* Firebase turns arrays into {0:v,1:v} objects — convert back */
+/* Convert Firebase object-arrays back to real arrays */
 function toArr(v,def=[]){
   if(!v)return def;
   if(Array.isArray(v))return v;
@@ -412,49 +536,107 @@ function toArr(v,def=[]){
   }
   return def;
 }
-function normalize(d){
+function normalizeState(d){
   const players=toArr(d.players,[]).map(p=>({
-    id:p.id||'',
-    name:p.name||'',
-    color:p.color||'#333',
-    scores:p.scores||{},
-    yBonus:p.yBonus||0,
-    rollsLeft:p.rollsLeft!=null?p.rollsLeft:3,
-    dice:toArr(p.dice,[1,1,1,1,1]),
-    held:toArr(p.held,[false,false,false,false,false]),
+    id:        p.id||'',
+    name:      p.name||'',
+    color:     p.color||'#333',
+    scores:    p.scores||{},
+    yBonus:    p.yBonus||0,
+    rollsLeft: p.rollsLeft!=null?p.rollsLeft:3,
+    dice:      toArr(p.dice,[1,1,1,1,1]),
+    held:      toArr(p.held,[false,false,false,false,false]),
+    joined:    !!p.joined, // true once this player has entered the game
   }));
   return{
     players,
-    curIdx:Number(d.curIdx)||0,
+    curIdx: Number(d.curIdx)||0,
     started:!!d.started,
-    over:!!d.over,
+    over:   !!d.over,
+    code:   d.code||'',
   };
 }
 
-/* ══ STATE HANDLER ══════════════════════════════════════ */
+/* ── Generate a unique 6-letter game code ── */
+function makeCode(){
+  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no I,O,0,1 (confusing)
+  let c='';
+  for(let i=0;i<6;i++) c+=chars[Math.floor(Math.random()*chars.length)];
+  return c;
+}
+
+/* ── Subscribe to Firebase for this game ── */
+function subscribeToGame(code){
+  if(unsub){ unsub(); unsub=null; }
+  gameCode=code;
+  const r=ref(DB,'ytz6/'+code);
+  unsub=onValue(r,snap=>{
+    const raw=snap.val();
+    if(!raw){ return; }
+    state=normalizeState(raw);
+    onStateChange();
+  },e=>toast('DB: '+e.message));
+}
+
+/* ── Connection dot ── */
+onValue(ref(DB,'.info/connected'),snap=>{
+  const on=!!snap.val();
+  const d=document.getElementById('conn-dot');
+  if(d) d.className='dot '+(on?'on':'off');
+});
+
+/* ═══════════════════════════════════════════════
+   STATE CHANGE — decides which screen to show
+   ═══════════════════════════════════════════════ */
 function onStateChange(){
+  if(!state) return;
+
   if(state.over){
-    showOnly('ov-over');
+    show('main-card');
+    showOv('ov-over');
     renderGameOver();
     return;
   }
+
   if(state.started){
-    document.getElementById('main-card').style.display='block';
-    showOnly(null);
-    // Keep viewPid valid; default to current-turn player
+    show('main-card');
+    hideAllOv();
+    // Keep viewPid valid
     if(!state.players.find(p=>p.id===viewPid)){
       viewPid=curP()?.id||state.players[0]?.id||null;
     }
     renderAll();
     return;
   }
-  document.getElementById('main-card').style.display='none';
-  showOnly('ov-setup');
+
+  // Not started — check if all players have now joined
+  if(state.players.length>0 && myPid){
+    // Keep game card visible for host/joiner while waiting
+    show('main-card');
+    hideAllOv();
+    renderAll();
+    checkAllJoined();
+  }
 }
 
-function curP(){return state.players[state.curIdx]||null;}
+/* ═══════════════════════════════════════════════
+   INITIAL LOAD — decide which screen to present
+   ═══════════════════════════════════════════════ */
+async function init(){
+  // If we have a saved session, try to resume
+  if(gameCode && myPid){
+    subscribeToGame(gameCode);
+    // onStateChange will handle rendering
+    return;
+  }
+  // Otherwise show host setup
+  showOv('ov-host');
+  initSetup();
+}
 
-/* ══ SETUP ══════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════
+   HOST SETUP
+   ═══════════════════════════════════════════════ */
 function initSetup(){
   setupRows=[{name:'',color:COLORS[0]},{name:'',color:COLORS[1]}];
   renderSetup();
@@ -466,7 +648,7 @@ function renderSetup(){
     const dot=document.createElement('div');dot.className='cdot';dot.style.background=r.color;
     const inp=document.createElement('input');
     inp.type='text';inp.placeholder='Player '+(i+1);inp.value=r.name;inp.maxLength=14;
-    inp.addEventListener('input',()=>setupRows[i].name=inp.value);
+    inp.addEventListener('input',()=>setupRows[i].name=inp.value.trim());
     row.appendChild(dot);row.appendChild(inp);
     if(setupRows.length>1){
       const del=document.createElement('button');del.className='del-btn';del.textContent='×';
@@ -476,43 +658,153 @@ function renderSetup(){
     list.appendChild(row);
   });
 }
-function startGame(){
-  /* Each player in setupRows corresponds to a device.
-     Player 1 is this device (myPid = players[0].id).
-     Others join by loading the same URL — they become
-     the next player whose myPid isn't taken. */
+
+async function startGame(){
+  const code=makeCode();
   const ts=Date.now();
+  /* Each setup row is a player slot.
+     Player index 0 is THIS device (the host).
+     Players 1..N start as NOT joined — they must join via QR/code. */
   const players=setupRows.map((r,i)=>({
-    id:'p'+ts+i,
-    name:r.name.trim()||'Player '+(i+1),
-    color:COLORS[i%COLORS.length],
-    scores:{},yBonus:0,rollsLeft:3,
-    dice:[1,1,1,1,1],held:[false,false,false,false,false],
+    id:       'p'+ts+i,
+    name:     r.name||'Player '+(i+1),
+    color:    COLORS[i%COLORS.length],
+    scores:   {}, yBonus:0, rollsLeft:3,
+    dice:     [1,1,1,1,1],
+    held:     [false,false,false,false,false],
+    joined:   i===0, // host is immediately joined
   }));
-  /* This device becomes Player 1 */
+  gameCode=code;
   myPid=players[0].id;
   viewPid=players[0].id;
-  try{sessionStorage.setItem('ytz_myPid',myPid);}catch(e){}
-  const newState={players,curIdx:0,started:true,over:false};
-  state=newState;
-  push(newState);
-  document.getElementById('main-card').style.display='block';
-  showOnly(null);
+  saveSession();
+
+  const newState={players,curIdx:0,started:false,over:false,code};
+  state=normalizeState(newState);
+  await pushState(newState);
+  subscribeToGame(code);
+
+  // Show the game card with waiting screen
+  show('main-card');
+  hideAllOv();
+  document.getElementById('code-display').textContent=code;
+  document.getElementById('code-badge').style.display='inline-flex';
+
   renderAll();
+
+  // Check if all players are already joined (1-player edge case or re-start)
+  checkAllJoined();
 }
 
-/* ══ RENDER ══════════════════════════════════════════════ */
-function renderAll(){renderTabs();renderDicePanel();renderScorecard();}
+/* ═══════════════════════════════════════════════
+   JOIN FLOW
+   When player 2..N scans QR or enters code manually
+   ═══════════════════════════════════════════════ */
+async function joinGame(){
+  const code=document.getElementById('join-code').value.trim().toUpperCase();
+  const name=document.getElementById('join-name').value.trim();
+  const err=document.getElementById('join-err');
+  err.textContent='';
+
+  if(code.length<6){ err.textContent='Enter the full 6-letter code.'; return; }
+  if(!name){ err.textContent='Enter your name.'; return; }
+
+  // Look up the game in Firebase
+  let snap;
+  try{
+    snap=await get(ref(DB,'ytz6/'+code));
+  }catch(e){
+    err.textContent='Connection error. Try again.'; return;
+  }
+  if(!snap.exists()){ err.textContent='Game not found. Check the code.'; return; }
+
+  const raw=snap.val();
+  const g=normalizeState(raw);
+
+  if(g.over){ err.textContent='That game is already finished.'; return; }
+
+  // Find first unjoine player slot
+  const slot=g.players.find(p=>!p.joined);
+  if(!slot){
+    // All slots taken — see if this name already exists (re-join)
+    const existing=g.players.find(p=>p.name.toLowerCase()===name.toLowerCase());
+    if(existing){
+      // Re-joining
+      gameCode=code; myPid=existing.id; viewPid=existing.id;
+      saveSession();
+      subscribeToGame(code);
+      show('main-card');
+      hideAllOv();
+      return;
+    }
+    err.textContent='All player slots are taken.'; return;
+  }
+
+  // Claim the slot
+  gameCode=code;
+  myPid=slot.id;
+  viewPid=slot.id;
+  saveSession();
+
+  // Update Firebase: mark this slot as joined with chosen name
+  try{
+    await update(ref(DB,'ytz6/'+code+'/players/'+g.players.indexOf(slot)),{
+      joined:true, name
+    });
+  }catch(e){
+    err.textContent='Error joining. Try again.'; return;
+  }
+
+  subscribeToGame(code);
+  show('main-card');
+  hideAllOv();
+}
+
+/* After each join, check if everyone has joined → start game */
+function checkAllJoined(){
+  if(!state) return;
+  if(state.started) return;
+  if(state.players.every(p=>p.joined)){
+    state.started=true;
+    viewPid=curP()?.id||state.players[0].id;
+    pushState(state);
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   RENDER
+   ═══════════════════════════════════════════════ */
+function renderAll(){
+  if(!state) return;
+  updateCodeBadge();
+  renderTabs();
+  renderDicePanel();
+  renderScorecard();
+
+  // Show waiting message if not everyone joined yet
+  if(!state.started && state.players.some(p=>!p.joined)){
+    const waiting=state.players.filter(p=>!p.joined).map(p=>p.name).join(', ');
+    document.getElementById('dice-hint').innerHTML='Waiting for <b>'+esc(waiting)+'</b> to join…';
+    document.getElementById('btn-roll').disabled=true;
+  }
+}
+
+function updateCodeBadge(){
+  if(!gameCode) return;
+  document.getElementById('code-display').textContent=gameCode;
+}
 
 function renderTabs(){
   const bar=document.getElementById('tabs');bar.innerHTML='';
   state.players.forEach((p,i)=>{
-    const active=p.id===viewPid,isMyTurn=i===state.curIdx;
+    const active=p.id===viewPid, isMyTurn=i===state.curIdx;
     const t=document.createElement('div');
     t.className='tab'+(active?' active':'')+(isMyTurn?' myturn':'');
-    if(active){t.style.color=p.color;t.style.borderColor=p.color;}
-    t.innerHTML=esc(p.name)+'<br><span class="tab-pts">'+calcGrand(p)+'pt</span>';
-    t.addEventListener('click',()=>{viewPid=p.id;renderAll();});
+    if(active){ t.style.color=p.color; t.style.borderColor=p.color; }
+    // Show pending indicator for unjoined players
+    const joinedTxt=p.joined?'':'⏳ ';
+    t.innerHTML=joinedTxt+esc(p.name)+'<br><span class="tab-pts">'+calcGrand(p)+'pt</span>';
+    t.addEventListener('click',()=>{ viewPid=p.id; renderAll(); });
     bar.appendChild(t);
   });
   const vp=getVP();
@@ -525,34 +817,42 @@ function renderTabs(){
 
 function renderDicePanel(){
   const cp=curP();if(!cp)return;
-  const imt=isItMyTurn();
-  // Turn label
-  const tl=document.getElementById('turn-lbl');
-  tl.textContent=cp.name+"'s Turn";tl.style.color=cp.color;
-  // Roll count
+  const imt=isMyTurn();
+  const allJoined=state.players.every(p=>p.joined);
+
+  document.getElementById('turn-lbl').textContent=cp.name+"'s Turn";
+  document.getElementById('turn-lbl').style.color=cp.color;
   document.getElementById('roll-lbl').textContent=
     cp.rollsLeft>0?cp.rollsLeft+' roll'+(cp.rollsLeft!==1?'s':'')+' left':'No rolls left';
-  // Roll button disabled unless it's my turn and I have rolls left
-  document.getElementById('btn-roll').disabled=!imt||cp.rollsLeft<=0;
-  // Dice
+
+  // Roll button: only enabled for active player on their device, all joined, rolls remaining
+  document.getElementById('btn-roll').disabled=!imt||!allJoined||cp.rollsLeft<=0;
+
   const row=document.getElementById('dice-row');row.innerHTML='';
   for(let i=0;i<5;i++){
     const wrap=document.createElement('div');wrap.className='die-wrap';
     const die=document.createElement('div');
     die.className='die'+(cp.held[i]?' held':'');
+    if(imt&&allJoined){ die.classList.add('mine'); die.addEventListener('click',()=>toggleHold(i)); }
     die.appendChild(mkPips(cp.dice[i]));
-    die.style.cursor=imt?'pointer':'default';
-    if(imt)die.addEventListener('click',()=>toggleHold(i));
     const lbl=document.createElement('div');lbl.className='held-lbl';
     lbl.textContent=cp.held[i]?'HELD':'';
     wrap.appendChild(die);wrap.appendChild(lbl);row.appendChild(wrap);
   }
-  // Hint
+
   const hint=document.getElementById('dice-hint');
-  if(!imt)hint.innerHTML='Waiting for <b>'+esc(cp.name)+'</b>…';
-  else if(cp.rollsLeft===3)hint.textContent='Roll to start your turn';
-  else if(cp.rollsLeft===0)hint.innerHTML='<b>Pick a scoring box!</b>';
-  else hint.innerHTML='Tap dice to <b>hold</b>, then roll again';
+  if(!allJoined){
+    const waiting=state.players.filter(p=>!p.joined).map(p=>p.name).join(', ');
+    hint.innerHTML='Waiting for <b>'+esc(waiting)+'</b> to join…';
+  } else if(!imt){
+    hint.innerHTML='Waiting for <b>'+esc(cp.name)+'</b>…';
+  } else if(cp.rollsLeft===3){
+    hint.textContent='Roll to start your turn';
+  } else if(cp.rollsLeft===0){
+    hint.innerHTML='<b>Pick a scoring box!</b>';
+  } else {
+    hint.innerHTML='Tap dice to <b>hold</b>, then roll again';
+  }
 }
 
 function mkPips(v){
@@ -564,19 +864,19 @@ function mkPips(v){
 function renderScorecard(){
   const vp=getVP();if(!vp)return;
   const cp=curP();
-  /* Show suggestions ONLY when:
-     1. I am the active player on this device
-     2. I am viewing MY OWN scorecard
-     3. I have rolled at least once this turn */
-  const showSugg=isItMyTurn()&&vp.id===cp?.id&&cp.rollsLeft<3;
+  /* Suggestions shown only when:
+     1. It is MY turn on this device
+     2. I am looking at MY OWN scorecard
+     3. I have rolled at least once  */
+  const showSugg=isMyTurn()&&vp.id===cp?.id&&cp.rollsLeft<3&&state.players.every(p=>p.joined);
   const body=document.getElementById('sc-body');body.innerHTML='';
 
   CATS.filter(c=>c.sec==='U').forEach(cat=>body.appendChild(mkRow(cat,vp,cp,showSugg)));
 
   const uRaw=calcU(vp),bonus=uRaw>=63?35:0;
-  body.appendChild(mkStatRow('TOTAL SCORE','',uRaw,false));
+  body.appendChild(mkStatRow('TOTAL SCORE',uRaw,false));
   body.appendChild(mkBonusRow(bonus));
-  body.appendChild(mkStatRow('TOTAL (Upper)','',uRaw+bonus,true));
+  body.appendChild(mkStatRow('TOTAL (Upper)',uRaw+bonus,true));
 
   const lh=document.createElement('tr');
   lh.innerHTML='<td colspan="3" class="sh la" style="font-size:var(--fxs)">Lower Section</td>';
@@ -589,14 +889,14 @@ function renderScorecard(){
   ybr.innerHTML=
     '<td class="la" style="font-size:var(--fxs)">YAHTZEE BONUS</td>'+
     '<td style="font-size:var(--fxs);color:#777">+100 each</td>'+
-    '<td><button class="sb-btn stat'+(yb>0?' bon':'')+'">'+
+    '<td><button class="sbb stat'+(yb>0?' bon':'')+'">'+
     (yb>0?'×'+yb+'='+(yb*100):'—')+'</button></td>';
   body.appendChild(ybr);
 
   const grand=calcGrand(vp);
   const gr=document.createElement('tr');gr.className='tr';
   gr.innerHTML='<td class="la" colspan="2"><b>GRAND TOTAL</b></td>'+
-    '<td><button class="sb-btn stat" style="font-weight:900">'+grand+'</button></td>';
+    '<td><button class="sbb stat" style="font-weight:900">'+grand+'</button></td>';
   body.appendChild(gr);
 
   document.getElementById('vname').textContent=vp.name;
@@ -611,12 +911,10 @@ function mkRow(cat,vp,cp,showSugg){
   const joker=isYtz5&&vp.scores.yahtzee!==undefined;
   const sugg=(!filled&&showSugg&&cp)?calcScore(cat.id,cp.dice,vp,joker):null;
 
-  const td1=document.createElement('td');td1.className='la';
-  td1.style.fontSize='var(--fsm)';td1.textContent=cat.name;
-  const td2=document.createElement('td');
-  td2.style.fontSize='var(--fxs)';td2.style.color='#777';td2.textContent=cat.hint;
+  const td1=document.createElement('td');td1.className='la';td1.style.fontSize='var(--fsm)';td1.textContent=cat.name;
+  const td2=document.createElement('td');td2.style.fontSize='var(--fxs)';td2.style.color='#777';td2.textContent=cat.hint;
   const td3=document.createElement('td');td3.className='sb';
-  const btn=document.createElement('button');btn.className='sb-btn';
+  const btn=document.createElement('button');btn.className='sbb';
 
   if(filled){
     btn.classList.add('filled');btn.textContent=String(vp.scores[cat.id]);btn.disabled=true;
@@ -625,62 +923,61 @@ function mkRow(cat,vp,cp,showSugg){
     btn.textContent=sugg>0?'+'+sugg:'0';
     btn.addEventListener('click',()=>scoreIt(vp.id,cat.id));
   } else {
-    btn.disabled=true;btn.textContent='';
+    btn.disabled=true; btn.textContent='';
   }
   td3.appendChild(btn);
   tr.appendChild(td1);tr.appendChild(td2);tr.appendChild(td3);
   return tr;
 }
-function mkStatRow(label,_,val,bold){
+function mkStatRow(label,val,bold){
   const tr=document.createElement('tr');tr.className='tr';
   tr.innerHTML='<td class="la" colspan="2" style="font-size:var(--fxs)">'
     +(bold?'<b>':'')+label+(bold?'</b>':'')+'</td>'
-    +'<td><button class="sb-btn stat">'+val+'</button></td>';
+    +'<td><button class="sbb stat">'+val+'</button></td>';
   return tr;
 }
 function mkBonusRow(val){
   const tr=document.createElement('tr');
   tr.innerHTML='<td class="la" style="font-size:var(--fxs)"><b>BONUS (if ≥63)</b></td>'
     +'<td style="font-size:var(--fxs);color:#777">Score 35</td>'
-    +'<td><button class="sb-btn stat'+(val>0?' bon':'')+'">'+
+    +'<td><button class="sbb stat'+(val>0?' bon':'')+'">'+
     (val>0?'+35':'—')+'</button></td>';
   return tr;
 }
 
-/* ══ ACTIONS ═════════════════════════════════════════════
-   All actions mutate local state immediately (instant UI),
-   then push to Firebase. Firebase echo is idempotent.
-   ══════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════
+   ACTIONS — all mutate state locally then push
+   ═══════════════════════════════════════════════ */
 function toggleHold(i){
   const cp=curP();
-  if(!cp||cp.rollsLeft===3){toast('Roll first!');return;}
+  if(!cp||cp.rollsLeft===3){ toast('Roll first!'); return; }
   cp.held[i]=!cp.held[i];
   renderDicePanel();
-  push(state);
+  pushState(state);
 }
 
 function rollDice(){
   const cp=curP();
-  if(!cp||!isItMyTurn()||cp.rollsLeft<=0)return;
+  if(!cp||!isMyTurn()||cp.rollsLeft<=0) return;
   rollSnd();
   document.querySelectorAll('.die').forEach((d,i)=>{
-    if(!cp.held[i])d.classList.add('rolling');
+    if(!cp.held[i]) d.classList.add('rolling');
   });
-  setTimeout(()=>document.querySelectorAll('.die').forEach(d=>d.classList.remove('rolling')),380);
+  setTimeout(()=>document.querySelectorAll('.die').forEach(d=>d.classList.remove('rolling')),390);
   cp.dice=cp.dice.map((v,i)=>cp.held[i]?v:Math.ceil(Math.random()*6));
   cp.rollsLeft--;
   renderDicePanel();
   renderScorecard();
-  push(state);
+  pushState(state);
 }
 
 function scoreIt(pid,catId){
-  if(!isItMyTurn()){toast("It's not your turn!");return;}
+  if(!isMyTurn()){ toast("Not your turn!"); return; }
   const cp=curP();
-  if(!cp||cp.id!==pid){toast("Wrong player!");return;}
-  if(cp.rollsLeft===3){toast('Roll first!');return;}
+  if(!cp||cp.id!==pid){ toast("Wrong player!"); return; }
+  if(cp.rollsLeft===3){ toast('Roll first!'); return; }
   const p=state.players.find(x=>x.id===pid);
-  if(!p||p.scores[catId]!==undefined)return;
+  if(!p||p.scores[catId]!==undefined) return;
 
   const isYtz5=cp.dice.every(d=>d===cp.dice[0]);
   const joker=isYtz5&&p.scores.yahtzee!==undefined;
@@ -688,31 +985,32 @@ function scoreIt(pid,catId){
   p.scores[catId]=score;
   ding();
 
-  if(catId==='yahtzee'&&score===50){fanfare();blast('5 OF A KIND • 50 POINTS');}
+  if(catId==='yahtzee'&&score===50){ fanfare(); blast('5 OF A KIND • 50 POINTS'); }
   if(isYtz5&&catId!=='yahtzee'&&p.scores.yahtzee===50){
     p.yBonus=(p.yBonus||0)+1;
-    fanfare();blast('YAHTZEE BONUS! +100 POINTS');
+    fanfare(); blast('YAHTZEE BONUS! +100 POINTS');
     toast(p.name+' gets Yahtzee Bonus! +100');
   }
 
-  cp.rollsLeft=3;
-  cp.held=[false,false,false,false,false];
+  cp.rollsLeft=3; cp.held=[false,false,false,false,false];
   state.curIdx=(state.curIdx+1)%state.players.length;
 
   if(state.players.every(pl=>countFilled(pl)>=13)){
     state.over=true;
-    push(state);
-    showOnly('ov-over');
+    pushState(state);
+    showOv('ov-over');
     renderGameOver();
     return;
   }
   toast(p.name+' scored '+score+' pts');
   viewPid=curP().id;
-  push(state);
+  pushState(state);
   renderAll();
 }
 
-/* ══ GAME OVER ══════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════
+   GAME OVER
+   ═══════════════════════════════════════════════ */
 function renderGameOver(){
   const sorted=[...state.players].sort((a,b)=>calcGrand(b)-calcGrand(a));
   const medals=['🥇','🥈','🥉','4th','5th','6th'];
@@ -728,17 +1026,20 @@ function renderGameOver(){
       +'<td style="font-weight:900;color:'+p.color+'">'+calcGrand(p)+'</td></tr>';
   }).join('');
 }
+
 function newGame(){
-  myPid=null;viewPid=null;
-  try{sessionStorage.removeItem('ytz_myPid');}catch(e){}
-  state={players:[],curIdx:0,started:false,over:false};
-  push(state);
-  document.getElementById('main-card').style.display='none';
+  if(unsub){ unsub(); unsub=null; }
+  gameCode=null; myPid=null; state=null; viewPid=null; qrDone=false;
+  try{ sessionStorage.removeItem('ytz_session'); }catch(e){}
+  hide('main-card');
+  hideAllOv();
+  showOv('ov-host');
   initSetup();
-  showOnly('ov-setup');
 }
 
-/* ══ SCORE CALC ══════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════
+   SCORE CALCULATIONS
+   ═══════════════════════════════════════════════ */
 function calcScore(id,dice,player,joker=false){
   const cnt=Array(7).fill(0);dice.forEach(d=>cnt[d]++);
   const sum=dice.reduce((a,b)=>a+b,0);
@@ -755,7 +1056,7 @@ function calcScore(id,dice,player,joker=false){
     case 'sixes': return dice.filter(d=>d===6).reduce((a,b)=>a+b,0);
     case 'threeK':return cnt.some(c=>c>=3)?sum:0;
     case 'fourK': return cnt.some(c=>c>=4)?sum:0;
-    case 'fullH':{const vals=cnt.filter(c=>c>0);return(vals.includes(3)&&vals.includes(2))?25:0;}
+    case 'fullH':{const v=cnt.filter(c=>c>0);return(v.includes(3)&&v.includes(2))?25:0;}
     case 'smStr':{const u=[...new Set(dice)].sort((a,b)=>a-b);let r=1,m=1;
       for(let i=1;i<u.length;i++){r=u[i]===u[i-1]+1?r+1:1;m=Math.max(m,r);}return m>=4?30:0;}
     case 'lgStr':{const u=[...new Set(dice)].sort((a,b)=>a-b);if(u.length<5)return 0;let r=1,m=1;
@@ -765,23 +1066,40 @@ function calcScore(id,dice,player,joker=false){
     default:return 0;
   }
 }
-function calcU(p){return U_IDS.reduce((a,id)=>a+(p.scores[id]||0),0);}
+function calcU(p){ return U_IDS.reduce((a,id)=>a+(p.scores[id]||0),0); }
 function calcGrand(p){
   const u=calcU(p),bonus=u>=63?35:0;
   const l=L_IDS.reduce((a,id)=>a+(p.scores[id]||0),0);
   return u+bonus+l+(p.yBonus||0)*100;
 }
-function countFilled(p){return ALL_IDS.filter(id=>p.scores[id]!==undefined).length;}
+function countFilled(p){ return ALL_IDS.filter(id=>p.scores[id]!==undefined).length; }
 
-/* ══ HELPERS ════════════════════════════════════════════ */
-function getVP(){return state.players.find(p=>p.id===viewPid)||state.players[0]||null;}
-function isItMyTurn(){const cp=curP();return!!(cp&&myPid&&cp.id===myPid);}
-function showOnly(id){
-  ['ov-setup','ov-ytz','ov-qr','ov-over'].forEach(oid=>{
-    const el=document.getElementById(oid);
-    if(el)el.classList.toggle('vis',oid===id);
+/* ═══════════════════════════════════════════════
+   HELPERS
+   ═══════════════════════════════════════════════ */
+function getVP(){ return state?.players.find(p=>p.id===viewPid)||state?.players[0]||null; }
+function curP(){ return state?.players[state.curIdx]||null; }
+
+/* isMyTurn: true only when the current-turn player's id matches myPid on this device */
+function isMyTurn(){ const cp=curP(); return !!(cp&&myPid&&cp.id===myPid&&state.started); }
+
+function saveSession(){
+  try{ sessionStorage.setItem('ytz_session',JSON.stringify({gameCode,myPid})); }catch(e){}
+}
+
+function showOv(id){
+  ['ov-host','ov-join','ov-ytz','ov-qr','ov-over'].forEach(oid=>{
+    document.getElementById(oid).classList.toggle('vis',oid===id);
   });
 }
+function hideAllOv(){
+  ['ov-host','ov-join','ov-ytz','ov-qr','ov-over'].forEach(oid=>{
+    document.getElementById(oid).classList.remove('vis');
+  });
+}
+function show(id){ document.getElementById(id).style.display='block'; }
+function hide(id){ document.getElementById(id).style.display='none'; }
+
 function blast(sub){
   document.getElementById('ytz-sub').textContent=sub;
   document.getElementById('ov-ytz').classList.add('vis');
@@ -789,45 +1107,79 @@ function blast(sub){
 }
 function toast(msg){
   const t=document.getElementById('toast');t.textContent=msg;
-  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600);
+  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2700);
 }
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 /* QR */
 function openQR(){
+  if(!gameCode) return;
   const url=window.location.href;
   document.getElementById('qr-url').textContent=url;
+  document.getElementById('qr-code-lbl').textContent=gameCode;
   if(!qrDone){
     document.getElementById('qr-render').innerHTML='';
     new QRCode(document.getElementById('qr-render'),
-      {text:url,width:160,height:160,colorDark:'#222',
+      {text:url,width:170,height:170,colorDark:'#1a1a1a',
        colorLight:'#fff',correctLevel:QRCode.CorrectLevel.H});
     qrDone=true;
   }
-  showOnly('ov-qr');
+  showOv('ov-qr');
 }
 
-/* ══ BUTTONS ════════════════════════════════════════════ */
+/* Copy code badge */
+document.getElementById('code-badge').addEventListener('click',()=>{
+  if(!gameCode) return;
+  try{ navigator.clipboard.writeText(gameCode).then(()=>toast('Code copied: '+gameCode)); }
+  catch(e){ toast('Code: '+gameCode); }
+});
+
+/* ═══════════════════════════════════════════════
+   WIRE BUTTONS
+   ═══════════════════════════════════════════════ */
 document.getElementById('btn-add').addEventListener('click',()=>{
-  if(setupRows.length>=6){toast('Max 6 players');return;}
-  setupRows.push({name:'',color:COLORS[setupRows.length%COLORS.length]});renderSetup();
+  if(setupRows.length>=6){ toast('Max 6 players'); return; }
+  setupRows.push({name:'',color:COLORS[setupRows.length%COLORS.length]});
+  renderSetup();
 });
 document.getElementById('btn-start').addEventListener('click',startGame);
 document.getElementById('btn-roll').addEventListener('click',rollDice);
 document.getElementById('btn-new').addEventListener('click',newGame);
 document.getElementById('btn-again').addEventListener('click',newGame);
 document.getElementById('btn-qr').addEventListener('click',openQR);
-document.getElementById('btn-close-qr').addEventListener('click',()=>showOnly(null));
+document.getElementById('btn-close-qr').addEventListener('click',hideAllOv);
 document.getElementById('ov-qr').addEventListener('click',e=>{
-  if(e.target===document.getElementById('ov-qr'))showOnly(null);
+  if(e.target===document.getElementById('ov-qr'))hideAllOv();
 });
 
-/* ══ INIT ════════════════════════════════════════════════
-   Firebase onValue fires immediately with current DB state,
-   which calls onStateChange() and shows the right screen.
-   No manual show/hide needed here.
-   ══════════════════════════════════════════════════════ */
-initSetup();
+/* JOIN flow — triggered from host screen "Join a Game" btn or QR scan landing */
+document.getElementById('btn-join-back').addEventListener('click',()=>{
+  showOv('ov-host'); initSetup();
+});
+document.getElementById('btn-join-go').addEventListener('click',joinGame);
+document.getElementById('join-code').addEventListener('keydown',e=>{
+  if(e.key==='Enter') document.getElementById('join-name').focus();
+});
+document.getElementById('join-name').addEventListener('keydown',e=>{
+  if(e.key==='Enter') joinGame();
+});
+// Uppercase code input
+document.getElementById('join-code').addEventListener('input',e=>{
+  e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'');
+});
+
+/* Add a "Join Existing Game" option on the host screen */
+const joinLink=document.createElement('button');
+joinLink.className='btn btn-gray';
+joinLink.style.cssText='margin-top:10px;width:100%;justify-content:center;';
+joinLink.textContent='🔗 Join an existing game';
+joinLink.addEventListener('click',()=>{ showOv('ov-join'); });
+document.querySelector('.setup-btns').insertAdjacentElement('afterend',joinLink);
+
+/* ═══════════════════════════════════════════════
+   START
+   ═══════════════════════════════════════════════ */
+init();
 </script>
 </body>
 </html>
