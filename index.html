@@ -7,6 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
+/* ── TOKENS ── */
 :root{
   --ink:#1a1a1a; --bg:#fff; --hbg:#f0f0f0; --card:#f9f9f9;
   --gold:#c8920a; --green:#166534; --red:#b91c1c;
@@ -25,50 +26,36 @@ body{
   display:flex;justify-content:center;align-items:flex-start;
   padding:clamp(6px,2vw,22px);
 }
-.card{
-  width:100%;max-width:min(98vw,660px);
-  background:var(--bg);border:2px solid var(--ink);
-  padding:var(--pad);box-shadow:0 4px 20px rgba(0,0,0,.14);
-}
-/* TABS */
+
+/* ── CARD ── */
+.card{width:100%;max-width:min(98vw,660px);background:var(--bg);border:2px solid var(--ink);padding:var(--pad);box-shadow:0 4px 20px rgba(0,0,0,.14);}
+
+/* ── TABS ── */
 .tabs{display:flex;gap:2px;margin-bottom:var(--gap);overflow-x:auto;padding-bottom:2px;scrollbar-width:none;}
 .tabs::-webkit-scrollbar{display:none;}
-.tab{
-  background:#ebebeb;border:1px solid #bbb;border-bottom:none;border-radius:4px 4px 0 0;
-  padding:clamp(3px,.8vw,7px) clamp(8px,2vw,16px);
-  font-size:var(--fxs);font-weight:700;cursor:pointer;white-space:nowrap;
-  flex-shrink:0;color:#777;transition:all .15s;line-height:1.35;
-}
+.tab{background:#ebebeb;border:1px solid #bbb;border-bottom:none;border-radius:4px 4px 0 0;padding:clamp(3px,.8vw,7px) clamp(8px,2vw,16px);font-size:var(--fxs);font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;color:#777;transition:all .15s;line-height:1.35;}
 .tab.active{background:var(--bg);border-color:var(--ink);color:var(--ink);}
 .tab.myturn::after{content:' 🎲';}
 .tab-pts{font-size:var(--fxs);color:#999;font-weight:400;}
-/* NAMEBAR */
-.namebar{
-  display:flex;align-items:center;gap:var(--gap);flex-wrap:wrap;
-  border-bottom:1px solid #ccc;margin-bottom:var(--gap);padding-bottom:clamp(3px,.7vw,7px);
-}
+
+/* ── NAMEBAR ── */
+.namebar{display:flex;align-items:center;gap:var(--gap);flex-wrap:wrap;border-bottom:1px solid #ccc;margin-bottom:var(--gap);padding-bottom:clamp(3px,.7vw,7px);}
 .nb-label{font-size:var(--fsm);font-weight:800;white-space:nowrap;}
 .nb-name{font-size:var(--fsm);font-weight:700;flex:1;min-width:60px;}
 .nb-score{font-size:var(--fxs);color:#555;white-space:nowrap;}
-.nb-edit{
-  background:none;border:1px solid #ccc;border-radius:3px;
-  font-size:var(--fxs);padding:2px 8px;cursor:pointer;color:#555;white-space:nowrap;
-}
+.nb-edit{background:none;border:1px solid #ccc;border-radius:3px;font-size:var(--fxs);padding:2px 8px;cursor:pointer;color:#555;white-space:nowrap;}
 .nb-edit:hover{background:#f0f0f0;}
 .dot{width:clamp(7px,1.4vw,10px);height:clamp(7px,1.4vw,10px);border-radius:50%;background:#bbb;flex-shrink:0;transition:background .3s;}
 .dot.on{background:var(--green);}.dot.off{background:var(--red);}
-/* DICE PANEL */
+
+/* ── DICE ── */
 .dice-panel{background:#f4f4f4;border:1px solid #ccc;border-radius:6px;padding:var(--gap);margin-bottom:var(--gap);}
 .dice-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--gap);}
 .turn-lbl{font-size:var(--flg);font-weight:800;}
 .roll-lbl{font-size:var(--fsm);color:#555;}
 .dice-row{display:flex;justify-content:space-evenly;margin-bottom:var(--gap);}
 .die-wrap{display:flex;flex-direction:column;align-items:center;gap:2px;}
-.die{
-  width:var(--die);height:var(--die);border-radius:clamp(6px,1.4vw,11px);
-  background:#fff;border:2px solid #555;display:flex;align-items:center;justify-content:center;
-  box-shadow:2px 2px 0 #aaa;transition:border-color .12s,background .12s;
-}
+.die{width:var(--die);height:var(--die);border-radius:clamp(6px,1.4vw,11px);background:#fff;border:2px solid #555;display:flex;align-items:center;justify-content:center;box-shadow:2px 2px 0 #aaa;transition:border-color .12s,background .12s;}
 .die.mine{cursor:pointer;}
 .die.mine:hover{box-shadow:3px 3px 0 #777;transform:translateY(-1px);}
 .die.held{background:#fffbeb;border-color:var(--gold);box-shadow:2px 2px 0 var(--gold);}
@@ -77,40 +64,26 @@ body{
 .held-lbl{font-size:clamp(.48rem,1.1vw,.62rem);font-weight:900;color:var(--gold);text-transform:uppercase;height:clamp(8px,1.4vw,12px);line-height:1;}
 .pg{display:grid;padding:clamp(2px,.5vw,5px);gap:clamp(1px,.3vw,3px);width:calc(var(--die)*.74);height:calc(var(--die)*.74);}
 .pip{width:var(--pip);height:var(--pip);border-radius:50%;background:#111;}
-.p1{grid-template:repeat(3,1fr)/repeat(3,1fr);}
-.p1 .pip{grid-column:2;grid-row:2;align-self:center;justify-self:center;}
-.p2{grid-template:repeat(2,1fr)/repeat(2,1fr);}
-.p2 .pip:nth-child(1){grid-column:1;grid-row:1;align-self:start;justify-self:start;}
-.p2 .pip:nth-child(2){grid-column:2;grid-row:2;align-self:end;justify-self:end;}
-.p3{grid-template:repeat(3,1fr)/repeat(3,1fr);}
-.p3 .pip:nth-child(1){grid-column:1;grid-row:1;}
-.p3 .pip:nth-child(2){grid-column:2;grid-row:2;align-self:center;justify-self:center;}
-.p3 .pip:nth-child(3){grid-column:3;grid-row:3;}
+.p1{grid-template:repeat(3,1fr)/repeat(3,1fr);}.p1 .pip{grid-column:2;grid-row:2;align-self:center;justify-self:center;}
+.p2{grid-template:repeat(2,1fr)/repeat(2,1fr);}.p2 .pip:nth-child(1){grid-column:1;grid-row:1;align-self:start;justify-self:start;}.p2 .pip:nth-child(2){grid-column:2;grid-row:2;align-self:end;justify-self:end;}
+.p3{grid-template:repeat(3,1fr)/repeat(3,1fr);}.p3 .pip:nth-child(1){grid-column:1;grid-row:1;}.p3 .pip:nth-child(2){grid-column:2;grid-row:2;align-self:center;justify-self:center;}.p3 .pip:nth-child(3){grid-column:3;grid-row:3;}
 .p4{grid-template:repeat(2,1fr)/repeat(2,1fr);}
-.p5{grid-template:repeat(3,1fr)/repeat(3,1fr);}
-.p5 .pip:nth-child(1){grid-column:1;grid-row:1;}
-.p5 .pip:nth-child(2){grid-column:3;grid-row:1;}
-.p5 .pip:nth-child(3){grid-column:2;grid-row:2;align-self:center;justify-self:center;}
-.p5 .pip:nth-child(4){grid-column:1;grid-row:3;}
-.p5 .pip:nth-child(5){grid-column:3;grid-row:3;}
+.p5{grid-template:repeat(3,1fr)/repeat(3,1fr);}.p5 .pip:nth-child(1){grid-column:1;grid-row:1;}.p5 .pip:nth-child(2){grid-column:3;grid-row:1;}.p5 .pip:nth-child(3){grid-column:2;grid-row:2;align-self:center;justify-self:center;}.p5 .pip:nth-child(4){grid-column:1;grid-row:3;}.p5 .pip:nth-child(5){grid-column:3;grid-row:3;}
 .p6{grid-template:repeat(3,1fr)/repeat(2,1fr);}
 .dice-btns{display:flex;align-items:center;gap:var(--gap);}
 .dice-hint{font-size:var(--fsm);color:#555;flex:1;line-height:1.35;}
 .dice-hint b{color:var(--red);}
-/* BUTTONS */
-.btn{
-  padding:clamp(5px,1.1vw,10px) clamp(10px,2.4vw,20px);
-  border:2px solid var(--ink);border-radius:4px;cursor:pointer;font-size:var(--fsm);
-  font-weight:700;font-family:inherit;display:inline-flex;align-items:center;
-  gap:4px;transition:all .12s;white-space:nowrap;line-height:1;
-}
+
+/* ── BUTTONS ── */
+.btn{padding:clamp(5px,1.1vw,10px) clamp(10px,2.4vw,20px);border:2px solid var(--ink);border-radius:4px;cursor:pointer;font-size:var(--fsm);font-weight:700;font-family:inherit;display:inline-flex;align-items:center;gap:4px;transition:all .12s;white-space:nowrap;line-height:1;}
 .btn:hover{filter:brightness(.88);}
 .btn:active{transform:scale(.96);}
 .btn-red{background:var(--red);color:#fff;border-color:var(--red);}
 .btn-gray{background:#ececec;color:#333;border-color:#999;font-size:var(--fxs);padding:clamp(4px,.8vw,8px) clamp(8px,1.8vw,14px);}
 .btn-grn{background:var(--green);color:#fff;border-color:var(--green);}
 .btn:disabled{opacity:.32;cursor:not-allowed;transform:none!important;}
-/* TABLE */
+
+/* ── TABLE ── */
 table{width:100%;border-collapse:collapse;font-size:var(--fsm);table-layout:fixed;}
 th,td{border:1px solid var(--ink);text-align:center;padding:clamp(2px,.6vw,5px);height:var(--row);}
 .la{text-align:left;padding-left:clamp(4px,.8vw,8px);}
@@ -119,12 +92,7 @@ thead th{background:var(--hbg);font-size:var(--fxs);text-transform:uppercase;}
 .tr{font-weight:800;background:#f4f4f4;}
 .sb{background:var(--card);}
 .col-c{width:34%;}.col-h{width:28%;}.col-s{width:38%;}
-.sbb{
-  width:100%;height:100%;min-height:clamp(22px,3.5vw,30px);
-  border:none;background:transparent;text-align:center;
-  font-size:var(--fmd);font-weight:700;cursor:pointer;
-  font-family:inherit;border-radius:2px;transition:all .14s;color:var(--ink);
-}
+.sbb{width:100%;height:100%;min-height:clamp(22px,3.5vw,30px);border:none;background:transparent;text-align:center;font-size:var(--fmd);font-weight:700;cursor:pointer;font-family:inherit;border-radius:2px;transition:all .14s;color:var(--ink);}
 .sbb:hover:not(:disabled):not(.filled){background:#dbeafe;}
 .sbb.filled{cursor:default;}
 .sbb.sug{background:var(--sbg);color:var(--green);font-weight:800;animation:pulse .9s ease-in-out infinite alternate;}
@@ -133,50 +101,28 @@ thead th{background:var(--hbg);font-size:var(--fxs);text-transform:uppercase;}
 .sbb.stat{cursor:default;}
 .sbb.bon{color:var(--green);font-weight:800;}
 .sbb:disabled:not(.filled):not(.stat){opacity:.25;cursor:not-allowed;}
-/* TOOLBAR */
+
+/* ── TOOLBAR ── */
 .toolbar{display:flex;gap:var(--gap);justify-content:center;flex-wrap:wrap;margin-top:var(--gap);padding-top:var(--gap);border-top:1px solid #ddd;}
-/* OVERLAYS */
-.ov{
-  position:fixed;inset:0;z-index:500;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  opacity:0;pointer-events:none;transition:opacity .22s;
-  padding:clamp(12px,3vw,28px);overflow-y:auto;
-}
+
+/* ── OVERLAYS ── */
+.ov{position:fixed;inset:0;z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .22s;padding:clamp(12px,3vw,28px);overflow-y:auto;}
 .ov.vis{opacity:1;pointer-events:all;}
-/* HOST SETUP */
+
+/* HOST SETUP — only host name, no player slots */
 #ov-host{background:linear-gradient(135deg,#b0b8c8,#8a9ab0);z-index:700;}
-.setup-box{
-  background:#fff;border:2px solid var(--ink);border-radius:6px;
-  padding:clamp(14px,3vw,26px);width:100%;max-width:min(96vw,440px);
-  box-shadow:5px 5px 0 rgba(0,0,0,.18);
-}
-.setup-box h2{font-family:'Permanent Marker',cursive;font-size:clamp(1.5rem,5.5vw,2.1rem);margin-bottom:6px;}
-.setup-sub{font-size:var(--fsm);color:#555;margin-bottom:10px;}
-.host-name-row{
-  display:flex;align-items:center;gap:8px;margin-bottom:12px;
-  padding:10px;background:#f7f7f7;border:1.5px solid #ddd;border-radius:5px;
-}
-.host-name-row label{font-size:var(--fsm);font-weight:700;white-space:nowrap;}
-.host-name-row input{flex:1;border:1.5px solid #ccc;border-radius:4px;padding:clamp(5px,1vw,8px) clamp(6px,1.2vw,10px);font-size:var(--fmd);font-family:inherit;}
+.setup-box{background:#fff;border:2px solid var(--ink);border-radius:6px;padding:clamp(16px,3.5vw,28px);width:100%;max-width:min(96vw,400px);box-shadow:5px 5px 0 rgba(0,0,0,.18);}
+.setup-box h2{font-family:'Permanent Marker',cursive;font-size:clamp(1.6rem,6vw,2.2rem);margin-bottom:6px;}
+.setup-sub{font-size:var(--fsm);color:#555;margin-bottom:18px;line-height:1.5;}
+.host-name-row{display:flex;flex-direction:column;gap:6px;margin-bottom:18px;}
+.host-name-row label{font-size:var(--fsm);font-weight:700;}
+.host-name-row input{border:2px solid #ccc;border-radius:5px;padding:clamp(8px,1.8vw,12px) clamp(10px,2vw,14px);font-size:var(--fmd);font-family:inherit;width:100%;}
 .host-name-row input:focus{outline:none;border-color:var(--ink);}
-.setup-divider{display:flex;align-items:center;gap:8px;margin:8px 0 6px;font-size:var(--fxs);color:#999;font-weight:600;}
-.setup-divider::before,.setup-divider::after{content:'';flex:1;height:1px;background:#ddd;}
-.setup-sub2{font-size:var(--fxs);color:#999;margin-bottom:8px;}
-.setup-list{display:flex;flex-direction:column;gap:clamp(5px,1.2vw,9px);margin-bottom:12px;}
-.setup-row{display:flex;align-items:center;gap:var(--gap);}
-.cdot{width:12px;height:12px;border-radius:50%;border:1px solid #aaa;flex-shrink:0;}
-.setup-row input{flex:1;border:1.5px solid #ccc;border-radius:4px;padding:clamp(5px,1vw,8px) clamp(6px,1.2vw,10px);font-size:var(--fmd);font-family:inherit;}
-.setup-row input:focus{outline:none;border-color:var(--ink);}
-.del-btn{background:none;border:1.5px solid #ccc;color:#aaa;width:clamp(24px,4.5vw,32px);height:clamp(24px,4.5vw,32px);border-radius:50%;cursor:pointer;font-size:.9rem;flex-shrink:0;}
-.del-btn:hover{background:var(--red);border-color:var(--red);color:#fff;}
 .setup-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+
 /* LOBBY */
 #ov-lobby{background:linear-gradient(135deg,#b0b8c8,#8a9ab0);z-index:650;}
-.lobby-box{
-  background:#fff;border:2px solid var(--ink);border-radius:6px;
-  padding:clamp(14px,3vw,26px);width:100%;max-width:min(96vw,420px);
-  box-shadow:5px 5px 0 rgba(0,0,0,.18);text-align:center;
-}
+.lobby-box{background:#fff;border:2px solid var(--ink);border-radius:6px;padding:clamp(14px,3vw,26px);width:100%;max-width:min(96vw,420px);box-shadow:5px 5px 0 rgba(0,0,0,.18);text-align:center;}
 .lobby-box h2{font-family:'Permanent Marker',cursive;font-size:clamp(1.3rem,4.5vw,1.8rem);margin-bottom:4px;}
 .lobby-code{font-family:'Permanent Marker',cursive;font-size:clamp(1.8rem,7vw,2.8rem);letter-spacing:7px;color:var(--red);margin:6px 0;}
 .lobby-qr{display:flex;justify-content:center;margin:8px 0;}
@@ -186,20 +132,26 @@ thead th{background:var(--hbg);font-size:var(--fxs);text-transform:uppercase;}
 .lp-name{font-size:var(--fsm);font-weight:700;flex:1;}
 .lp-status{font-size:var(--fxs);color:#aaa;}
 .lp-status.joined{color:var(--green);font-weight:700;}
-.lobby-hint{font-size:var(--fxs);color:#888;margin:4px 0 10px;}
+.lobby-hint{font-size:var(--fxs);color:#888;margin:4px 0 10px;line-height:1.5;}
 .lobby-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
-/* JOIN */
+
+/* JOIN (non-host via QR) */
 #ov-join{background:linear-gradient(135deg,#b0b8c8,#8a9ab0);z-index:700;}
-.join-box{
-  background:#fff;border:2px solid var(--ink);border-radius:6px;
-  padding:clamp(16px,3.5vw,28px);width:100%;max-width:min(96vw,380px);
-  box-shadow:5px 5px 0 rgba(0,0,0,.18);text-align:center;
-}
+.join-box{background:#fff;border:2px solid var(--ink);border-radius:6px;padding:clamp(16px,3.5vw,28px);width:100%;max-width:min(96vw,380px);box-shadow:5px 5px 0 rgba(0,0,0,.18);text-align:center;}
 .join-box h2{font-family:'Permanent Marker',cursive;font-size:clamp(1.4rem,5vw,2rem);margin-bottom:8px;}
-.join-box p{font-size:var(--fsm);color:#555;margin-bottom:14px;}
-.join-name-input{width:100%;border:1.5px solid #ccc;border-radius:4px;padding:clamp(8px,1.8vw,14px);font-size:var(--fmd);font-family:inherit;margin-bottom:12px;text-align:center;}
+.join-box p{font-size:var(--fsm);color:#555;margin-bottom:14px;line-height:1.4;}
+.join-name-input{width:100%;border:2px solid #ccc;border-radius:5px;padding:clamp(8px,1.8vw,14px);font-size:var(--fmd);font-family:inherit;margin-bottom:10px;text-align:center;}
 .join-name-input:focus{outline:none;border-color:var(--ink);}
 .join-err{font-size:var(--fsm);color:var(--red);min-height:1.4em;margin-bottom:8px;}
+
+/* WAITING (non-host before game starts) */
+#ov-wait{background:linear-gradient(135deg,#b0b8c8,#8a9ab0);z-index:640;}
+.wait-box{background:#fff;border:2px solid var(--ink);border-radius:6px;padding:clamp(16px,3.5vw,28px);width:100%;max-width:min(96vw,380px);box-shadow:5px 5px 0 rgba(0,0,0,.18);text-align:center;}
+.wait-box h2{font-family:'Permanent Marker',cursive;font-size:clamp(1.3rem,4.5vw,1.8rem);margin-bottom:10px;color:var(--green);}
+.wait-players{display:flex;flex-direction:column;gap:5px;margin:10px 0;text-align:left;}
+.spinner{display:inline-block;width:20px;height:20px;border:3px solid #ddd;border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:10px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
 /* RENAME */
 #ov-rename{background:rgba(0,0,0,.55);z-index:800;}
 .rename-box{background:#fff;border:2px solid var(--ink);border-radius:6px;padding:clamp(16px,3.5vw,26px);width:100%;max-width:min(96vw,340px);box-shadow:5px 5px 0 rgba(0,0,0,.3);text-align:center;}
@@ -207,14 +159,17 @@ thead th{background:var(--hbg);font-size:var(--fxs);text-transform:uppercase;}
 .rename-input{width:100%;border:2px solid var(--ink);border-radius:4px;padding:clamp(8px,1.8vw,12px);font-size:var(--fmd);font-family:inherit;margin-bottom:12px;text-align:center;}
 .rename-input:focus{outline:none;border-color:var(--green);}
 .rename-btns{display:flex;gap:8px;justify-content:center;}
+
 /* CODE BADGE */
 .code-badge{display:inline-flex;align-items:center;gap:6px;background:#f0f0f0;border:1.5px solid #aaa;border-radius:4px;padding:3px 10px;font-size:var(--fsm);font-weight:800;letter-spacing:3px;font-family:'Permanent Marker',cursive;cursor:pointer;user-select:all;}
 .code-badge span{font-size:var(--fxs);font-weight:400;letter-spacing:0;font-family:inherit;color:#777;}
-/* YAHTZEE */
+
+/* YAHTZEE BLAST */
 #ov-ytz{background:rgba(0,0,0,.6);z-index:600;}
 .ytz-word{font-family:'Permanent Marker',cursive;font-size:clamp(3.2rem,16vw,8rem);color:#fff;text-shadow:4px 4px 0 var(--red),0 0 45px rgba(255,200,0,.9);animation:pop .5s cubic-bezier(.175,.885,.32,1.275) forwards;}
 @keyframes pop{0%{transform:scale(0) rotate(-8deg)}60%{transform:scale(1.18) rotate(2deg)}100%{transform:scale(1) rotate(0)}}
 .ytz-sub{color:#ffe;font-size:clamp(.85rem,2.5vw,1.2rem);font-weight:700;letter-spacing:3px;text-transform:uppercase;margin-top:10px;}
+
 /* QR */
 #ov-qr{background:rgba(0,0,0,.72);z-index:500;}
 .qr-box{background:#fff;border:2px solid var(--ink);border-radius:6px;padding:clamp(16px,3.5vw,26px);text-align:center;width:clamp(260px,82vw,340px);box-shadow:5px 5px 0 rgba(0,0,0,.3);}
@@ -223,6 +178,7 @@ thead th{background:var(--hbg);font-size:var(--fxs);text-transform:uppercase;}
 #qr-render{display:flex;justify-content:center;margin-bottom:10px;}
 .qr-code-lbl{font-family:'Permanent Marker',cursive;font-size:1.5rem;letter-spacing:6px;color:var(--ink);margin-bottom:4px;}
 .qr-url{font-size:var(--fxs);color:#999;word-break:break-all;background:#f4f4f4;padding:5px;border-radius:3px;margin-bottom:12px;}
+
 /* GAME OVER */
 #ov-over{background:rgba(255,255,255,.97);z-index:400;text-align:center;overflow-y:auto;}
 #ov-over h2{font-family:'Permanent Marker',cursive;font-size:clamp(1.6rem,6vw,2.8rem);color:var(--red);margin-bottom:10px;}
@@ -230,9 +186,11 @@ thead th{background:var(--hbg);font-size:var(--fxs);text-transform:uppercase;}
 .go-tbl{width:100%;max-width:min(96vw,520px);border-collapse:collapse;font-size:var(--fsm);margin-bottom:16px;}
 .go-tbl th{background:#222;color:#fff;padding:clamp(5px,1.2vw,8px);font-size:var(--fxs);text-transform:uppercase;}
 .go-tbl td{padding:clamp(6px,1.4vw,10px);border-bottom:1px solid #ddd;text-align:center;}
+
 /* TOAST */
-.toast{position:fixed;bottom:clamp(14px,3vw,24px);left:50%;transform:translateX(-50%) translateY(70px);background:#1a1a1a;color:#fff;padding:clamp(6px,1.2vw,10px) clamp(14px,3vw,22px);border-radius:4px;font-size:var(--fsm);font-weight:700;z-index:900;transition:transform .26s;pointer-events:none;white-space:nowrap;max-width:90vw;text-align:center;}
+.toast{position:fixed;bottom:clamp(14px,3vw,24px);left:50%;transform:translateX(-50%) translateY(70px);background:#1a1a1a;color:#fff;padding:clamp(6px,1.2vw,10px) clamp(14px,3vw,22px);border-radius:4px;font-size:var(--fsm);font-weight:700;z-index:900;transition:transform .26s;pointer-events:none;max-width:90vw;text-align:center;}
 .toast.show{transform:translateX(-50%) translateY(0);}
+
 /* RESPONSIVE */
 @media(max-width:374px){:root{--fxs:.68rem;--fsm:.76rem;--fmd:.86rem;--flg:.95rem;--die:38px;--pip:5px;--row:20px;}}
 @media(max-height:480px) and (orientation:landscape){:root{--fxs:.62rem;--fsm:.7rem;--fmd:.8rem;--flg:.88rem;--die:34px;--pip:4px;--row:17px;--gap:2px;--pad:4px;}body{padding:3px;}.dice-panel{margin-bottom:3px;}}
@@ -242,55 +200,62 @@ thead th{background:var(--hbg);font-size:var(--fxs);text-transform:uppercase;}
 </head>
 <body>
 
-<!-- HOST SETUP -->
+<!-- ══ HOST SETUP — only host name ══ -->
 <div class="ov vis" id="ov-host">
   <div class="setup-box">
     <h2>🎲 Yahtzee</h2>
-    <p class="setup-sub">Set up your game — you'll get a QR code to share after starting</p>
+    <p class="setup-sub">Enter your name to host a game. You'll get a QR code to share with other players.</p>
     <div class="host-name-row">
-      <label>Your name:</label>
-      <input type="text" id="host-name" maxlength="14" placeholder="Host" autocomplete="off">
+      <label for="host-name">Your name</label>
+      <input type="text" id="host-name" maxlength="14" placeholder="e.g. Alex" autocomplete="off" autocapitalize="words">
     </div>
-    <div class="setup-divider">OTHER PLAYERS</div>
-    <p class="setup-sub2">Add slots for other players — they'll pick their name after scanning</p>
-    <div class="setup-list" id="setup-list"></div>
     <div class="setup-btns">
-      <button class="btn btn-gray" id="btn-add">+ Add Slot</button>
-      <button class="btn btn-red"  id="btn-start">▶ Start &amp; Get QR</button>
+      <button class="btn btn-red" id="btn-start">▶ Start Game &amp; Get QR</button>
     </div>
   </div>
 </div>
 
-<!-- LOBBY (host waiting room) -->
+<!-- ══ LOBBY — host sees this, shares QR, starts when ready ══ -->
 <div class="ov" id="ov-lobby">
   <div class="lobby-box">
-    <h2>📲 Share &amp; Wait</h2>
-    <p style="font-size:var(--fxs);color:#666;margin-bottom:2px">Scan QR or share game code:</p>
+    <h2>📲 Invite Players</h2>
+    <p style="font-size:var(--fxs);color:#666;margin-bottom:2px">Scan QR or share the code:</p>
     <div class="lobby-code" id="lobby-code"></div>
     <div class="lobby-qr" id="lobby-qr-render"></div>
     <div class="lobby-players" id="lobby-players"></div>
-    <p class="lobby-hint">Others scan the QR or visit this URL and enter the code</p>
+    <p class="lobby-hint">Each player scans the QR (or visits this page with the code) and enters their name. Start when everyone is in.</p>
     <div class="lobby-btns">
       <button class="btn btn-gray" id="btn-lobby-copy">📋 Copy Link</button>
-      <button class="btn btn-grn"  id="btn-lobby-start-now">▶ Start Now</button>
+      <button class="btn btn-grn"  id="btn-lobby-start-now">▶ Start Game</button>
     </div>
   </div>
 </div>
 
-<!-- JOIN (non-host players via QR) -->
+<!-- ══ JOIN — non-host players via QR/link ══ -->
 <div class="ov" id="ov-join">
   <div class="join-box">
     <h2>🎲 Join Game</h2>
     <p id="join-intro">Enter your name to join</p>
-    <input class="join-name-input" id="join-name" maxlength="14" placeholder="Your name" autocomplete="off">
+    <input class="join-name-input" id="join-name" maxlength="14" placeholder="Your name" autocomplete="off" autocapitalize="words">
     <div class="join-err" id="join-err"></div>
     <div style="display:flex;justify-content:center;">
-      <button class="btn btn-grn" id="btn-join-go">Join Game →</button>
+      <button class="btn btn-grn" id="btn-join-go">Join →</button>
     </div>
   </div>
 </div>
 
-<!-- RENAME MODAL -->
+<!-- ══ WAITING — non-host sees this after joining, before game starts ══ -->
+<div class="ov" id="ov-wait">
+  <div class="wait-box">
+    <div class="spinner"></div>
+    <h2>✅ You're In!</h2>
+    <p style="font-size:var(--fsm);color:#555;margin-bottom:10px;">Waiting for the host to start the game…</p>
+    <div class="wait-players" id="wait-players"></div>
+    <p style="font-size:var(--fxs);color:#aaa;margin-top:10px;">The game will begin automatically when the host starts.</p>
+  </div>
+</div>
+
+<!-- ══ RENAME MODAL ══ -->
 <div class="ov" id="ov-rename">
   <div class="rename-box">
     <h3>✏️ Change Name</h3>
@@ -302,17 +267,17 @@ thead th{background:var(--hbg);font-size:var(--fxs);text-transform:uppercase;}
   </div>
 </div>
 
-<!-- YAHTZEE BLAST -->
+<!-- ══ YAHTZEE BLAST ══ -->
 <div class="ov" id="ov-ytz">
   <div class="ytz-word">YAHTZEE!</div>
   <div class="ytz-sub" id="ytz-sub">5 OF A KIND</div>
 </div>
 
-<!-- QR MODAL (in-game) -->
+<!-- ══ QR MODAL (in-game share) ══ -->
 <div class="ov" id="ov-qr">
   <div class="qr-box">
-    <h3>📲 Share Game</h3>
-    <p>Scan QR or enter code manually</p>
+    <h3>📲 Invite More Players</h3>
+    <p>Scan QR or enter the code</p>
     <div id="qr-render"></div>
     <div class="qr-code-lbl" id="qr-code-lbl"></div>
     <div class="qr-url" id="qr-url"></div>
@@ -320,7 +285,7 @@ thead th{background:var(--hbg);font-size:var(--fxs);text-transform:uppercase;}
   </div>
 </div>
 
-<!-- GAME OVER -->
+<!-- ══ GAME OVER ══ -->
 <div class="ov" id="ov-over">
   <h2>🏆 Game Over!</h2>
   <div class="go-winner" id="go-winner"></div>
@@ -334,7 +299,7 @@ thead th{background:var(--hbg);font-size:var(--fxs);text-transform:uppercase;}
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<!-- MAIN GAME CARD -->
+<!-- ══ MAIN GAME CARD ══ -->
 <div class="card" id="main-card" style="display:none">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--gap);">
     <div class="code-badge" id="code-badge" title="Tap to copy code">
@@ -346,7 +311,7 @@ thead th{background:var(--hbg);font-size:var(--fxs);text-transform:uppercase;}
   <div class="namebar">
     <span class="nb-label">VIEWING:</span>
     <span class="nb-name" id="vname"></span>
-    <button class="nb-edit" id="btn-edit-name" style="display:none">✏️ Edit Name</button>
+    <button class="nb-edit" id="btn-edit-name" style="display:none">✏️ Edit</button>
     <span class="nb-score" id="vscore"></span>
   </div>
   <div class="dice-panel">
@@ -363,7 +328,7 @@ thead th{background:var(--hbg);font-size:var(--fxs);text-transform:uppercase;}
   <table>
     <thead>
       <tr class="sh">
-        <th class="la col-c">Upper Section</th>
+        <th class="la col-c">Category</th>
         <th class="col-h">How to Score</th>
         <th class="col-s">Score</th>
       </tr>
@@ -371,257 +336,389 @@ thead th{background:var(--hbg);font-size:var(--fxs);text-transform:uppercase;}
     <tbody id="sc-body"></tbody>
   </table>
   <div class="toolbar">
-    <button class="btn btn-gray" id="btn-qr">📲 QR / Share</button>
+    <button class="btn btn-gray" id="btn-qr">📲 QR / Invite</button>
     <button class="btn btn-red"  id="btn-new" style="display:none">↺ Reset Game</button>
   </div>
 </div>
 
+<!-- ══════════════════════════════════════════
+     GAME LOGIC
+══════════════════════════════════════════ -->
 <script type="module">
 import{initializeApp}from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import{getDatabase,ref,set,get,update,onValue}from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+import{getDatabase,ref,set,get,push,update,onValue}from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
 
 const app=initializeApp({databaseURL:'https://scoreboard-1677c-default-rtdb.firebaseio.com/'});
 const DB=getDatabase(app);
 
-/* Audio */
+/* ── Audio ── */
 let _ac=null;
 const AC=()=>_ac||(_ac=new(window.AudioContext||window.webkitAudioContext)());
 function ding(){try{const c=AC(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sine';o.frequency.setValueAtTime(880,c.currentTime);o.frequency.exponentialRampToValueAtTime(1320,c.currentTime+.1);g.gain.setValueAtTime(.25,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.3);o.start();o.stop(c.currentTime+.35);}catch(e){}}
 function rollSnd(){try{const c=AC();[0,.04,.08,.12,.16].forEach(t=>{const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='triangle';o.frequency.setValueAtTime(90+Math.random()*260,c.currentTime+t);g.gain.setValueAtTime(.08,c.currentTime+t);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+t+.06);o.start(c.currentTime+t);o.stop(c.currentTime+t+.08);});}catch(e){}}
 function fanfare(){try{const c=AC();[[523,0],[659,.13],[784,.26],[1047,.4],[1319,.52],[1047,.62],[1319,.72],[1568,.83]].forEach(([f,t])=>{const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='triangle';const ct=c.currentTime+t;o.frequency.setValueAtTime(f,ct);g.gain.setValueAtTime(.24,ct);g.gain.exponentialRampToValueAtTime(.001,ct+.2);o.start(ct);o.stop(ct+.22);});}catch(e){}}
 
+/* ── Game categories ── */
 const COLORS=['#b91c1c','#1d4ed8','#166534','#7c3aed','#b45309','#be185d'];
 const CATS=[
-  {id:'aces',name:'Aces',hint:'Add 1s',sec:'U'},
-  {id:'twos',name:'Twos',hint:'Add 2s',sec:'U'},
-  {id:'threes',name:'Threes',hint:'Add 3s',sec:'U'},
-  {id:'fours',name:'Fours',hint:'Add 4s',sec:'U'},
-  {id:'fives',name:'Fives',hint:'Add 5s',sec:'U'},
-  {id:'sixes',name:'Sixes',hint:'Add 6s',sec:'U'},
-  {id:'threeK',name:'3 of a kind',hint:'Total all',sec:'L'},
-  {id:'fourK',name:'4 of a kind',hint:'Total all',sec:'L'},
-  {id:'fullH',name:'Full House',hint:'Score 25',sec:'L'},
-  {id:'smStr',name:'Sm. Straight',hint:'Score 30',sec:'L'},
-  {id:'lgStr',name:'Lg. Straight',hint:'Score 40',sec:'L'},
-  {id:'yahtzee',name:'YAHTZEE 🎲',hint:'Score 50',sec:'L'},
-  {id:'chance',name:'Chance',hint:'Total all 5',sec:'L'},
+  {id:'aces',  name:'Aces',        hint:'Sum of 1s',    sec:'U'},
+  {id:'twos',  name:'Twos',        hint:'Sum of 2s',    sec:'U'},
+  {id:'threes',name:'Threes',      hint:'Sum of 3s',    sec:'U'},
+  {id:'fours', name:'Fours',       hint:'Sum of 4s',    sec:'U'},
+  {id:'fives', name:'Fives',       hint:'Sum of 5s',    sec:'U'},
+  {id:'sixes', name:'Sixes',       hint:'Sum of 6s',    sec:'U'},
+  {id:'threeK',name:'3 of a Kind', hint:'Sum all dice', sec:'L'},
+  {id:'fourK', name:'4 of a Kind', hint:'Sum all dice', sec:'L'},
+  {id:'fullH', name:'Full House',  hint:'25 pts',       sec:'L'},
+  {id:'smStr', name:'Sm. Straight',hint:'30 pts',       sec:'L'},
+  {id:'lgStr', name:'Lg. Straight',hint:'40 pts',       sec:'L'},
+  {id:'yahtzee',name:'YAHTZEE',    hint:'50 pts',       sec:'L'},
+  {id:'chance',name:'Chance',      hint:'Sum all dice', sec:'L'},
 ];
 const U_IDS=CATS.filter(c=>c.sec==='U').map(c=>c.id);
 const L_IDS=CATS.filter(c=>c.sec==='L').map(c=>c.id);
 const ALL_IDS=CATS.map(c=>c.id);
 
-let gameCode=null,myPid=null,isHost=false,state=null,viewPid=null;
-let setupRows=[],qrDone=false,lobbyQrDone=false,unsub=null;
+/* ── Session ── */
+let gameCode=null, myPid=null, isHost=false, state=null, viewPid=null;
+let qrDone=false, lobbyQrDone=false, unsub=null;
 
 try{
   const s=JSON.parse(sessionStorage.getItem('ytz_session')||'null');
   if(s){gameCode=s.gameCode;myPid=s.myPid;isHost=!!s.isHost;}
 }catch(e){}
 
+/* ── URL helpers ── */
 function getJoinCode(){
   try{const p=new URLSearchParams(window.location.search);return p.get('join')||p.get('code')||null;}
   catch(e){return null;}
 }
 function joinUrl(code){
-  const u=new URL(window.location.href);
-  u.search='?join='+code;
-  return u.toString();
+  const u=new URL(window.location.href);u.search='?join='+code;return u.toString();
 }
 
-function dbRef(path){return ref(DB,'ytz6/'+gameCode+(path?'/'+path:''));}
-function pushState(s){return set(dbRef(),JSON.parse(JSON.stringify(s)));}
+/* ── Firebase ── */
+function gameRef(path){return ref(DB,'ytz7/'+gameCode+(path?'/'+path:''));}
+
+/* Write full game state */
+function pushState(s){return set(gameRef(),JSON.parse(JSON.stringify(s)));}
+
+/* Normalise Firebase data (objects → arrays, missing fields → defaults) */
 function toArr(v,def=[]){
   if(!v)return def;
   if(Array.isArray(v))return v;
-  if(typeof v==='object'){const keys=Object.keys(v).map(Number).sort((a,b)=>a-b);return keys.map(k=>v[k]);}
+  if(typeof v==='object'){
+    const keys=Object.keys(v).map(Number).sort((a,b)=>a-b);
+    return keys.map(k=>v[k]);
+  }
   return def;
 }
-function normalizeState(d){
-  const players=toArr(d.players,[]).map(p=>({
-    id:p.id||'',name:p.name||'',color:p.color||'#333',
-    scores:p.scores||{},yBonus:p.yBonus||0,rollsLeft:p.rollsLeft!=null?p.rollsLeft:3,
-    dice:toArr(p.dice,[1,1,1,1,1]),held:toArr(p.held,[false,false,false,false,false]),
-    joined:!!p.joined,
-  }));
-  return{players,curIdx:Number(d.curIdx)||0,started:!!d.started,over:!!d.over,code:d.code||'',hostPid:d.hostPid||''};
+function normPlayer(p){
+  return{
+    id:      p.id||'',
+    name:    p.name||'Player',
+    color:   p.color||'#333',
+    scores:  p.scores||{},
+    yBonus:  p.yBonus||0,
+    rollsLeft: (p.rollsLeft!=null)?p.rollsLeft:3,
+    dice:    toArr(p.dice,[1,1,1,1,1]),
+    held:    toArr(p.held,[false,false,false,false,false]),
+  };
 }
-function makeCode(){const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<6;i++)s+=c[Math.floor(Math.random()*c.length)];return s;}
+function normalizeState(d){
+  return{
+    players: toArr(d.players,[]).map(normPlayer),
+    curIdx:  Number(d.curIdx)||0,
+    started: !!d.started,
+    over:    !!d.over,
+    code:    d.code||'',
+    hostPid: d.hostPid||'',
+  };
+}
+function makeCode(){
+  const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let s='';for(let i=0;i<6;i++)s+=c[Math.floor(Math.random()*c.length)];return s;
+}
 
+/* ── Subscribe to live game ── */
 function subscribeToGame(code){
   if(unsub){unsub();unsub=null;}
   gameCode=code;
-  unsub=onValue(ref(DB,'ytz6/'+code),snap=>{
+  unsub=onValue(ref(DB,'ytz7/'+code),snap=>{
     const raw=snap.val();if(!raw)return;
-    state=normalizeState(raw);onStateChange();
-  },e=>toast('DB: '+e.message));
+    state=normalizeState(raw);
+    onStateChange();
+  },e=>toast('Connection error: '+e.message));
 }
 
+/* Connection indicator */
 onValue(ref(DB,'.info/connected'),snap=>{
   const on=!!snap.val();
   const d=document.getElementById('conn-dot');
   if(d)d.className='dot '+(on?'on':'off');
 });
 
-/* STATE CHANGE */
+/* ══════════════════════════════════════════
+   STATE MACHINE — decide which screen to show
+══════════════════════════════════════════ */
 function onStateChange(){
   if(!state)return;
-  if(myPid&&state.hostPid)isHost=(myPid===state.hostPid);
 
-  if(state.over){show('main-card');showOv('ov-over');renderGameOver();return;}
+  /* Sync isHost from authoritative state */
+  if(myPid&&state.hostPid) isHost=(myPid===state.hostPid);
 
-  if(state.started){
-    show('main-card');hideAllOv();
-    if(!state.players.find(p=>p.id===viewPid))
-      viewPid=curP()?.id||state.players[0]?.id||null;
-    renderAll();return;
+  /* Game finished */
+  if(state.over){
+    show('main-card'); showOv('ov-over'); renderGameOver(); return;
   }
 
-  if(myPid){
-    const me=state.players.find(p=>p.id===myPid);
-    if(me){
-      if(isHost){show('main-card');showOv('ov-lobby');renderLobby();checkAllJoined();}
-      else{show('main-card');hideAllOv();renderAll();}
-    }
+  /* Game running */
+  if(state.started){
+    show('main-card'); hideAllOv();
+    /* Keep viewPid on a valid player */
+    if(!state.players.find(p=>p.id===viewPid))
+      viewPid=curP()?.id||state.players[0]?.id||null;
+    renderAll(); return;
+  }
+
+  /* Pre-start — waiting lobby */
+  if(!myPid) return; /* shouldn't happen */
+
+  const me=state.players.find(p=>p.id===myPid);
+  if(!me) return;
+
+  if(isHost){
+    /* Host sees lobby with player list + Start button */
+    show('main-card');
+    document.getElementById('code-display').textContent=state.code;
+    showOv('ov-lobby');
+    renderLobby();
+  } else {
+    /* Non-host sees waiting screen */
+    showOv('ov-wait');
+    renderWait();
   }
 }
 
-/* INIT */
+/* ══════════════════════════════════════════
+   INITIALISE
+══════════════════════════════════════════ */
 async function init(){
   const joinCode=getJoinCode();
+
   if(joinCode){
-    if(gameCode&&gameCode!==joinCode){
-      gameCode=null;myPid=null;isHost=false;
+    /* Someone scanned a QR or followed a link */
+    if(gameCode && gameCode!==joinCode){
+      /* Different game — clear old session */
+      gameCode=null; myPid=null; isHost=false;
       try{sessionStorage.removeItem('ytz_session');}catch(e){}
     }
     if(!myPid){
+      /* Not yet in this game — show join screen */
       gameCode=joinCode;
-      showJoinScreen(joinCode);return;
+      showJoinScreen(joinCode);
+      return;
     }
+    /* Already in this game — reconnect */
   }
-  if(gameCode&&myPid){subscribeToGame(gameCode);return;}
-  showOv('ov-host');initSetup();
+
+  if(gameCode && myPid){
+    subscribeToGame(gameCode);
+    return;
+  }
+
+  /* Fresh start — show host setup */
+  showOv('ov-host');
+  setTimeout(()=>document.getElementById('host-name').focus(),200);
 }
 
-/* HOST SETUP */
-function initSetup(){
-  setupRows=[{color:COLORS[1]},{color:COLORS[2]}];
-  renderSetup();
-}
-function renderSetup(){
-  const list=document.getElementById('setup-list');list.innerHTML='';
-  setupRows.forEach((r,i)=>{
-    const row=document.createElement('div');row.className='setup-row';
-    const dot=document.createElement('div');dot.className='cdot';dot.style.background=r.color;
-    const inp=document.createElement('input');
-    inp.type='text';inp.placeholder='Player '+(i+2)+' (optional)';inp.maxLength=14;inp.value=r.name||'';
-    inp.addEventListener('input',()=>setupRows[i].name=inp.value.trim());
-    const del=document.createElement('button');del.className='del-btn';del.textContent='×';
-    del.addEventListener('click',()=>{setupRows.splice(i,1);renderSetup();});
-    row.appendChild(dot);row.appendChild(inp);row.appendChild(del);list.appendChild(row);
-  });
-}
-
+/* ══════════════════════════════════════════
+   HOST: START GAME
+   Creates game in Firebase with only the host player.
+   Other players are added dynamically as they join.
+══════════════════════════════════════════ */
 async function startGame(){
   const hostName=document.getElementById('host-name').value.trim()||'Host';
-  const ts=Date.now();const hostId='p'+ts+'0';
-  const players=[{
-    id:hostId,name:hostName,color:COLORS[0],scores:{},yBonus:0,rollsLeft:3,
-    dice:[1,1,1,1,1],held:[false,false,false,false,false],joined:true,
-  }];
-  setupRows.forEach((r,i)=>players.push({
-    id:'p'+ts+(i+1),name:r.name||('Player '+(i+2)),color:COLORS[(i+1)%COLORS.length],
-    scores:{},yBonus:0,rollsLeft:3,dice:[1,1,1,1,1],held:[false,false,false,false,false],joined:false,
-  }));
+  const ts=Date.now();
+  const hostId='p'+ts+'0';
   const code=makeCode();
-  gameCode=code;myPid=hostId;isHost=true;viewPid=hostId;saveSession();
-  const newState={players,curIdx:0,started:false,over:false,code,hostPid:hostId};
+
+  const hostPlayer={
+    id:hostId, name:hostName, color:COLORS[0],
+    scores:{}, yBonus:0, rollsLeft:3,
+    dice:[1,1,1,1,1], held:[false,false,false,false,false],
+  };
+
+  const newState={
+    players:[hostPlayer],
+    curIdx:0,
+    started:false,       /* host explicitly starts from lobby */
+    over:false,
+    code,
+    hostPid:hostId,
+  };
+
+  gameCode=code; myPid=hostId; isHost=true; viewPid=hostId;
+  saveSession();
+
   state=normalizeState(newState);
   await pushState(newState);
-  subscribeToGame(code);
+  subscribeToGame(code);   /* subscribe AFTER write so we don't get stale echo */
+
   show('main-card');
   document.getElementById('code-display').textContent=code;
-  showOv('ov-lobby');renderLobby();
+  showOv('ov-lobby');
+  renderLobby();
 }
 
-/* LOBBY */
+/* ══════════════════════════════════════════
+   LOBBY (host view — waiting for others)
+══════════════════════════════════════════ */
 function renderLobby(){
   if(!state)return;
   const code=state.code||gameCode;
   document.getElementById('lobby-code').textContent=code;
+
+  /* Render QR once */
   if(!lobbyQrDone){
     const el=document.getElementById('lobby-qr-render');el.innerHTML='';
-    new QRCode(el,{text:joinUrl(code),width:130,height:130,colorDark:'#1a1a1a',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.H});
+    new QRCode(el,{text:joinUrl(code),width:130,height:130,
+      colorDark:'#1a1a1a',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.H});
     lobbyQrDone=true;
   }
+
+  /* Player list */
   const pl=document.getElementById('lobby-players');pl.innerHTML='';
   state.players.forEach(p=>{
     const row=document.createElement('div');row.className='lp-row';
     const dot=document.createElement('div');dot.className='lp-dot';dot.style.background=p.color;
-    const nm=document.createElement('div');nm.className='lp-name';nm.textContent=p.name+(p.id===myPid?' (you)':'');
-    const st=document.createElement('div');st.className='lp-status'+(p.joined?' joined':'');
-    st.textContent=p.joined?'✓ Joined':'Waiting…';
-    row.appendChild(dot);row.appendChild(nm);row.appendChild(st);pl.appendChild(row);
+    const nm=document.createElement('div');nm.className='lp-name';
+    nm.textContent=p.name+(p.id===myPid?' (you — host)':'');
+    const st=document.createElement('div');st.className='lp-status joined';
+    st.textContent='✓ Ready';
+    row.appendChild(dot);row.appendChild(nm);row.appendChild(st);
+    pl.appendChild(row);
   });
 }
 
-/* JOIN */
+/* ══════════════════════════════════════════
+   JOIN (non-host via QR/link)
+   Adds a NEW player entry to the Firebase array.
+══════════════════════════════════════════ */
 function showJoinScreen(code){
-  document.getElementById('join-intro').textContent='Enter your name to join game '+code;
+  const intro=document.getElementById('join-intro');
+  intro.textContent='You\'ve been invited to join game '+code+'. Enter your name to join!';
   document.getElementById('join-err').textContent='';
   document.getElementById('join-name').value='';
   showOv('ov-join');
+  setTimeout(()=>document.getElementById('join-name').focus(),200);
 }
 
 async function joinGame(){
   const name=document.getElementById('join-name').value.trim();
   const err=document.getElementById('join-err');
   err.textContent='';
+
   if(!name){err.textContent='Please enter your name.';return;}
+  if(name.length<1){err.textContent='Name too short.';return;}
+
   const code=gameCode||(getJoinCode()||'');
   if(!code){err.textContent='No game code found.';return;}
+
+  /* Fetch current state */
   let snap;
-  try{snap=await get(ref(DB,'ytz6/'+code));}
-  catch(e){err.textContent='Connection error.';return;}
-  if(!snap.exists()){err.textContent='Game not found.';return;}
+  try{snap=await get(ref(DB,'ytz7/'+code));}
+  catch(e){err.textContent='Connection error. Try again.';return;}
+  if(!snap.exists()){err.textContent='Game not found. Check the code.';return;}
+
   const g=normalizeState(snap.val());
-  if(g.over){err.textContent='That game is already finished.';return;}
-  const slot=g.players.find(p=>!p.joined);
-  if(!slot){
-    const existing=g.players.find(p=>p.name.toLowerCase()===name.toLowerCase());
-    if(existing){
-      gameCode=code;myPid=existing.id;isHost=(existing.id===g.hostPid);
-      viewPid=existing.id;saveSession();subscribeToGame(code);
-      show('main-card');hideAllOv();return;
+  if(g.over){err.textContent='That game is already over.';return;}
+
+  /* Prevent duplicate names */
+  const dupe=g.players.find(p=>p.name.toLowerCase()===name.toLowerCase());
+  if(dupe){
+    /* Allow re-joining same device with same name */
+    if(dupe.id===myPid){
+      gameCode=code; isHost=(dupe.id===g.hostPid); viewPid=dupe.id;
+      saveSession(); subscribeToGame(code); hideAllOv(); show('main-card'); return;
     }
-    err.textContent='All player slots are taken.';return;
+    err.textContent='That name is already taken. Choose another.'; return;
   }
-  gameCode=code;myPid=slot.id;isHost=false;viewPid=slot.id;saveSession();
-  try{await update(ref(DB,'ytz6/'+code+'/players/'+g.players.indexOf(slot)),{joined:true,name});}
-  catch(e){err.textContent='Error joining.';return;}
-  subscribeToGame(code);show('main-card');hideAllOv();
+
+  if(g.players.length>=6){err.textContent='Game is full (max 6 players).';return;}
+
+  /* Build new player object */
+  const ts=Date.now();
+  const newPlayer={
+    id:'p'+ts+'x',
+    name,
+    color:COLORS[g.players.length%COLORS.length],
+    scores:{},yBonus:0,rollsLeft:3,
+    dice:[1,1,1,1,1],held:[false,false,false,false,false],
+  };
+
+  /* Append to players array in Firebase */
+  const newIndex=g.players.length;
+  try{
+    await update(ref(DB,'ytz7/'+code+'/players/'+newIndex), newPlayer);
+  }catch(e){err.textContent='Error joining. Try again.';return;}
+
+  gameCode=code; myPid=newPlayer.id; isHost=false; viewPid=newPlayer.id;
+  saveSession();
+  subscribeToGame(code);
+  show('main-card');
+  /* Show waiting screen — onStateChange will move to game when host starts */
+  showOv('ov-wait');
 }
 
-function checkAllJoined(){
-  if(!state||state.started)return;
-  if(state.players.every(p=>p.joined)){
-    state.started=true;viewPid=curP()?.id||state.players[0].id;pushState(state);
-  }
+/* WAITING SCREEN (non-host before game starts) */
+function renderWait(){
+  if(!state)return;
+  const wp=document.getElementById('wait-players');wp.innerHTML='';
+  state.players.forEach(p=>{
+    const row=document.createElement('div');row.className='lp-row';
+    const dot=document.createElement('div');dot.className='lp-dot';dot.style.background=p.color;
+    const nm=document.createElement('div');nm.className='lp-name';
+    nm.textContent=p.name+(p.id===myPid?' (you)':'')+(p.id===state.hostPid?' 👑':'');
+    row.appendChild(dot);row.appendChild(nm);
+    wp.appendChild(row);
+  });
 }
 
-/* RENDER */
+/* ══════════════════════════════════════════
+   HOST: START GAME PROPER (from lobby)
+══════════════════════════════════════════ */
+async function startGameNow(){
+  if(!state)return;
+  if(state.players.length<1)return;
+
+  /* Shuffle turn order (optional but fair — host goes first as registered) */
+  state.started=true;
+  state.curIdx=0;
+  viewPid=state.players[0].id;
+
+  await pushState(state);
+  /* onStateChange will fire and show the game board */
+}
+
+/* ══════════════════════════════════════════
+   RENDER — main game board
+══════════════════════════════════════════ */
 function renderAll(){
   if(!state)return;
-  updateCodeBadge();renderTabs();renderDicePanel();renderScorecard();
+  updateCodeBadge();
+  renderTabs();
+  renderDicePanel();
+  renderScorecard();
+
+  /* Host-only controls */
   document.getElementById('btn-new').style.display=isHost?'inline-flex':'none';
   document.getElementById('btn-again').style.display=isHost?'inline-flex':'none';
+
+  /* Edit-name button: only when viewing your own card */
   const vp=getVP();
-  const editBtn=document.getElementById('btn-edit-name');
-  if(editBtn)editBtn.style.display=(vp&&vp.id===myPid)?'inline-flex':'none';
-  if(!state.started&&state.players.some(p=>!p.joined)){
-    const waiting=state.players.filter(p=>!p.joined).map(p=>p.name).join(', ');
-    document.getElementById('dice-hint').innerHTML='Waiting for <b>'+esc(waiting)+'</b> to join…';
-    document.getElementById('btn-roll').disabled=true;
-  }
+  document.getElementById('btn-edit-name').style.display=
+    (vp && vp.id===myPid)?'inline-flex':'none';
 }
 
 function updateCodeBadge(){
@@ -630,15 +727,15 @@ function updateCodeBadge(){
 }
 
 function renderTabs(){
-  const bar=document.getElementById('tabs');bar.innerHTML='';if(!state)return;
+  const bar=document.getElementById('tabs');bar.innerHTML='';
+  if(!state)return;
   state.players.forEach((p,i)=>{
-    const active=p.id===viewPid,mt=i===state.curIdx;
+    const active=(p.id===viewPid), isCurrentTurn=(i===state.curIdx&&state.started);
     const t=document.createElement('div');
-    t.className='tab'+(active?' active':'')+(mt?' myturn':'');
+    t.className='tab'+(active?' active':'')+(isCurrentTurn?' myturn':'');
     if(active){t.style.color=p.color;t.style.borderColor=p.color;}
-    const joinedTxt=p.joined?'':'⏳ ';
     const youTxt=(p.id===myPid)?' (you)':'';
-    t.innerHTML=joinedTxt+esc(p.name)+youTxt+'<br><span class="tab-pts">'+calcGrand(p)+'pt</span>';
+    t.innerHTML=esc(p.name)+youTxt+'<br><span class="tab-pts">'+calcGrand(p)+'pt</span>';
     t.addEventListener('click',()=>{viewPid=p.id;renderAll();});
     bar.appendChild(t);
   });
@@ -652,252 +749,440 @@ function renderTabs(){
 
 function renderDicePanel(){
   const cp=curP();if(!cp)return;
-  const imt=isMyTurn();
-  const allJoined=state.players.every(p=>p.joined);
-  document.getElementById('turn-lbl').textContent=cp.name+"'s Turn"+(cp.id===myPid?' ← YOU':'');
+  const imt=isMyTurn();  /* true only on THIS device, THIS player's turn, game started */
+
+  const turnSuffix=(cp.id===myPid)?' ← YOUR TURN':'';
+  document.getElementById('turn-lbl').textContent=cp.name+"'s Turn"+turnSuffix;
   document.getElementById('turn-lbl').style.color=cp.color;
   document.getElementById('roll-lbl').textContent=
-    cp.rollsLeft>0?cp.rollsLeft+' roll'+(cp.rollsLeft!==1?'s':'')+' left':'No rolls left';
-  document.getElementById('btn-roll').disabled=!imt||!allJoined||cp.rollsLeft<=0;
+    cp.rollsLeft>0 ? cp.rollsLeft+' roll'+(cp.rollsLeft!==1?'s':'')+' left'
+                   : 'No rolls left — pick a box!';
+
+  /* Roll button enabled ONLY when: game started + it IS my turn + rolls remain */
+  document.getElementById('btn-roll').disabled=(!imt || cp.rollsLeft<=0);
+
   const row=document.getElementById('dice-row');row.innerHTML='';
   for(let i=0;i<5;i++){
     const wrap=document.createElement('div');wrap.className='die-wrap';
     const die=document.createElement('div');
     die.className='die'+(cp.held[i]?' held':'');
-    if(imt&&allJoined){die.classList.add('mine');die.addEventListener('click',()=>toggleHold(i));}
+    /* Dice are only tappable by the active player on their own device, after first roll */
+    if(imt && cp.rollsLeft<3){
+      die.classList.add('mine');
+      die.addEventListener('click',()=>toggleHold(i));
+    }
     die.appendChild(mkPips(cp.dice[i]));
-    const lbl=document.createElement('div');lbl.className='held-lbl';lbl.textContent=cp.held[i]?'HELD':'';
+    const lbl=document.createElement('div');lbl.className='held-lbl';
+    lbl.textContent=cp.held[i]?'HELD':'';
     wrap.appendChild(die);wrap.appendChild(lbl);row.appendChild(wrap);
   }
+
   const hint=document.getElementById('dice-hint');
-  if(!allJoined){
-    hint.innerHTML='Waiting for <b>'+esc(state.players.filter(p=>!p.joined).map(p=>p.name).join(', '))+'</b> to join…';
-  } else if(!imt){
-    hint.innerHTML='Waiting for <b>'+esc(cp.name)+'</b>…';
+  if(!imt){
+    hint.innerHTML='Waiting for <b>'+esc(cp.name)+'</b> to play…';
   } else if(cp.rollsLeft===3){
-    hint.textContent='Roll to start your turn';
+    hint.textContent='Press Roll to start your turn';
   } else if(cp.rollsLeft===0){
-    hint.innerHTML='<b>Pick a scoring box!</b>';
+    hint.innerHTML='<b>Select a scoring box below!</b>';
   } else {
-    hint.innerHTML='Tap dice to <b>hold</b>, then roll again';
+    hint.innerHTML='Tap dice to <b>hold</b>, then roll again — or score now';
   }
 }
 
 function mkPips(v){
   const g=document.createElement('div');g.className='pg p'+v;
-  for(let i=0;i<v;i++){const p=document.createElement('div');p.className='pip';g.appendChild(p);}
+  for(let i=0;i<v;i++){
+    const p=document.createElement('div');p.className='pip';g.appendChild(p);
+  }
   return g;
 }
 
 function renderScorecard(){
   const vp=getVP();if(!vp)return;
   const cp=curP();
-  const showSugg=isMyTurn()&&vp.id===cp?.id&&cp.rollsLeft<3&&state.players.every(p=>p.joined);
-  const canScore=isMyTurn()&&vp.id===cp?.id&&state.players.every(p=>p.joined);
+  /*
+   * Show scoring suggestions ONLY when ALL of:
+   *  1. It is this device's turn (isMyTurn)
+   *  2. The viewed card belongs to the current player
+   *  3. At least one roll has been made (rollsLeft < 3)
+   */
+  const imt=isMyTurn();
+  const showSugg = imt && vp.id===cp?.id && cp.rollsLeft<3;
+  /* Buttons are clickable only with the same conditions as showSugg */
+  const canScore = showSugg;
+
   const body=document.getElementById('sc-body');body.innerHTML='';
-  CATS.filter(c=>c.sec==='U').forEach(cat=>body.appendChild(mkRow(cat,vp,cp,showSugg,canScore)));
-  const uRaw=calcU(vp),bonus=uRaw>=63?35:0;
-  body.appendChild(mkStatRow('TOTAL SCORE',uRaw,false));
-  body.appendChild(mkBonusRow(bonus));
-  body.appendChild(mkStatRow('TOTAL (Upper)',uRaw+bonus,true));
+
+  /* Upper section */
+  CATS.filter(c=>c.sec==='U').forEach(cat=>
+    body.appendChild(mkRow(cat,vp,cp,showSugg,canScore)));
+
+  const uRaw=calcU(vp), upperBonus=uRaw>=63?35:0;
+  body.appendChild(mkStatRow('Upper Total',uRaw,false));
+  body.appendChild(mkBonusRow(upperBonus));
+  body.appendChild(mkStatRow('Upper + Bonus',uRaw+upperBonus,true));
+
+  /* Lower section header */
   const lh=document.createElement('tr');
   lh.innerHTML='<td colspan="3" class="sh la" style="font-size:var(--fxs)">Lower Section</td>';
   body.appendChild(lh);
-  CATS.filter(c=>c.sec==='L').forEach(cat=>body.appendChild(mkRow(cat,vp,cp,showSugg,canScore)));
+
+  /* Lower section */
+  CATS.filter(c=>c.sec==='L').forEach(cat=>
+    body.appendChild(mkRow(cat,vp,cp,showSugg,canScore)));
+
+  /* Yahtzee bonus row */
   const yb=vp.yBonus||0;
   const ybr=document.createElement('tr');
-  ybr.innerHTML='<td class="la" style="font-size:var(--fxs)">YAHTZEE BONUS</td>'
-    +'<td style="font-size:var(--fxs);color:#777">+100 each</td>'
-    +'<td><button class="sbb stat'+(yb>0?' bon':'')+'">'+( yb>0?'×'+yb+'='+(yb*100):'—')+'</button></td>';
+  ybr.innerHTML='<td class="la" style="font-size:var(--fxs)">Yahtzee Bonus</td>'
+    +'<td style="font-size:var(--fxs);color:#777">+100 each extra</td>'
+    +'<td><button class="sbb stat'+(yb>0?' bon':'')+'">'+
+    (yb>0 ? '×'+yb+' = '+(yb*100) : '—')+'</button></td>';
   body.appendChild(ybr);
+
+  /* Grand total */
   const grand=calcGrand(vp);
   const gr=document.createElement('tr');gr.className='tr';
-  gr.innerHTML='<td class="la" colspan="2"><b>GRAND TOTAL</b></td>'
+  gr.innerHTML='<td class="la" colspan="2"><b>Grand Total</b></td>'
     +'<td><button class="sbb stat" style="font-weight:900">'+grand+'</button></td>';
   body.appendChild(gr);
+
+  /* Also update namebar */
   document.getElementById('vname').textContent=vp.name+(vp.id===myPid?' (you)':'');
   document.getElementById('vname').style.color=vp.color;
   document.getElementById('vscore').textContent='Total: '+grand;
 }
 
+/*
+ * mkRow — builds one scorecard row.
+ *
+ * JOKER RULE (official Yahtzee):
+ *   A joker applies when you roll a 5-of-a-kind AND the Yahtzee box is
+ *   already filled (50 or 0).  You MUST first try to score in the upper
+ *   section matching the face value.  Only if THAT upper box is also filled
+ *   may you use the joker in a lower-section box for full points.
+ *   (We handle this by calculating the joker-score and only showing it as
+ *   a suggestion; the player still must click the box.)
+ */
 function mkRow(cat,vp,cp,showSugg,canScore){
   const tr=document.createElement('tr');
-  const filled=vp.scores[cat.id]!==undefined;
-  const isYtz5=cp&&cp.dice.length===5&&cp.dice.every(d=>d===cp.dice[0]);
-  const joker=isYtz5&&vp.scores.yahtzee!==undefined;
-  const sugg=(!filled&&showSugg&&cp)?calcScore(cat.id,cp.dice,vp,joker):null;
+  const filled=(vp.scores[cat.id]!==undefined);
+
+  /* Is the current roll a five-of-a-kind? */
+  const isYtz5=cp && cp.dice.every(d=>d===cp.dice[0]);
+  /*
+   * Joker conditions:
+   *  - Five-of-a-kind rolled
+   *  - Yahtzee box already filled (score 50 or forced 0)
+   *  - Upper section box for that face is also already filled
+   */
+  const faceValue=cp ? cp.dice[0] : 0;
+  const upperIdForFace=['','aces','twos','threes','fours','fives','sixes'][faceValue]||'';
+  const yahtzeeBoxFilled=(vp.scores['yahtzee']!==undefined);
+  const upperBoxFilled=(vp.scores[upperIdForFace]!==undefined);
+  const joker=isYtz5 && yahtzeeBoxFilled && upperBoxFilled;
+
+  const sugg=(!filled && showSugg && cp)
+    ? calcScore(cat.id, cp.dice, vp, joker)
+    : null;
+
   const td1=document.createElement('td');td1.className='la';td1.style.fontSize='var(--fsm)';td1.textContent=cat.name;
   const td2=document.createElement('td');td2.style.fontSize='var(--fxs)';td2.style.color='#777';td2.textContent=cat.hint;
   const td3=document.createElement('td');td3.className='sb';
   const btn=document.createElement('button');btn.className='sbb';
+
   if(filled){
-    btn.classList.add('filled');btn.textContent=String(vp.scores[cat.id]);btn.disabled=true;
-  } else if(sugg!==null&&canScore){
-    btn.classList.add(sugg>0?'sug':'zsug');btn.textContent=sugg>0?'+'+sugg:'0';
+    btn.classList.add('filled');
+    btn.textContent=String(vp.scores[cat.id]);
+    btn.disabled=true;
+  } else if(sugg!==null && canScore){
+    btn.classList.add(sugg>0?'sug':'zsug');
+    btn.textContent=sugg>0 ? '+'+sugg : '0';
+    btn.title=sugg>0 ? 'Score '+sugg+' pts' : 'Score 0 (enter zero)';
     btn.addEventListener('click',()=>scoreIt(vp.id,cat.id));
   } else {
-    btn.disabled=true;btn.textContent='';
+    btn.disabled=true;
+    btn.textContent='';
   }
-  td3.appendChild(btn);tr.appendChild(td1);tr.appendChild(td2);tr.appendChild(td3);
+  td3.appendChild(btn);
+  tr.appendChild(td1);tr.appendChild(td2);tr.appendChild(td3);
   return tr;
 }
+
 function mkStatRow(label,val,bold){
   const tr=document.createElement('tr');tr.className='tr';
-  tr.innerHTML='<td class="la" colspan="2" style="font-size:var(--fxs)">'+(bold?'<b>':'')+label+(bold?'</b>':'')+'</td>'
+  tr.innerHTML='<td class="la" colspan="2" style="font-size:var(--fxs)">'
+    +(bold?'<b>':'')+label+(bold?'</b>':'')+'</td>'
     +'<td><button class="sbb stat">'+val+'</button></td>';
   return tr;
 }
 function mkBonusRow(val){
   const tr=document.createElement('tr');
-  tr.innerHTML='<td class="la" style="font-size:var(--fxs)"><b>BONUS (if ≥63)</b></td>'
-    +'<td style="font-size:var(--fxs);color:#777">Score 35</td>'
-    +'<td><button class="sbb stat'+(val>0?' bon':'')+'">'+( val>0?'+35':'—')+'</button></td>';
+  tr.innerHTML='<td class="la" style="font-size:var(--fxs)"><b>Upper Bonus (≥63)</b></td>'
+    +'<td style="font-size:var(--fxs);color:#777">+35 pts</td>'
+    +'<td><button class="sbb stat'+(val>0?' bon':'')+'">'+
+    (val>0?'+35':'—')+'</button></td>';
   return tr;
 }
 
-/* ACTIONS */
+/* ══════════════════════════════════════════
+   PLAYER ACTIONS
+══════════════════════════════════════════ */
+
+/* Toggle hold on a die — only available after first roll, on your turn */
 function toggleHold(i){
-  const cp=curP();if(!cp||cp.rollsLeft===3){toast('Roll first!');return;}
-  cp.held[i]=!cp.held[i];renderDicePanel();pushState(state);
-}
-
-function rollDice(){
-  const cp=curP();if(!cp||!isMyTurn()||cp.rollsLeft<=0)return;
-  rollSnd();
-  document.querySelectorAll('.die').forEach((d,i)=>{if(!cp.held[i])d.classList.add('rolling');});
-  setTimeout(()=>document.querySelectorAll('.die').forEach(d=>d.classList.remove('rolling')),390);
-  cp.dice=cp.dice.map((v,i)=>cp.held[i]?v:Math.ceil(Math.random()*6));
-  cp.rollsLeft--;renderDicePanel();renderScorecard();pushState(state);
-}
-
-function scoreIt(pid,catId){
-  if(!isMyTurn()){toast("Not your turn!");return;}
   const cp=curP();
-  if(!cp||cp.id!==pid){toast("Wrong player!");return;}
-  if(cp.rollsLeft===3){toast('Roll first!');return;}
-  const p=state.players.find(x=>x.id===pid);
-  if(!p||p.scores[catId]!==undefined)return;
-  const isYtz5=cp.dice.every(d=>d===cp.dice[0]);
-  const joker=isYtz5&&p.scores.yahtzee!==undefined;
-  const score=calcScore(catId,cp.dice,p,joker);
-  p.scores[catId]=score;ding();
-  if(catId==='yahtzee'&&score===50){fanfare();blast('5 OF A KIND • 50 POINTS');}
-  if(isYtz5&&catId!=='yahtzee'&&p.scores.yahtzee===50){
-    p.yBonus=(p.yBonus||0)+1;fanfare();blast('YAHTZEE BONUS! +100 POINTS');
-    toast(p.name+' gets Yahtzee Bonus! +100');
-  }
-  cp.rollsLeft=3;cp.held=[false,false,false,false,false];
-  state.curIdx=(state.curIdx+1)%state.players.length;
-  if(state.players.every(pl=>countFilled(pl)>=13)){
-    state.over=true;pushState(state);showOv('ov-over');renderGameOver();return;
-  }
-  toast(p.name+' scored '+score+' pts');
-  viewPid=curP().id;pushState(state);renderAll();
+  if(!cp || !isMyTurn()) return;
+  if(cp.rollsLeft===3){ toast('Roll first before holding dice!'); return; }
+  cp.held[i]=!cp.held[i];
+  renderDicePanel();
+  pushState(state);
 }
 
-/* GAME OVER */
+/* Roll dice — gate: must be started, my turn, rolls remaining */
+function rollDice(){
+  const cp=curP();
+  if(!cp || !isMyTurn()){ toast("It's not your turn!"); return; }
+  if(!state.started){ toast('Waiting for host to start the game.'); return; }
+  if(cp.rollsLeft<=0){ toast('No rolls left — pick a scoring box!'); return; }
+
+  rollSnd();
+  /* Animate non-held dice */
+  document.querySelectorAll('.die').forEach((d,i)=>{
+    if(!cp.held[i]) d.classList.add('rolling');
+  });
+  setTimeout(()=>document.querySelectorAll('.die').forEach(d=>d.classList.remove('rolling')),390);
+
+  /* Randomise non-held dice */
+  cp.dice=cp.dice.map((v,i)=>cp.held[i] ? v : (Math.floor(Math.random()*6)+1));
+  cp.rollsLeft--;
+
+  renderDicePanel();
+  renderScorecard();
+  pushState(state);
+}
+
+/*
+ * scoreIt — record score for a category.
+ *
+ * Yahtzee Bonus rule:
+ *   A second (or subsequent) YAHTZEE in the same game scores +100 bonus
+ *   IF AND ONLY IF the first YAHTZEE was scored 50 in the Yahtzee box.
+ *   If the Yahtzee box was scored 0 (forced zero), no bonus chips are awarded.
+ */
+function scoreIt(pid,catId){
+  if(!isMyTurn()){ toast("It's not your turn!"); return; }
+  const cp=curP();
+  if(!cp || cp.id!==pid){ toast("Not the current player!"); return; }
+  if(cp.rollsLeft===3){ toast('You must roll at least once before scoring!'); return; }
+
+  const p=state.players.find(x=>x.id===pid);
+  if(!p || p.scores[catId]!==undefined) return; /* already scored */
+
+  /* Joker logic (same as mkRow) */
+  const isYtz5=cp.dice.every(d=>d===cp.dice[0]);
+  const faceValue=cp.dice[0];
+  const upperIdForFace=['','aces','twos','threes','fours','fives','sixes'][faceValue]||'';
+  const yahtzeeBoxFilled=(p.scores['yahtzee']!==undefined);
+  const upperBoxFilled=(p.scores[upperIdForFace]!==undefined);
+  const joker=isYtz5 && yahtzeeBoxFilled && upperBoxFilled;
+
+  const score=calcScore(catId,cp.dice,p,joker);
+  p.scores[catId]=score;
+  ding();
+
+  /* First Yahtzee */
+  if(catId==='yahtzee' && score===50){
+    fanfare(); blast('YAHTZEE! 5 OF A KIND • 50 PTS');
+  }
+
+  /* Extra Yahtzee bonus — only awarded if FIRST yahtzee was scored 50 */
+  if(isYtz5 && catId!=='yahtzee' && p.scores['yahtzee']===50){
+    p.yBonus=(p.yBonus||0)+1;
+    fanfare(); blast('YAHTZEE BONUS! +100 PTS');
+    toast(p.name+' earns a Yahtzee Bonus! +100');
+  }
+
+  /* End of turn: reset dice state, advance player */
+  cp.rollsLeft=3;
+  cp.held=[false,false,false,false,false];
+  state.curIdx=(state.curIdx+1)%state.players.length;
+
+  /* Check if all 13 categories filled for every player → game over */
+  if(state.players.every(pl=>countFilled(pl)>=13)){
+    state.over=true;
+    pushState(state);
+    showOv('ov-over');
+    renderGameOver();
+    return;
+  }
+
+  toast(p.name+' scored '+score+' in '+catId);
+  viewPid=curP().id;  /* auto-switch view to next player */
+  pushState(state);
+  renderAll();
+}
+
+/* ══════════════════════════════════════════
+   GAME OVER
+══════════════════════════════════════════ */
 function renderGameOver(){
   const sorted=[...state.players].sort((a,b)=>calcGrand(b)-calcGrand(a));
   const medals=['🥇','🥈','🥉','4th','5th','6th'];
   document.getElementById('go-winner').innerHTML=
-    '<span style="color:'+sorted[0].color+'">🏆 '+esc(sorted[0].name)+'</span> wins with '+calcGrand(sorted[0])+' pts!';
+    '<span style="color:'+sorted[0].color+'">🏆 '+esc(sorted[0].name)
+    +'</span> wins with '+calcGrand(sorted[0])+' pts!';
   document.getElementById('go-body').innerHTML=sorted.map((p,i)=>{
-    const u=calcU(p),bonus=u>=63?35:0;
+    const u=calcU(p), bonus=u>=63?35:0;
     const l=L_IDS.reduce((a,id)=>a+(p.scores[id]||0),0)+(p.yBonus||0)*100;
-    return'<tr><td>'+medals[i]+'</td><td style="color:'+p.color+';font-weight:700">'+esc(p.name)+'</td>'
-      +'<td>'+u+'</td><td>'+bonus+'</td><td>'+l+'</td><td style="font-weight:900;color:'+p.color+'">'+calcGrand(p)+'</td></tr>';
+    return '<tr><td>'+medals[i]+'</td>'
+      +'<td style="color:'+p.color+';font-weight:700">'+esc(p.name)+'</td>'
+      +'<td>'+u+'</td><td>'+bonus+'</td><td>'+l+'</td>'
+      +'<td style="font-weight:900;color:'+p.color+'">'+calcGrand(p)+'</td></tr>';
   }).join('');
   document.getElementById('btn-again').style.display=isHost?'inline-flex':'none';
 }
 
 function newGame(){
-  if(!isHost){toast('Only the host can reset the game.');return;}
+  if(!isHost){ toast('Only the host can start a new game.'); return; }
   if(unsub){unsub();unsub=null;}
-  gameCode=null;myPid=null;state=null;viewPid=null;qrDone=false;lobbyQrDone=false;isHost=false;
+  gameCode=null; myPid=null; state=null; viewPid=null;
+  qrDone=false; lobbyQrDone=false; isHost=false;
   try{sessionStorage.removeItem('ytz_session');}catch(e){}
   try{window.history.replaceState({},'',window.location.pathname);}catch(e){}
-  hide('main-card');hideAllOv();showOv('ov-host');initSetup();
+  hide('main-card'); hideAllOv(); showOv('ov-host');
+  setTimeout(()=>document.getElementById('host-name').focus(),200);
 }
 
-/* NAME EDITING */
+/* ══════════════════════════════════════════
+   NAME EDITING
+══════════════════════════════════════════ */
 function openRename(){
-  const me=state?.players.find(p=>p.id===myPid);if(!me)return;
+  const me=state?.players.find(p=>p.id===myPid); if(!me) return;
   document.getElementById('rename-input').value=me.name;
   showOv('ov-rename');
   setTimeout(()=>document.getElementById('rename-input').focus(),100);
 }
 async function saveRename(){
   const newName=document.getElementById('rename-input').value.trim();
-  if(!newName){toast('Name cannot be empty.');return;}
-  const idx=state.players.findIndex(p=>p.id===myPid);if(idx<0)return;
+  if(!newName){ toast('Name cannot be empty.'); return; }
+  const idx=state.players.findIndex(p=>p.id===myPid); if(idx<0) return;
+  /* Check for duplicate */
+  const dupe=state.players.find((p,i)=>i!==idx && p.name.toLowerCase()===newName.toLowerCase());
+  if(dupe){ toast('That name is already taken.'); return; }
   try{
-    await update(ref(DB,'ytz6/'+gameCode+'/players/'+idx),{name:newName});
-    toast('Name updated!');hideAllOv();
-    if(state.started)renderAll();
-    else if(isHost){showOv('ov-lobby');renderLobby();}
-  }catch(e){toast('Error saving name.');}
+    await update(ref(DB,'ytz7/'+gameCode+'/players/'+idx),{name:newName});
+    toast('Name updated!');
+    hideAllOv();
+    if(state.started) renderAll();
+    else if(isHost){ showOv('ov-lobby'); renderLobby(); }
+    else { showOv('ov-wait'); renderWait(); }
+  }catch(e){ toast('Error saving name.'); }
 }
 
-/* SCORE CALC */
+/* ══════════════════════════════════════════
+   SCORE CALCULATIONS
+══════════════════════════════════════════ */
 function calcScore(id,dice,player,joker=false){
-  const cnt=Array(7).fill(0);dice.forEach(d=>cnt[d]++);
+  const cnt=Array(7).fill(0); dice.forEach(d=>cnt[d]++);
   const sum=dice.reduce((a,b)=>a+b,0);
+
+  /*
+   * Joker scoring (per official rules):
+   * When a joker applies you may score any unfilled lower-section box at
+   * its full fixed value (Full House=25, Sm.Str=30, Lg.Str=40) even if
+   * the dice don't technically satisfy the normal requirement.
+   * Three-of-a-kind, Four-of-a-kind, and Chance score the sum of all dice.
+   */
   if(joker){
-    if(id==='fullH')return 25;if(id==='smStr')return 30;if(id==='lgStr')return 40;
-    if(['threeK','fourK','chance'].includes(id))return sum;
+    if(id==='fullH') return 25;
+    if(id==='smStr') return 30;
+    if(id==='lgStr') return 40;
+    if(['threeK','fourK','chance'].includes(id)) return sum;
   }
+
   switch(id){
-    case 'aces':return dice.filter(d=>d===1).reduce((a,b)=>a+b,0);
-    case 'twos':return dice.filter(d=>d===2).reduce((a,b)=>a+b,0);
-    case 'threes':return dice.filter(d=>d===3).reduce((a,b)=>a+b,0);
-    case 'fours':return dice.filter(d=>d===4).reduce((a,b)=>a+b,0);
-    case 'fives':return dice.filter(d=>d===5).reduce((a,b)=>a+b,0);
-    case 'sixes':return dice.filter(d=>d===6).reduce((a,b)=>a+b,0);
-    case 'threeK':return cnt.some(c=>c>=3)?sum:0;
-    case 'fourK':return cnt.some(c=>c>=4)?sum:0;
-    case 'fullH':{const v=cnt.filter(c=>c>0);return(v.includes(3)&&v.includes(2))?25:0;}
-    case 'smStr':{const u=[...new Set(dice)].sort((a,b)=>a-b);let r=1,m=1;
-      for(let i=1;i<u.length;i++){r=u[i]===u[i-1]+1?r+1:1;m=Math.max(m,r);}return m>=4?30:0;}
-    case 'lgStr':{const u=[...new Set(dice)].sort((a,b)=>a-b);if(u.length<5)return 0;let r=1,m=1;
-      for(let i=1;i<u.length;i++){r=u[i]===u[i-1]+1?r+1:1;m=Math.max(m,r);}return m>=5?40:0;}
-    case 'yahtzee':return cnt.some(c=>c===5)?50:0;
-    case 'chance':return sum;
-    default:return 0;
+    /* Upper section: sum of matching faces */
+    case 'aces':   return dice.filter(d=>d===1).reduce((a,b)=>a+b,0);
+    case 'twos':   return dice.filter(d=>d===2).reduce((a,b)=>a+b,0);
+    case 'threes': return dice.filter(d=>d===3).reduce((a,b)=>a+b,0);
+    case 'fours':  return dice.filter(d=>d===4).reduce((a,b)=>a+b,0);
+    case 'fives':  return dice.filter(d=>d===5).reduce((a,b)=>a+b,0);
+    case 'sixes':  return dice.filter(d=>d===6).reduce((a,b)=>a+b,0);
+
+    /* Lower section */
+    case 'threeK': return cnt.some(c=>c>=3) ? sum : 0;
+    case 'fourK':  return cnt.some(c=>c>=4) ? sum : 0;
+    case 'fullH': {
+      /* Exactly a 3-of-a-kind and a pair */
+      const vals=cnt.filter(c=>c>0);
+      return (vals.includes(3) && vals.includes(2)) ? 25 : 0;
+    }
+    case 'smStr': {
+      /* At least 4 sequential values among the 5 dice */
+      const uniq=[...new Set(dice)].sort((a,b)=>a-b);
+      let run=1,best=1;
+      for(let i=1;i<uniq.length;i++){
+        run = uniq[i]===uniq[i-1]+1 ? run+1 : 1;
+        best=Math.max(best,run);
+      }
+      return best>=4 ? 30 : 0;
+    }
+    case 'lgStr': {
+      /* All 5 dice form one sequence */
+      const uniq=[...new Set(dice)].sort((a,b)=>a-b);
+      if(uniq.length<5) return 0;
+      let run=1,best=1;
+      for(let i=1;i<uniq.length;i++){
+        run = uniq[i]===uniq[i-1]+1 ? run+1 : 1;
+        best=Math.max(best,run);
+      }
+      return best>=5 ? 40 : 0;
+    }
+    case 'yahtzee': return cnt.some(c=>c===5) ? 50 : 0;
+    case 'chance':  return sum;
+    default: return 0;
   }
 }
-function calcU(p){return U_IDS.reduce((a,id)=>a+(p.scores[id]||0),0);}
+
+function calcU(p){ return U_IDS.reduce((a,id)=>a+(p.scores[id]||0),0); }
 function calcGrand(p){
-  const u=calcU(p),bonus=u>=63?35:0;
-  return u+bonus+L_IDS.reduce((a,id)=>a+(p.scores[id]||0),0)+(p.yBonus||0)*100;
+  const u=calcU(p), bonus=u>=63?35:0;
+  const l=L_IDS.reduce((a,id)=>a+(p.scores[id]||0),0);
+  return u+bonus+l+(p.yBonus||0)*100;
 }
-function countFilled(p){return ALL_IDS.filter(id=>p.scores[id]!==undefined).length;}
-function getVP(){return state?.players.find(p=>p.id===viewPid)||state?.players[0]||null;}
-function curP(){return state?.players[state.curIdx]||null;}
-function isMyTurn(){const cp=curP();return !!(cp&&myPid&&cp.id===myPid&&state.started);}
-function saveSession(){try{sessionStorage.setItem('ytz_session',JSON.stringify({gameCode,myPid,isHost}));}catch(e){}}
+function countFilled(p){ return ALL_IDS.filter(id=>p.scores[id]!==undefined).length; }
+
+/* ── Helpers ── */
+function getVP(){ return state?.players.find(p=>p.id===viewPid)||state?.players[0]||null; }
+function curP(){ return state?.players[state.curIdx]||null; }
+/* isMyTurn: true ONLY when game is started AND it's the current player AND that player is on THIS device */
+function isMyTurn(){ const cp=curP(); return !!(cp && myPid && cp.id===myPid && state?.started); }
+function saveSession(){ try{sessionStorage.setItem('ytz_session',JSON.stringify({gameCode,myPid,isHost}));}catch(e){} }
 
 function showOv(id){
-  ['ov-host','ov-join','ov-lobby','ov-rename','ov-ytz','ov-qr','ov-over'].forEach(oid=>{
+  ['ov-host','ov-join','ov-lobby','ov-wait','ov-rename','ov-ytz','ov-qr','ov-over'].forEach(oid=>{
     document.getElementById(oid).classList.toggle('vis',oid===id);
   });
 }
 function hideAllOv(){
-  ['ov-host','ov-join','ov-lobby','ov-rename','ov-ytz','ov-qr','ov-over'].forEach(oid=>{
+  ['ov-host','ov-join','ov-lobby','ov-wait','ov-rename','ov-ytz','ov-qr','ov-over'].forEach(oid=>{
     document.getElementById(oid).classList.remove('vis');
   });
 }
-function show(id){document.getElementById(id).style.display='block';}
-function hide(id){document.getElementById(id).style.display='none';}
+function show(id){ document.getElementById(id).style.display='block'; }
+function hide(id){ document.getElementById(id).style.display='none'; }
+
 function blast(sub){
   document.getElementById('ytz-sub').textContent=sub;
   document.getElementById('ov-ytz').classList.add('vis');
-  setTimeout(()=>document.getElementById('ov-ytz').classList.remove('vis'),2200);
+  setTimeout(()=>document.getElementById('ov-ytz').classList.remove('vis'),2400);
 }
 function toast(msg){
-  const t=document.getElementById('toast');t.textContent=msg;
-  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2700);
+  const t=document.getElementById('toast'); t.textContent=msg;
+  t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2700);
 }
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 function openQR(){
   if(!gameCode)return;
@@ -907,22 +1192,16 @@ function openQR(){
   if(!qrDone){
     document.getElementById('qr-render').innerHTML='';
     new QRCode(document.getElementById('qr-render'),
-      {text:url,width:170,height:170,colorDark:'#1a1a1a',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.H});
+      {text:url,width:170,height:170,colorDark:'#1a1a1a',
+       colorLight:'#fff',correctLevel:QRCode.CorrectLevel.H});
     qrDone=true;
   }
   showOv('ov-qr');
 }
 
-/* WIRE */
-document.getElementById('code-badge').addEventListener('click',()=>{
-  if(!gameCode)return;
-  try{navigator.clipboard.writeText(gameCode).then(()=>toast('Code copied: '+gameCode));}
-  catch(e){toast('Code: '+gameCode);}
-});
-document.getElementById('btn-add').addEventListener('click',()=>{
-  if(setupRows.length>=5){toast('Max 6 players total');return;}
-  setupRows.push({name:'',color:COLORS[(setupRows.length+1)%COLORS.length]});
-  renderSetup();
+/* ── Wire up all buttons ── */
+document.getElementById('host-name').addEventListener('keydown',e=>{
+  if(e.key==='Enter') startGame();
 });
 document.getElementById('btn-start').addEventListener('click',startGame);
 document.getElementById('btn-roll').addEventListener('click',rollDice);
@@ -931,29 +1210,40 @@ document.getElementById('btn-again').addEventListener('click',newGame);
 document.getElementById('btn-qr').addEventListener('click',openQR);
 document.getElementById('btn-close-qr').addEventListener('click',hideAllOv);
 document.getElementById('ov-qr').addEventListener('click',e=>{
-  if(e.target===document.getElementById('ov-qr'))hideAllOv();
+  if(e.target===document.getElementById('ov-qr')) hideAllOv();
 });
+
 document.getElementById('btn-lobby-copy').addEventListener('click',()=>{
   if(!gameCode)return;
-  try{navigator.clipboard.writeText(joinUrl(gameCode)).then(()=>toast('Link copied!'));}
-  catch(e){toast('Copy this URL: '+joinUrl(gameCode));}
+  try{ navigator.clipboard.writeText(joinUrl(gameCode)).then(()=>toast('Link copied!')); }
+  catch(e){ toast(joinUrl(gameCode)); }
 });
-document.getElementById('btn-lobby-start-now').addEventListener('click',()=>{
-  if(!state)return;
-  state.started=true;viewPid=curP()?.id||state.players[0].id;
-  pushState(state);show('main-card');hideAllOv();renderAll();toast('Game started!');
-});
+document.getElementById('btn-lobby-start-now').addEventListener('click',startGameNow);
+
 document.getElementById('btn-join-go').addEventListener('click',joinGame);
-document.getElementById('join-name').addEventListener('keydown',e=>{if(e.key==='Enter')joinGame();});
+document.getElementById('join-name').addEventListener('keydown',e=>{
+  if(e.key==='Enter') joinGame();
+});
+
+document.getElementById('code-badge').addEventListener('click',()=>{
+  if(!gameCode)return;
+  try{ navigator.clipboard.writeText(gameCode).then(()=>toast('Code copied: '+gameCode)); }
+  catch(e){ toast('Code: '+gameCode); }
+});
+
 document.getElementById('btn-edit-name').addEventListener('click',openRename);
 document.getElementById('btn-rename-save').addEventListener('click',saveRename);
 document.getElementById('btn-rename-cancel').addEventListener('click',()=>{
   hideAllOv();
-  if(state?.started)renderAll();
-  else if(isHost){showOv('ov-lobby');renderLobby();}
+  if(state?.started) renderAll();
+  else if(isHost){ showOv('ov-lobby'); renderLobby(); }
+  else { showOv('ov-wait'); renderWait(); }
 });
-document.getElementById('rename-input').addEventListener('keydown',e=>{if(e.key==='Enter')saveRename();});
+document.getElementById('rename-input').addEventListener('keydown',e=>{
+  if(e.key==='Enter') saveRename();
+});
 
+/* ── Go! ── */
 init();
 </script>
 </body>
