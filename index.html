@@ -231,27 +231,11 @@ body.dark .confirm-box{background:#0d0d0d;border-color:#444;}
 .confirm-pts.zero{color:var(--red);}
 .confirm-btns{display:flex;gap:10px;justify-content:center;}
 
-/* ── TURN TIMER ── */
-.turn-timer{display:flex;align-items:center;gap:6px;font-size:var(--fxs);}
-.timer-ring{position:relative;width:clamp(26px,4vw,34px);height:clamp(26px,4vw,34px);flex-shrink:0;}
-.timer-ring svg{transform:rotate(-90deg);}
-.timer-track{fill:none;stroke:#ddd;stroke-width:3;}
-.timer-arc{fill:none;stroke:var(--green);stroke-width:3;stroke-linecap:round;transition:stroke-dashoffset .9s linear,stroke .5s;}
-.timer-arc.urgent{stroke:var(--red);}
-.timer-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:clamp(.52rem,1.1vw,.7rem);font-weight:900;}
-body.dark .timer-track{stroke:#333;}
-
-/* joker-alert banner */
-.joker-alert{background:#fef9c3;border:2px solid #ca8a04;border-radius:4px;padding:clamp(4px,.8vw,7px) clamp(8px,1.5vw,12px);font-size:var(--fxs);color:#92400e;margin-bottom:var(--gap);display:none;}
-.joker-alert.vis{display:block;}
-body.dark .joker-alert{background:#1c1708;border-color:#ca8a04;color:#fde68a;}
+/* ── DARK MODE TOGGLE BTN ── */
 .btn-dark{background:none;border:1.5px solid #bbb;border-radius:20px;padding:3px 10px;font-size:var(--fxs);cursor:pointer;color:#555;font-family:inherit;transition:all .15s;white-space:nowrap;}
 .btn-dark:hover{background:#f0f0f0;}
 body.dark .btn-dark{border-color:#555;color:#aaa;}
 body.dark .btn-dark:hover{background:#1a1a1a;}
-
-/* ── DARK MODE TOGGLE BTN ── */
-/* (styles already defined above) */
 
 /* TOAST */
 .toast{position:fixed;bottom:clamp(14px,3vw,24px);left:50%;transform:translateX(-50%) translateY(70px);background:#1a1a1a;color:#fff;padding:clamp(6px,1.2vw,10px) clamp(14px,3vw,22px);border-radius:4px;font-size:var(--fsm);font-weight:700;z-index:900;transition:transform .26s;pointer-events:none;max-width:90vw;text-align:center;}
@@ -394,21 +378,8 @@ body.dark .btn-dark:hover{background:#1a1a1a;}
   <div class="dice-panel">
     <div class="dice-top">
       <div class="turn-lbl" id="turn-lbl">—</div>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <div class="turn-timer" id="turn-timer" style="display:none">
-          <div class="timer-ring">
-            <svg viewBox="0 0 34 34" width="100%" height="100%">
-              <circle class="timer-track" cx="17" cy="17" r="14"/>
-              <circle class="timer-arc" id="timer-arc" cx="17" cy="17" r="14"
-                stroke-dasharray="87.96" stroke-dashoffset="0"/>
-            </svg>
-            <div class="timer-num" id="timer-num">45</div>
-          </div>
-        </div>
-        <div class="roll-lbl" id="roll-lbl">3 rolls left</div>
-      </div>
+      <div class="roll-lbl" id="roll-lbl">3 rolls left</div>
     </div>
-    <div class="joker-alert" id="joker-alert">⚠️ <b>Joker Rule:</b> You must score <span id="joker-target-name"></span> first!</div>
     <div class="dice-row" id="dice-row"></div>
     <div class="dice-btns">
       <div class="dice-hint" id="dice-hint">Waiting…</div>
@@ -490,25 +461,6 @@ function joinUrl(code){
 
 /* ── Firebase ── */
 function gameRef(path){return ref(DB,'ytz7/'+gameCode+(path?'/'+path:''));}
-
-/*
- * SECURITY NOTE:
- * Full client-side trust is an inherent limitation of a pure frontend app.
- * For production, add Firebase Security Rules like:
- *   "ytz7": { "$game": { ".write": "auth != null" } }
- * and validate score ranges in Cloud Functions.
- *
- * Lightweight client-side guard: reject suspiciously large scores before writing.
- */
-function isScoreSane(catId, score){
-  const maxPerCat={
-    aces:5,twos:10,threes:15,fours:20,fives:25,sixes:30,
-    threeK:30,fourK:30,fullH:25,smStr:30,lgStr:40,yahtzee:50,chance:30
-  };
-  if(score<0) return false;
-  if(maxPerCat[catId]!==undefined && score>maxPerCat[catId]) return false;
-  return true;
-}
 
 /* Write full game state */
 function pushState(s){return set(gameRef(),JSON.parse(JSON.stringify(s)));}
@@ -767,10 +719,10 @@ async function joinGame(){
     dice:[1,1,1,1,1],held:[false,false,false,false,false],
   };
 
-  /* Atomically push new player — avoids race condition if two people join simultaneously */
+  /* Append to players array in Firebase */
+  const newIndex=g.players.length;
   try{
-    const playersRef=ref(DB,'ytz7/'+code+'/players');
-    await push(playersRef, newPlayer);
+    await update(ref(DB,'ytz7/'+code+'/players/'+newIndex), newPlayer);
   }catch(e){err.textContent='Error joining. Try again.';return;}
 
   gameCode=code; myPid=newPlayer.id; isHost=false; viewPid=newPlayer.id;
@@ -859,7 +811,7 @@ function renderTabs(){
 
 function renderDicePanel(){
   const cp=curP();if(!cp)return;
-  const imt=isMyTurn();
+  const imt=isMyTurn();  /* true only on THIS device, THIS player's turn, game started */
 
   const turnSuffix=(cp.id===myPid)?' ← YOUR TURN':'';
   document.getElementById('turn-lbl').textContent=cp.name+"'s Turn"+turnSuffix;
@@ -870,35 +822,6 @@ function renderDicePanel(){
 
   /* Roll button enabled ONLY when: game started + it IS my turn + rolls remain */
   document.getElementById('btn-roll').disabled=(!imt || cp.rollsLeft<=0);
-
-  /* ── Turn timer ── */
-  const timerEl=document.getElementById('turn-timer');
-  if(imt){
-    timerEl.style.display='flex';
-    startTurnTimer();
-  } else {
-    timerEl.style.display='none';
-    stopTurnTimer();
-  }
-
-  /* ── Joker alert banner ── */
-  const jokerAlert=document.getElementById('joker-alert');
-  if(imt && cp.rollsLeft<3){
-    const isYtz5=cp.dice.every(d=>d===cp.dice[0]);
-    const faceValue=cp.dice[0];
-    const upperIdForFace=['','aces','twos','threes','fours','fives','sixes'][faceValue]||'';
-    const yahtzeeBoxFilled=(getVP().scores['yahtzee']!==undefined);
-    const upperBoxFilled=(getVP().scores[upperIdForFace]!==undefined);
-    if(isYtz5 && yahtzeeBoxFilled && !upperBoxFilled){
-      const catName=CATS.find(c=>c.id===upperIdForFace)?.name||upperIdForFace;
-      document.getElementById('joker-target-name').textContent=catName;
-      jokerAlert.classList.add('vis');
-    } else {
-      jokerAlert.classList.remove('vis');
-    }
-  } else {
-    jokerAlert.classList.remove('vis');
-  }
 
   const row=document.getElementById('dice-row');row.innerHTML='';
   for(let i=0;i<5;i++){
@@ -1009,25 +932,15 @@ function mkRow(cat,vp,cp,showSugg,canScore){
   const joker=isYtz5 && yahtzeeBoxFilled && upperBoxFilled;
 
   /*
-   * JOKER RULE enforcement (official Hasbro):
-   *
-   * Case A — Extra Yahtzee rolled, Yahtzee box already filled, matching UPPER box still OPEN:
-   *   → ONLY the matching upper box may be scored. All other categories are locked.
-   *
-   * Case B — Extra Yahtzee rolled, Yahtzee box filled, matching UPPER box already filled:
-   *   → Lower section available as "Joker" (full fixed values even without normal conditions).
-   *   → Other upper boxes may also be used (scoring their face-value sum).
-   *
-   * mustScoreUpper: player MUST use the upper box this turn — block everything else.
-   * joker: lower-section joker scoring unlocked (Case B).
+   * JOKER RULE enforcement:
+   * If it's a joker situation, the upper section box for the face value MUST be
+   * scored first (if it's still open). If that upper box is the current row and
+   * it's open, force it to be the only available option.
+   * If the upper box is already filled, only then can lower section be used as Joker.
    */
-  const mustScoreUpper = isYtz5 && yahtzeeBoxFilled && !upperBoxFilled;
-  /* In Case A: this specific upper row is the ONLY allowed cell */
-  const isTheMandatoryUpper = mustScoreUpper && cat.id === upperIdForFace;
-  /* In Case A: every other unfilled row is blocked */
-  const blockedByJoker = mustScoreUpper && cat.id !== upperIdForFace;
+  const mustScoreUpper = isYtz5 && yahtzeeBoxFilled && !upperBoxFilled && cat.sec==='L';
 
-  const sugg=(!filled && showSugg && cp && !blockedByJoker)
+  const sugg=(!filled && showSugg && cp && !mustScoreUpper)
     ? calcScore(cat.id, cp.dice, vp, joker)
     : null;
 
@@ -1040,17 +953,15 @@ function mkRow(cat,vp,cp,showSugg,canScore){
     btn.classList.add('filled');
     btn.textContent=String(vp.scores[cat.id]);
     btn.disabled=true;
-  } else if(blockedByJoker && showSugg){
-    /* Blocked — must score the matching upper box first (Joker rule Case A) */
+  } else if(mustScoreUpper && showSugg){
+    /* Blocked — must score upper section first per Joker rule */
     btn.disabled=true;
-    btn.textContent='🔒';
-    btn.title='Must score '+upperIdForFace+' first (Joker rule)';
-    btn.style.opacity='.3';
+    btn.textContent='';
+    btn.title='Score the upper section for this face value first (Joker rule)';
   } else if(sugg!==null && canScore){
     btn.classList.add(sugg>0?'sug':'zsug');
     btn.textContent=sugg>0 ? '+'+sugg : '0';
     btn.title=sugg>0 ? 'Score '+sugg+' pts' : 'Score 0 (enter zero)';
-    if(isTheMandatoryUpper) btn.title='⚠️ REQUIRED by Joker rule — '+btn.title;
     btn.addEventListener('click',()=>scoreIt(vp.id,cat.id,cat.name));
   } else {
     btn.disabled=true;
@@ -1095,9 +1006,7 @@ function toggleHold(i){
   if(cp.rollsLeft===3){ toast('Roll first before holding dice!'); return; }
   cp.held[i]=!cp.held[i];
   renderDicePanel();
-  /* Granular update — only sync the held array, not the whole state */
-  const idx=state.players.findIndex(p=>p.id===cp.id);
-  update(ref(DB,'ytz7/'+gameCode+'/players/'+idx),{held:cp.held});
+  pushState(state);
 }
 
 /* Roll dice — gate: must be started, my turn, rolls remaining */
@@ -1120,9 +1029,7 @@ function rollDice(){
 
   renderDicePanel();
   renderScorecard();
-  /* Granular update — only sync changed dice fields, not entire state */
-  const idx=state.players.findIndex(p=>p.id===cp.id);
-  update(ref(DB,'ytz7/'+gameCode+'/players/'+idx),{dice:cp.dice,rollsLeft:cp.rollsLeft,held:cp.held});
+  pushState(state);
 }
 
 /* ── Confirm score dialog ── */
@@ -1144,13 +1051,6 @@ function scoreIt(pid,catId,catName){
   const yahtzeeBoxFilled=(p.scores['yahtzee']!==undefined);
   const upperBoxFilled=(p.scores[upperIdForFace]!==undefined);
   const joker=isYtz5 && yahtzeeBoxFilled && upperBoxFilled;
-
-  /* Joker Case A enforcement: block any category except mandatory upper */
-  if(isYtz5 && yahtzeeBoxFilled && !upperBoxFilled && catId !== upperIdForFace){
-    toast('⚠️ Joker rule: you must score '+upperIdForFace+' first!');
-    return;
-  }
-
   const score=calcScore(catId,cp.dice,p,joker);
 
   _pendingScore={pid,catId,catName,score};
@@ -1174,12 +1074,6 @@ function commitScore(){
   if(!p || p.scores[catId]!==undefined) return;
 
   p.scores[catId]=score;
-  /* Sanity-check the score before it goes to Firebase */
-  if(!isScoreSane(catId,score)){
-    toast('⚠️ Score rejected — value out of range.');
-    delete p.scores[catId];
-    return;
-  }
   ding();
 
   /* First Yahtzee */
@@ -1199,7 +1093,6 @@ function commitScore(){
   cp.rollsLeft=3;
   cp.held=[false,false,false,false,false];
   state.curIdx=(state.curIdx+1)%state.players.length;
-  stopTurnTimer();
 
   if(state.players.every(pl=>countFilled(pl)>=13)){
     state.over=true;
@@ -1307,17 +1200,8 @@ function calcScore(id,dice,player,joker=false){
     case 'threeK': return cnt.some(c=>c>=3) ? sum : 0;
     case 'fourK':  return cnt.some(c=>c>=4) ? sum : 0;
     case 'fullH': {
-      /*
-       * Official Hasbro rule:
-       *  - 3-of-a-kind + a pair → 25 pts (always valid)
-       *  - 5-of-a-kind (Yahtzee) → also counts as Full House (25 pts)
-       *    ONLY when the Yahtzee box has not been filled yet.
-       *  - Once Yahtzee box is filled, 5-of-a-kind needs Joker rule (handled above).
-       */
+      /* Strictly 3-of-a-kind AND a pair; 5-of-a-kind does NOT qualify without Joker */
       const vals=cnt.filter(c=>c>0);
-      const isYahtzeeRoll=cnt.some(c=>c===5);
-      const yahtzeeBoxOpen=(player.scores['yahtzee']===undefined);
-      if(isYahtzeeRoll && yahtzeeBoxOpen) return 25;
       return (vals.includes(3) && vals.includes(2)) ? 25 : 0;
     }
     case 'smStr': {
@@ -1408,66 +1292,6 @@ function openQR(){
     qrDone=true;
   }
   showOv('ov-qr');
-}
-
-/* ══════════════════════════════════════════
-   TURN TIMER — 45s, auto-scores Chance on expiry
-══════════════════════════════════════════ */
-const TIMER_SECS=45;
-let _timerInterval=null, _timerStart=null, _timerPid=null;
-
-function startTurnTimer(){
-  const cp=curP();if(!cp)return;
-  /* Don't restart if same player's timer is already running */
-  if(_timerPid===cp.id && _timerInterval) return;
-  stopTurnTimer();
-  _timerPid=cp.id;
-  _timerStart=Date.now();
-  _timerInterval=setInterval(()=>{
-    const elapsed=Math.floor((Date.now()-_timerStart)/1000);
-    const remaining=Math.max(0,TIMER_SECS-elapsed);
-    const arc=document.getElementById('timer-arc');
-    const num=document.getElementById('timer-num');
-    if(!arc||!num){stopTurnTimer();return;}
-    const circumference=87.96;
-    arc.style.strokeDashoffset=String(circumference*(1-remaining/TIMER_SECS));
-    arc.classList.toggle('urgent',remaining<=10);
-    num.textContent=String(remaining);
-    if(remaining<=0){
-      stopTurnTimer();
-      /* Auto-score Chance (sum of all dice) if still my turn */
-      if(isMyTurn()){
-        const cp2=curP();
-        if(cp2 && cp2.rollsLeft<3 && cp2.scores['chance']===undefined){
-          toast('⏱ Time up! Auto-scoring Chance.');
-          scoreIt(cp2.id,'chance','Chance');
-          /* Auto-confirm immediately */
-          setTimeout(commitScore,50);
-        } else if(cp2 && cp2.rollsLeft===3){
-          /* Never rolled — force roll first, then auto-score */
-          toast('⏱ Time up! Auto-rolling and scoring Chance.');
-          cp2.dice=cp2.dice.map(()=>Math.floor(Math.random()*6)+1);
-          cp2.rollsLeft=2;
-          const idx=state.players.findIndex(p=>p.id===cp2.id);
-          update(ref(DB,'ytz7/'+gameCode+'/players/'+idx),{dice:cp2.dice,rollsLeft:cp2.rollsLeft});
-          setTimeout(()=>{
-            if(isMyTurn()&&curP()?.scores['chance']===undefined){
-              scoreIt(curP().id,'chance','Chance');
-              setTimeout(commitScore,50);
-            }
-          },200);
-        }
-      }
-    }
-  },1000);
-}
-function stopTurnTimer(){
-  if(_timerInterval){clearInterval(_timerInterval);_timerInterval=null;}
-  _timerPid=null;
-  const arc=document.getElementById('timer-arc');
-  const num=document.getElementById('timer-num');
-  if(arc){arc.style.strokeDashoffset='0';arc.classList.remove('urgent');}
-  if(num) num.textContent=String(TIMER_SECS);
 }
 
 /* ── Wire up all buttons ── */
