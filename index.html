@@ -2,130 +2,100 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Yahtzee Live</title>
-<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Oswald:wght@400;500;600;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>🎲 Yahtzee Live</title>
+<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
-/* ══════════════════════════════════════════
-   CLASSIC YAHTZEE SCORECARD AESTHETIC
-   White/cream paper, black ink, red accents
-   ══════════════════════════════════════════ */
+/* ═══════════════════════════════════════════
+   BASE — keep original scorecard aesthetic
+   ═══════════════════════════════════════════ */
 :root{
-  --paper:#fffef8;--paper2:#f5f0e8;--ink:#1a1a1a;--red:#cc0000;
-  --red-light:#fee2e2;--gold:#b8860b;--green:#166534;
-  --blue:#1e3a8a;--border:#999;--border-dark:#555;
-  --shadow:rgba(0,0,0,.18);--r:4px;
-  --col-w:72px;
+  --border-color:#333;--bg-color:#fff;--header-bg:#f2f2f2;
+  --gold:#d4a017;--green:#15803d;--red:#cc0000;--blue:#1d4ed8;
+  --suggest-bg:#dcfce7;--suggest-border:#15803d;
+  --zero-bg:#fee2e2;--zero-border:#cc0000;
 }
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-html{scroll-behavior:smooth;background:#e8e0d0;}
-body{font-family:'Source Sans 3',sans-serif;background:#e8e0d0;
-  background-image:repeating-linear-gradient(90deg,transparent,transparent 30px,rgba(0,0,0,.02) 30px,rgba(0,0,0,.02) 31px),
-                   repeating-linear-gradient(180deg,transparent,transparent 30px,rgba(0,0,0,.02) 30px,rgba(0,0,0,.02) 31px);
-  min-height:100vh;color:var(--ink);}
-
-/* ── HEADER ─────────────────────────────── */
-.page-hdr{text-align:center;padding:16px 12px 8px;position:relative;z-index:1;}
-.logo-wrap{display:inline-flex;align-items:center;gap:10px;
-  background:var(--paper);border:3px solid var(--ink);border-radius:6px;
-  padding:8px 20px;box-shadow:4px 4px 0 var(--ink);}
-.logo{font-family:'Permanent Marker',cursive;font-size:clamp(2rem,9vw,3rem);
-  color:var(--ink);letter-spacing:1px;line-height:1;}
-.logo-reg{font-size:.6rem;vertical-align:super;color:var(--border-dark);}
-.tagline{font-family:'Oswald',sans-serif;font-size:.7rem;letter-spacing:3px;
-  text-transform:uppercase;color:var(--red);margin-top:2px;}
-.meta-bar{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;
-  font-size:.76rem;color:#555;margin:6px 0;font-family:'Oswald',sans-serif;}
-
-/* ── CONN ────────────────────────────────── */
-.conn{display:flex;align-items:center;gap:6px;background:var(--paper);
-  border:1.5px solid var(--border);border-radius:50px;padding:4px 12px;
-  margin:0 auto 10px;width:fit-content;font-size:.72rem;color:#555;
-  font-family:'Oswald',sans-serif;letter-spacing:.5px;}
-.cdot{width:7px;height:7px;border-radius:50%;background:#aaa;transition:background .4s;}
-.cdot.on{background:#15803d;}.cdot.off{background:var(--red);}
-
-/* ── MAIN LAYOUT ─────────────────────────── */
-.app{max-width:620px;margin:0 auto;padding:0 10px 100px;}
-
-/* ── SETUP CARD ──────────────────────────── */
-.setup-card{background:var(--paper);border:2px solid var(--ink);border-radius:var(--r);
-  padding:20px;margin-bottom:14px;box-shadow:4px 4px 0 var(--shadow);}
-.setup-card h2{font-family:'Oswald',sans-serif;font-size:1.1rem;letter-spacing:2px;
-  text-transform:uppercase;border-bottom:2px solid var(--ink);padding-bottom:8px;margin-bottom:14px;
-  display:flex;align-items:center;gap:8px;}
-.setup-card h2 .dot-red{color:var(--red);}
-.player-inputs{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;}
-.pi-row{display:flex;align-items:center;gap:8px;}
-.color-swatch{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--border);flex-shrink:0;}
-.pi-row input{flex:1;border:1.5px solid var(--border-dark);border-radius:3px;
-  padding:8px 10px;font-family:'Source Sans 3',sans-serif;font-size:.9rem;
-  background:var(--paper2);color:var(--ink);outline:none;transition:border-color .2s;}
-.pi-row input:focus{border-color:var(--ink);}
-.pi-row input::placeholder{color:#aaa;}
-.pi-del{background:none;border:1.5px solid var(--border);color:#999;
-  width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.9rem;
-  line-height:1;transition:all .2s;flex-shrink:0;}
-.pi-del:hover{background:var(--red);border-color:var(--red);color:#fff;}
-.setup-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
-
-/* ── BUTTONS ─────────────────────────────── */
-.btn{padding:9px 20px;border:2px solid var(--ink);border-radius:var(--r);cursor:pointer;
-  font-family:'Oswald',sans-serif;font-size:.85rem;font-weight:600;letter-spacing:1px;
-  text-transform:uppercase;display:inline-flex;align-items:center;gap:6px;
-  transition:all .15s;box-shadow:3px 3px 0 var(--ink);}
-.btn:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--ink);}
-.btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink);}
-.btn-red{background:var(--red);color:#fff;border-color:var(--red);box-shadow:3px 3px 0 rgba(0,0,0,.4);}
-.btn-red:hover{box-shadow:4px 4px 0 rgba(0,0,0,.4);}
-.btn-ink{background:var(--ink);color:#fff;}
-.btn-paper{background:var(--paper);color:var(--ink);}
-.btn-green-c{background:#166534;color:#fff;border-color:#166534;box-shadow:3px 3px 0 rgba(0,0,0,.4);}
-.btn-green-c:hover{box-shadow:4px 4px 0 rgba(0,0,0,.4);}
-.btn-sm{padding:6px 14px;font-size:.78rem;}
-.btn:disabled,.btn[disabled]{opacity:.4;cursor:not-allowed;transform:none!important;
-  box-shadow:2px 2px 0 var(--border)!important;}
-
-/* ── DICE SECTION ────────────────────────── */
-.dice-card{background:var(--paper);border:2px solid var(--ink);border-radius:var(--r);
-  padding:16px;margin-bottom:12px;box-shadow:4px 4px 0 var(--shadow);}
-.dice-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-.dice-header-title{font-family:'Oswald',sans-serif;font-size:.75rem;letter-spacing:2px;
-  text-transform:uppercase;color:var(--border-dark);}
-.turn-badge{background:var(--red);color:#fff;font-family:'Oswald',sans-serif;
-  font-size:.75rem;letter-spacing:1.5px;text-transform:uppercase;
-  padding:3px 10px;border-radius:2px;}
-.dice-row{display:flex;justify-content:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
-.die-wrap{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;}
-.die{width:58px;height:58px;border-radius:8px;background:#fff;
-  border:2px solid var(--border-dark);
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:3px 3px 0 var(--border-dark);transition:all .15s;position:relative;}
-.die:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--border-dark);}
-.die.held{background:#fffbe6;border-color:var(--gold);border-width:2.5px;
-  box-shadow:3px 3px 0 var(--gold);}
-.die.rolling{animation:shake .4s ease-in-out;}
-@keyframes shake{
-  0%,100%{transform:rotate(0)}15%{transform:rotate(-12deg) scale(1.1)}
-  30%{transform:rotate(10deg) scale(.92)}50%{transform:rotate(-8deg) scale(1.08)}
-  70%{transform:rotate(6deg) scale(.95)}85%{transform:rotate(-4deg)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  background:#e0e0e0;margin:0;padding:8px;
+  display:flex;justify-content:center;min-height:100vh;
 }
-.held-lbl{font-family:'Oswald',sans-serif;font-size:.55rem;letter-spacing:2px;
-  color:var(--gold);text-transform:uppercase;height:10px;line-height:1;}
 
-/* PIPS — classic black dots */
-.pip-grid{display:grid;width:42px;height:42px;padding:5px;gap:3px;}
-.pip{width:8px;height:8px;border-radius:50%;background:var(--ink);}
+/* ═══════════════════════════════════════════
+   SCORECARD CONTAINER — iPhone 14 optimized
+   ═══════════════════════════════════════════ */
+.scorecard-container{
+  width:100%;max-width:390px;background:var(--bg-color);
+  border:2px solid var(--border-color);padding:8px;
+  box-shadow:0 4px 10px rgba(0,0,0,.1);
+  position:relative;/* for overlays */
+}
+
+/* NAME ROW */
+.name-row{display:flex;align-items:center;gap:4px;margin-bottom:5px;
+  border-bottom:1px solid #ccc;padding-bottom:3px;}
+.name-row label{font-weight:bold;font-size:.75rem;white-space:nowrap;}
+.conn-dot{display:inline-block;width:7px;height:7px;border-radius:50%;
+  background:#aaa;margin-right:2px;vertical-align:middle;transition:background .3s;}
+.conn-dot.on{background:var(--green);}.conn-dot.off{background:var(--red);}
+
+/* ═══════════════════════════════════════════
+   PLAYER TABS
+   ═══════════════════════════════════════════ */
+.player-tabs{display:flex;gap:2px;margin-bottom:4px;overflow-x:auto;padding-bottom:2px;}
+.ptab{background:#f2f2f2;border:1px solid #ccc;border-bottom:none;
+  border-radius:3px 3px 0 0;padding:3px 8px;font-size:.68rem;font-weight:700;
+  cursor:pointer;white-space:nowrap;flex-shrink:0;color:#666;transition:all .15s;}
+.ptab.active{background:#fff;border-color:var(--border-color);color:#000;}
+.ptab.cur-turn::after{content:' 🎲';font-size:.6rem;}
+.ptab-score{font-size:.58rem;color:#888;font-weight:400;}
+
+/* ═══════════════════════════════════════════
+   DICE PANEL — compact for iPhone
+   ═══════════════════════════════════════════ */
+.dice-panel{background:#f9f9f9;border:1px solid #ccc;border-radius:4px;
+  padding:6px;margin-bottom:6px;}
+.dice-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.turn-info{font-size:.7rem;font-weight:700;color:#333;}
+.roll-info{font-size:.68rem;color:#666;}
+
+.dice-row{display:flex;justify-content:space-evenly;align-items:center;margin-bottom:6px;}
+
+/* Die */
+.die-wrap{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;}
+.die{
+  width:46px;height:46px;border-radius:7px;background:#fff;
+  border:1.5px solid #555;display:flex;align-items:center;justify-content:center;
+  box-shadow:2px 2px 0 #999;transition:all .15s;position:relative;
+}
+.die:hover{transform:translateY(-1px);box-shadow:3px 3px 0 #777;}
+.die.held{background:#fffbeb;border-color:var(--gold);border-width:2px;
+  box-shadow:2px 2px 0 var(--gold);}
+.held-label{font-size:.48rem;font-weight:900;letter-spacing:1px;
+  color:var(--gold);text-transform:uppercase;height:8px;line-height:1;}
+.die.rolling{animation:diceShake .38s ease-in-out;}
+@keyframes diceShake{
+  0%,100%{transform:rotate(0) scale(1)}
+  20%{transform:rotate(-13deg) scale(1.1)}
+  40%{transform:rotate(10deg) scale(.92)}
+  60%{transform:rotate(-7deg) scale(1.07)}
+  80%{transform:rotate(5deg) scale(.96)}
+}
+
+/* Pips */
+.pip-grid{display:grid;width:34px;height:34px;padding:3px;gap:2px;}
+.pip{width:7px;height:7px;border-radius:50%;background:#1a1a1a;}
 .p1{grid-template:repeat(3,1fr)/repeat(3,1fr);}
 .p1 .pip{grid-column:2;grid-row:2;align-self:center;justify-self:center;}
 .p2{grid-template:repeat(2,1fr)/repeat(2,1fr);}
 .p2 .pip:nth-child(1){grid-column:1;grid-row:1;align-self:start;justify-self:start;}
 .p2 .pip:nth-child(2){grid-column:2;grid-row:2;align-self:end;justify-self:end;}
 .p3{grid-template:repeat(3,1fr)/repeat(3,1fr);}
-.p3 .pip:nth-child(1){grid-column:1;grid-row:1;align-self:start;}
+.p3 .pip:nth-child(1){grid-column:1;grid-row:1;}
 .p3 .pip:nth-child(2){grid-column:2;grid-row:2;align-self:center;justify-self:center;}
-.p3 .pip:nth-child(3){grid-column:3;grid-row:3;align-self:end;justify-self:end;}
+.p3 .pip:nth-child(3){grid-column:3;grid-row:3;}
 .p4{grid-template:repeat(2,1fr)/repeat(2,1fr);}
 .p5{grid-template:repeat(3,1fr)/repeat(3,1fr);}
 .p5 .pip:nth-child(1){grid-column:1;grid-row:1;}
@@ -135,900 +105,612 @@ body{font-family:'Source Sans 3',sans-serif;background:#e8e0d0;
 .p5 .pip:nth-child(5){grid-column:3;grid-row:3;}
 .p6{grid-template:repeat(3,1fr)/repeat(2,1fr);}
 
-.dice-info{text-align:center;font-size:.8rem;color:#555;margin-bottom:10px;
-  font-family:'Source Sans 3',sans-serif;min-height:18px;}
-.dice-info b{color:var(--red);}
-.dice-btns{display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap;}
-.rolls-left{font-family:'Oswald',sans-serif;font-size:1rem;font-weight:700;
-  color:var(--ink);letter-spacing:1px;}
+.dice-btns{display:flex;justify-content:space-between;align-items:center;gap:6px;}
+.dice-hint{font-size:.62rem;color:#666;flex:1;line-height:1.2;}
+.dice-hint b{color:var(--red);}
 
-/* ── PLAYER TABS ─────────────────────────── */
-.player-tabs-wrap{overflow-x:auto;margin-bottom:0;padding-bottom:2px;}
-.player-tabs{display:flex;gap:0;border-bottom:none;}
-.ptab{background:var(--paper2);border:2px solid var(--border-dark);border-bottom:none;
-  border-radius:4px 4px 0 0;padding:7px 14px;font-family:'Oswald',sans-serif;
-  font-size:.8rem;letter-spacing:.5px;cursor:pointer;white-space:nowrap;
-  flex-shrink:0;margin-right:3px;transition:all .15s;color:#666;}
-.ptab.active{background:var(--paper);border-color:var(--ink);color:var(--ink);
-  position:relative;z-index:2;}
-.ptab.active-turn::after{content:'▶';font-size:.55rem;margin-left:4px;color:var(--red);}
-.ptab-score{font-size:.68rem;display:block;color:#999;}
-.ptab.active .ptab-score{color:var(--border-dark);}
+/* Buttons */
+.btn{padding:5px 12px;border:1.5px solid var(--border-color);border-radius:3px;
+  cursor:pointer;font-size:.72rem;font-weight:700;letter-spacing:.3px;
+  font-family:inherit;display:inline-flex;align-items:center;gap:4px;
+  transition:all .12s;white-space:nowrap;}
+.btn:hover{filter:brightness(.92);}
+.btn:active{transform:scale(.96);}
+.btn-roll{background:#cc0000;color:#fff;border-color:#cc0000;}
+.btn-sm-gray{background:#f2f2f2;color:#333;border-color:#999;font-size:.65rem;padding:4px 9px;}
+.btn:disabled,.btn[disabled]{opacity:.38;cursor:not-allowed;transform:none!important;}
 
-/* ── SCORECARD — exact match to official card ── */
-.scorecard-outer{background:var(--paper);border:2px solid var(--ink);
-  border-radius:0 var(--r) var(--r) var(--r);box-shadow:4px 4px 0 var(--shadow);overflow:hidden;}
+/* ═══════════════════════════════════════════
+   SCORECARD TABLE — exact original style
+   ═══════════════════════════════════════════ */
+table{width:100%;border-collapse:collapse;font-size:.72rem;table-layout:fixed;}
+th,td{border:1px solid var(--border-color);text-align:center;padding:3px 2px;height:22px;}
+.left-align{text-align:left;padding-left:4px;}
+thead th{background:var(--header-bg);font-size:.58rem;text-transform:uppercase;}
+.section-header{background:#eee;font-weight:bold;text-transform:uppercase;font-size:.72rem;}
+.total-row{font-weight:bold;background:#f9f9f9;}
+.score-box{background:#fafafa;}
 
-/* Table layout */
-.sc-table{width:100%;border-collapse:collapse;}
-.sc-table td,.sc-table th{border:1px solid var(--border);padding:0;vertical-align:middle;}
-.sc-table tr:last-child td{border-bottom:none;}
+/* Score buttons inside table cells */
+.sc-btn{
+  width:100%;height:100%;min-height:20px;border:none;background:transparent;
+  text-align:center;font-size:.8rem;font-weight:700;cursor:pointer;
+  font-family:inherit;padding:1px;border-radius:1px;transition:all .15s;
+  color:#111;
+}
+.sc-btn:hover:not([disabled]):not(.filled){background:#f0f9ff;}
+.sc-btn.filled{cursor:default;color:#111;font-weight:700;}
+.sc-btn.suggested{background:var(--suggest-bg);color:var(--green);
+  animation:suggestPulse .85s ease-in-out infinite alternate;font-weight:800;}
+@keyframes suggestPulse{from{box-shadow:none}to{box-shadow:inset 0 0 6px rgba(21,128,61,.4)}}
+.sc-btn.zero-sug{background:var(--zero-bg);color:var(--red);}
+.sc-btn.stat{cursor:default;font-weight:700;color:#111;}
+.sc-btn.bonus-yes{color:var(--green);font-weight:800;}
+.sc-btn[disabled]:not(.filled):not(.stat){opacity:.3;cursor:not-allowed;}
 
-/* Column headers */
-.sc-table thead th{background:var(--paper2);text-align:center;padding:4px 2px;
-  font-family:'Oswald',sans-serif;font-size:.72rem;letter-spacing:.5px;
-  color:var(--ink);border-bottom:2px solid var(--ink);}
-.sc-table thead th:first-child{text-align:left;padding-left:6px;min-width:130px;}
-.sc-table thead th.how-col{font-size:.62rem;color:#555;max-width:80px;line-height:1.2;}
+/* Column widths — 3 cols now: category | how to score | score */
+.col-cat{width:32%;}
+.col-how{width:28%;}
+.col-score{width:40%;}
 
-/* Section header rows */
-.tr-section{background:var(--ink);}
-.tr-section td{padding:5px 8px;font-family:'Oswald',sans-serif;font-size:.75rem;
-  letter-spacing:2px;text-transform:uppercase;color:#fff;font-weight:700;}
+/* ═══════════════════════════════════════════
+   OVERLAYS
+   ═══════════════════════════════════════════ */
 
-/* Regular score rows */
-.tr-score td.cat-td{padding:6px 8px;}
-.cat-name-main{font-family:'Oswald',sans-serif;font-size:.82rem;font-weight:600;
-  color:var(--ink);line-height:1.1;}
-.cat-hint-text{font-size:.6rem;color:#666;line-height:1.2;margin-top:1px;}
+/* YAHTZEE blast */
+.ytz-overlay{position:fixed;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;z-index:600;
+  background:rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:opacity .2s;}
+.ytz-overlay.show{opacity:1;}
+.ytz-word{font-family:'Permanent Marker',cursive;font-size:min(18vw,90px);
+  color:#fff;text-shadow:4px 4px 0 var(--red),0 0 40px rgba(255,200,0,.8);
+  animation:ytzPop .5s cubic-bezier(.175,.885,.32,1.275) forwards;}
+@keyframes ytzPop{0%{transform:scale(0) rotate(-8deg)}60%{transform:scale(1.18) rotate(2deg)}100%{transform:scale(1) rotate(0)}}
+.ytz-sub{color:#ffe;font-size:.9rem;font-weight:700;letter-spacing:2px;
+  text-transform:uppercase;margin-top:6px;}
 
-/* Total / bonus rows */
-.tr-total{background:var(--paper2);}
-.tr-total td.cat-td{padding:6px 8px;}
-.tr-total .cat-name-main{font-family:'Oswald',sans-serif;font-size:.78rem;font-weight:700;}
-.tr-bonus{background:#fffbe6;}
-
-/* Score cells */
-.score-td{text-align:center;padding:3px;}
-.score-btn{width:100%;min-height:36px;border:1.5px solid var(--border);
-  border-radius:2px;background:#fff;color:var(--ink);
-  font-family:'Oswald',sans-serif;font-size:.9rem;font-weight:600;
-  cursor:pointer;transition:all .15s;padding:2px;}
-.score-btn:hover:not([disabled]):not(.filled):not(.stat){
-  background:var(--red-light);border-color:var(--red);color:var(--red);}
-.score-btn.filled{background:transparent;border:none;cursor:default;
-  color:var(--ink);font-weight:700;font-size:.95rem;}
-.score-btn.suggested{background:#dcfce7;border-color:#166534;color:#166534;
-  animation:pulse-green .9s ease-in-out infinite alternate;font-weight:700;}
-@keyframes pulse-green{from{box-shadow:none}to{box-shadow:0 0 8px rgba(22,101,52,.5)}}
-.score-btn.zero-suggest{background:#fee2e2;border-color:var(--red);color:var(--red);}
-.score-btn.stat{background:transparent;border:none;cursor:default;
-  font-family:'Oswald',sans-serif;font-size:.9rem;font-weight:700;color:var(--ink);}
-.score-btn.bonus-earned{color:var(--green);}
-.score-btn[disabled]:not(.filled):not(.stat){opacity:.3;cursor:not-allowed;}
-
-/* Joker indicator */
-.joker-badge{display:inline-block;background:var(--red);color:#fff;
-  font-family:'Oswald',sans-serif;font-size:.5rem;letter-spacing:1px;
-  padding:1px 4px;border-radius:2px;vertical-align:middle;margin-left:3px;}
-
-/* ── PLAYERS OVERVIEW BAR ─────────────────── */
-.players-overview{display:flex;gap:8px;overflow-x:auto;padding:8px 0;flex-wrap:nowrap;}
-.ov-card{background:var(--paper);border:2px solid var(--border-dark);border-radius:var(--r);
-  padding:8px 12px;flex-shrink:0;min-width:90px;font-family:'Oswald',sans-serif;}
-.ov-card.active-turn{border-color:var(--ink);box-shadow:2px 2px 0 var(--ink);}
-.ov-name{font-size:.8rem;font-weight:700;white-space:nowrap;overflow:hidden;
-  text-overflow:ellipsis;max-width:100px;}
-.ov-score{font-size:1.2rem;font-weight:700;color:var(--ink);}
-.ov-progress{font-size:.62rem;color:#888;margin-top:2px;}
-
-/* ── ACTION BAR ──────────────────────────── */
-.action-bar{position:fixed;bottom:0;left:0;right:0;z-index:100;
-  background:rgba(248,243,232,.97);backdrop-filter:blur(8px);
-  border-top:2px solid var(--ink);padding:8px 14px 20px;
-  display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
-
-/* ── QR MODAL ────────────────────────────── */
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);
-  display:flex;align-items:center;justify-content:center;z-index:300;
+/* QR Modal */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);
+  display:flex;align-items:center;justify-content:center;z-index:500;
   opacity:0;pointer-events:none;transition:opacity .25s;}
 .modal-bg.show{opacity:1;pointer-events:all;}
-.modal{background:var(--paper);border:3px solid var(--ink);border-radius:6px;
-  padding:24px;text-align:center;max-width:300px;width:90%;box-shadow:6px 6px 0 var(--ink);}
-.modal h3{font-family:'Permanent Marker',cursive;color:var(--ink);font-size:1.4rem;margin-bottom:4px;}
-.modal p{font-size:.78rem;color:#555;margin-bottom:14px;}
-#qr-box{display:flex;justify-content:center;margin-bottom:12px;}
-.qr-url{font-size:.62rem;color:#777;word-break:break-all;padding:6px 8px;
-  background:var(--paper2);border:1px solid var(--border);border-radius:2px;margin-bottom:14px;}
+.modal{background:#fff;border:2px solid var(--border-color);border-radius:4px;
+  padding:18px;text-align:center;max-width:280px;width:90%;
+  box-shadow:4px 4px 0 rgba(0,0,0,.3);}
+.modal h3{font-style:italic;font-size:1.2rem;margin:0 0 4px;}
+.modal p{font-size:.72rem;color:#555;margin:0 0 12px;}
+#qr-box{display:flex;justify-content:center;margin-bottom:10px;}
+.qr-url{font-size:.58rem;color:#777;word-break:break-all;padding:5px;
+  background:#f2f2f2;border-radius:2px;margin-bottom:12px;}
 
-/* ── YAHTZEE BLAST ────────────────────────── */
-.ytz-blast{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;z-index:500;pointer-events:none;opacity:0;transition:opacity .2s;}
-.ytz-blast.show{opacity:1;}
-.ytz-blast-bg{position:absolute;inset:0;background:rgba(204,0,0,.12);backdrop-filter:blur(2px);}
-.ytz-text{font-family:'Permanent Marker',cursive;font-size:min(18vw,110px);
-  color:var(--red);text-shadow:4px 4px 0 var(--ink);position:relative;
-  animation:ytzPop .55s cubic-bezier(.175,.885,.32,1.275) forwards;}
-.ytz-sub{font-family:'Oswald',sans-serif;font-size:1rem;letter-spacing:3px;
-  color:var(--ink);margin-top:8px;position:relative;}
-@keyframes ytzPop{0%{transform:scale(0) rotate(-8deg)}60%{transform:scale(1.15) rotate(2deg)}100%{transform:scale(1) rotate(0)}}
+/* Game Over */
+.gameover-overlay{position:fixed;inset:0;background:rgba(255,255,255,.96);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  z-index:400;opacity:0;pointer-events:none;transition:opacity .3s;padding:20px;}
+.gameover-overlay.show{opacity:1;pointer-events:all;}
+.gameover-overlay h2{font-family:'Permanent Marker',cursive;font-size:2rem;
+  color:var(--red);margin:0 0 8px;}
+.go-winner{font-size:1rem;font-weight:700;margin-bottom:12px;color:#222;}
+.go-table{width:100%;max-width:340px;border-collapse:collapse;font-size:.78rem;margin-bottom:14px;}
+.go-table th{background:#333;color:#fff;padding:6px;font-size:.68rem;text-transform:uppercase;}
+.go-table td{padding:7px;border-bottom:1px solid #ddd;text-align:center;}
 
-/* ── TOAST ───────────────────────────────── */
-.toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%) translateY(50px);
-  background:var(--ink);color:#fff;font-family:'Oswald',sans-serif;
-  font-weight:600;letter-spacing:.5px;padding:9px 20px;border-radius:3px;
-  font-size:.85rem;z-index:400;transition:transform .3s;pointer-events:none;
-  box-shadow:2px 2px 0 rgba(0,0,0,.3);}
+/* Setup screen */
+.setup-overlay{position:fixed;inset:0;background:#e0e0e0;z-index:700;
+  display:flex;align-items:center;justify-content:center;padding:16px;}
+.setup-box{background:#fff;border:2px solid var(--border-color);
+  border-radius:4px;padding:18px;width:100%;max-width:360px;
+  box-shadow:4px 4px 0 rgba(0,0,0,.2);}
+.setup-box h2{font-style:italic;font-size:1.5rem;margin:0 0 12px;
+  font-family:'Permanent Marker',cursive;}
+.setup-inputs{display:flex;flex-direction:column;gap:7px;margin-bottom:12px;}
+.setup-row{display:flex;align-items:center;gap:6px;}
+.setup-row .color-dot{width:11px;height:11px;border-radius:50%;border:1px solid #999;flex-shrink:0;}
+.setup-row input{flex:1;border:1px solid #ccc;border-radius:2px;
+  padding:6px 8px;font-size:.85rem;font-family:inherit;}
+.setup-row .del-btn{background:none;border:1px solid #ccc;color:#999;
+  width:24px;height:24px;border-radius:50%;cursor:pointer;font-size:.8rem;flex-shrink:0;}
+.setup-row .del-btn:hover{background:var(--red);border-color:var(--red);color:#fff;}
+.setup-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+
+/* Bottom toolbar */
+.toolbar{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;
+  margin-top:6px;padding-top:6px;border-top:1px solid #ddd;}
+
+/* Toast */
+.toast{position:fixed;bottom:16px;left:50%;
+  transform:translateX(-50%) translateY(60px);
+  background:#333;color:#fff;padding:7px 16px;border-radius:3px;
+  font-size:.75rem;font-weight:700;z-index:800;
+  transition:transform .28s;pointer-events:none;white-space:nowrap;}
 .toast.show{transform:translateX(-50%) translateY(0);}
-
-/* ── GAME OVER ───────────────────────────── */
-.gameover-card{background:var(--paper);border:3px solid var(--ink);border-radius:var(--r);
-  padding:24px 20px;text-align:center;margin-bottom:14px;box-shadow:5px 5px 0 var(--ink);}
-.gameover-card h2{font-family:'Permanent Marker',cursive;color:var(--red);
-  font-size:2.2rem;margin-bottom:16px;letter-spacing:1px;}
-.winner-line{font-family:'Oswald',sans-serif;font-size:1.4rem;font-weight:700;
-  letter-spacing:1px;margin-bottom:16px;}
-.final-table{width:100%;border-collapse:collapse;margin:0 0 16px;}
-.final-table th{background:var(--ink);color:#fff;padding:7px;
-  font-family:'Oswald',sans-serif;font-size:.78rem;letter-spacing:1px;text-transform:uppercase;}
-.final-table td{padding:8px;border-bottom:1px solid var(--border);
-  font-family:'Oswald',sans-serif;font-size:.9rem;}
-.final-table tr:last-child td{border-bottom:none;}
-.final-table .rank-td{font-weight:700;font-size:1rem;}
-.final-table .score-td-f{font-weight:700;font-size:1.1rem;color:var(--red);}
-
-/* ERR */
-.err-banner{background:#fee2e2;border:1.5px solid var(--red);border-radius:var(--r);
-  padding:10px 14px;margin-bottom:10px;font-size:.8rem;color:#991b1b;display:none;}
-.err-banner.show{display:block;}
-
-/* RESPONSIVE */
-@media(max-width:400px){
-  .die{width:50px;height:50px;}
-  .pip-grid{width:36px;height:36px;}
-  .pip{width:7px;height:7px;}
-  --col-w:62px;
-}
 </style>
 </head>
 <body>
 
-<!-- Yahtzee Blast overlay -->
-<div class="ytz-blast" id="ytz-blast">
-  <div class="ytz-blast-bg"></div>
-  <div class="ytz-text">YAHTZEE!</div>
-  <div class="ytz-sub" id="ytz-sub">5 OF A KIND • 50 POINTS</div>
+<!-- ══ SETUP OVERLAY ══════════════════════ -->
+<div class="setup-overlay" id="setup-overlay">
+  <div class="setup-box">
+    <h2>🎲 Yahtzee</h2>
+    <div style="font-size:.75rem;color:#555;margin-bottom:10px;">Enter player names to start</div>
+    <div class="setup-inputs" id="setup-inputs"></div>
+    <div class="setup-btns">
+      <button class="btn btn-sm-gray" id="add-player-btn">+ Add Player</button>
+      <button class="btn btn-roll" id="start-btn">▶ Start Game</button>
+    </div>
+  </div>
 </div>
 
-<!-- QR Modal -->
+<!-- ══ YAHTZEE BLAST ═════════════════════ -->
+<div class="ytz-overlay" id="ytz-overlay">
+  <div class="ytz-word">YAHTZEE!</div>
+  <div class="ytz-sub" id="ytz-sub">5 OF A KIND</div>
+</div>
+
+<!-- ══ QR MODAL ══════════════════════════ -->
 <div class="modal-bg" id="qr-modal">
   <div class="modal">
-    <h3>Join Game</h3>
+    <h3>🎲 Join Game</h3>
     <p>Scan to join &amp; see live scores</p>
     <div id="qr-box"></div>
     <div class="qr-url" id="qr-url"></div>
-    <button class="btn btn-paper btn-sm" id="close-qr-btn">&#10005; Close</button>
+    <button class="btn btn-sm-gray" id="close-qr-btn">✕ Close</button>
   </div>
 </div>
 
+<!-- ══ GAME OVER ══════════════════════════ -->
+<div class="gameover-overlay" id="gameover-overlay">
+  <h2>🏆 Game Over!</h2>
+  <div class="go-winner" id="go-winner"></div>
+  <table class="go-table">
+    <thead><tr><th>#</th><th>Player</th><th>Upper</th><th>+Bonus</th><th>Lower</th><th>Total</th></tr></thead>
+    <tbody id="go-tbody"></tbody>
+  </table>
+  <button class="btn btn-roll" id="play-again-btn">🎲 Play Again</button>
+</div>
+
+<!-- ══ TOAST ══════════════════════════════ -->
 <div class="toast" id="toast"></div>
-<div class="err-banner" id="err-banner"></div>
 
-<div class="app">
-  <!-- HEADER -->
-  <div class="page-hdr">
-    <div class="logo-wrap">
-      <div>
-        <div class="logo">Yahtzee<sup class="logo-reg">®</sup></div>
-        <div class="tagline">Live Multiplayer</div>
-      </div>
-    </div>
-    <div class="meta-bar">
-      <span id="date-disp"></span>
-      <span id="time-disp"></span>
-    </div>
-  </div>
-  <div class="conn"><div class="cdot" id="cdot"></div><span id="ctext">Connecting…</span></div>
+<!-- ══ MAIN SCORECARD ═════════════════════ -->
+<div class="scorecard-container" id="sc-container">
 
-  <!-- SETUP -->
-  <div class="setup-card" id="setup-screen">
-    <h2><span class="dot-red">◆</span> NEW GAME</h2>
-    <div class="player-inputs" id="player-inputs"></div>
-    <div class="setup-btns">
-      <button class="btn btn-paper btn-sm" id="add-player-btn">+ Add Player</button>
-      <button class="btn btn-red" id="start-game-btn">▶ Start Game</button>
-    </div>
+  <!-- Player tabs -->
+  <div class="player-tabs" id="player-tabs"></div>
+
+  <!-- Name row (current viewing player + conn status) -->
+  <div class="name-row">
+    <label>NAME:</label>
+    <span id="viewing-name" style="font-size:.85rem;font-weight:700;flex:1;"></span>
+    <span id="viewing-score" style="font-size:.7rem;color:#555;margin-right:4px;"></span>
+    <span class="conn-dot" id="cdot"></span><span id="ctext" style="font-size:.62rem;color:#888;"></span>
   </div>
 
-  <!-- GAME AREA -->
-  <div id="game-area" style="display:none">
-
-    <!-- Players overview -->
-    <div class="players-overview" id="players-overview"></div>
-
-    <!-- Dice -->
-    <div class="dice-card">
-      <div class="dice-header">
-        <div class="dice-header-title">🎲 Dice</div>
-        <div class="turn-badge" id="turn-badge">Player's Turn</div>
-      </div>
-      <div class="dice-row" id="dice-row"></div>
-      <div class="dice-info" id="dice-info">Roll all 5 dice to begin your turn</div>
-      <div class="dice-btns">
-        <button class="btn btn-red" id="roll-btn">🎲 Roll Dice</button>
-        <span class="rolls-left" id="rolls-left">3 rolls left</span>
-      </div>
+  <!-- ══ DICE PANEL ══ -->
+  <div class="dice-panel">
+    <div class="dice-top">
+      <div class="turn-info" id="turn-info">—</div>
+      <div class="roll-info" id="roll-info">3 rolls left</div>
     </div>
-
-    <!-- Scorecard -->
-    <div class="player-tabs-wrap">
-      <div class="player-tabs" id="player-tabs"></div>
-    </div>
-    <div class="scorecard-outer">
-      <table class="sc-table" id="sc-table">
-        <thead id="sc-head"></thead>
-        <tbody id="sc-body"></tbody>
-      </table>
-    </div>
-
-  </div>
-
-  <!-- GAME OVER -->
-  <div id="gameover-area" style="display:none">
-    <div class="gameover-card">
-      <h2>🏆 Game Over!</h2>
-      <div class="winner-line" id="winner-line"></div>
-      <table class="final-table" id="final-table">
-        <thead><tr>
-          <th>#</th><th>Player</th>
-          <th>Upper</th><th>Bonus</th><th>Lower</th><th>Total</th>
-        </tr></thead>
-        <tbody id="final-tbody"></tbody>
-      </table>
-      <button class="btn btn-red" id="play-again-btn">🎲 Play Again</button>
+    <div class="dice-row" id="dice-row"></div>
+    <div class="dice-btns">
+      <div class="dice-hint" id="dice-hint">Roll to start your turn</div>
+      <button class="btn btn-roll" id="roll-btn">🎲 Roll</button>
     </div>
   </div>
+
+  <!-- ══ SCORECARD TABLE ══ -->
+  <table id="sc-table">
+    <thead>
+      <tr class="section-header">
+        <th class="left-align col-cat">Upper Section</th>
+        <th class="col-how">How to Score</th>
+        <th class="col-score" id="sc-col-head">Score</th>
+      </tr>
+    </thead>
+    <tbody id="sc-body"></tbody>
+  </table>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <button class="btn btn-sm-gray" id="qr-btn">📲 QR Code</button>
+    <button class="btn btn-sm-gray" id="new-game-btn">↺ New Game</button>
+  </div>
+
 </div>
 
-<!-- Fixed bottom bar -->
-<div class="action-bar">
-  <button class="btn btn-paper btn-sm" id="qr-btn">📲 QR Code</button>
-  <button class="btn btn-paper btn-sm" id="new-game-btn">↺ New Game</button>
-</div>
-
-<!-- ═══════════════════════════════════════════════
-     GAME LOGIC — Firebase module, all handlers via JS
-     ═══════════════════════════════════════════════ -->
+<!-- ═══════════════════════════════════════════
+     FIREBASE MODULE + GAME LOGIC
+     ═══════════════════════════════════════════ -->
 <script type="module">
-import { initializeApp }   from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { initializeApp }     from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import { getDatabase, ref, set, update, onValue }
   from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
 
-/* ══ FIREBASE ════════════════════════════════════ */
+/* ── FIREBASE ─────────────────────────── */
 const fbApp = initializeApp({ databaseURL:'https://scoreboard-1677c-default-rtdb.firebaseio.com/' });
 const db    = getDatabase(fbApp);
-const ROOT  = 'yahtzee2';   // fresh key so old broken data doesn't conflict
+const ROOT  = 'ytz3';
 
-/* ══ AUDIO ═══════════════════════════════════════ */
+/* ── AUDIO ────────────────────────────── */
 let _ac=null;
 const ac=()=>_ac||(_ac=new(window.AudioContext||window.webkitAudioContext)());
-function ding(){
-  try{const c=ac(),o=c.createOscillator(),g=c.createGain();
-    o.connect(g);g.connect(c.destination);o.type='sine';
-    o.frequency.setValueAtTime(880,c.currentTime);
-    o.frequency.exponentialRampToValueAtTime(1320,c.currentTime+.1);
-    g.gain.setValueAtTime(.3,c.currentTime);
-    g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.35);
-    o.start();o.stop(c.currentTime+.4);}catch(e){}
-}
-function rollSound(){
-  try{const c=ac();
-    [0,.04,.08,.12,.16].forEach(t=>{
-      const o=c.createOscillator(),g=c.createGain();
-      o.connect(g);g.connect(c.destination);o.type='triangle';
-      o.frequency.setValueAtTime(100+Math.random()*300,c.currentTime+t);
-      g.gain.setValueAtTime(.1,c.currentTime+t);
-      g.gain.exponentialRampToValueAtTime(.001,c.currentTime+t+.07);
-      o.start(c.currentTime+t);o.stop(c.currentTime+t+.08);});}catch(e){}
-}
-function fanfare(){
-  try{const c=ac();
-    [[523,.0],[659,.12],[784,.24],[1047,.36],[1319,.48],[1047,.6],[1319,.7],[1568,.8]]
-    .forEach(([f,t])=>{
-      const o=c.createOscillator(),g=c.createGain();
-      o.connect(g);g.connect(c.destination);o.type='triangle';
-      const ct=c.currentTime+t;
-      o.frequency.setValueAtTime(f,ct);
-      g.gain.setValueAtTime(.3,ct);g.gain.exponentialRampToValueAtTime(.001,ct+.25);
-      o.start(ct);o.stop(ct+.3);});}catch(e){}
-}
+function ding(){try{const c=ac(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sine';o.frequency.setValueAtTime(880,c.currentTime);o.frequency.exponentialRampToValueAtTime(1320,c.currentTime+.1);g.gain.setValueAtTime(.28,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.32);o.start();o.stop(c.currentTime+.35);}catch(e){}}
+function rollSnd(){try{const c=ac();[0,.04,.08,.12,.16].forEach(t=>{const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='triangle';o.frequency.setValueAtTime(80+Math.random()*280,c.currentTime+t);g.gain.setValueAtTime(.09,c.currentTime+t);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+t+.06);o.start(c.currentTime+t);o.stop(c.currentTime+t+.07);});}catch(e){}}
+function fanfare(){try{const c=ac(),ns=[[523,.0],[659,.13],[784,.26],[1047,.39],[1319,.52],[1047,.62],[1319,.72],[1568,.82]];ns.forEach(([f,t])=>{const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='triangle';const ct=c.currentTime+t;o.frequency.setValueAtTime(f,ct);g.gain.setValueAtTime(.28,ct);g.gain.exponentialRampToValueAtTime(.001,ct+.22);o.start(ct);o.stop(ct+.25);});}catch(e){}}
 
-/* ══ CONSTANTS ════════════════════════════════════
-   Official Yahtzee categories per official rules
-   ════════════════════════════════════════════════ */
-const COLORS=['#c2410c','#1d4ed8','#15803d','#7e22ce','#b45309','#be185d','#0f766e'];
-
-// All 13 scoreable boxes (plus yBonus display row)
+/* ── CONSTANTS ────────────────────────── */
+const COLORS=['#c2410c','#1d4ed8','#15803d','#7e22ce','#b45309','#be185d'];
 const CATS=[
-  // Upper section
-  {id:'aces',   name:'Aces',          hint:'Count & add only Aces',      sec:'U', pip:1},
-  {id:'twos',   name:'Twos',          hint:'Count & add only Twos',      sec:'U', pip:2},
-  {id:'threes', name:'Threes',        hint:'Count & add only Threes',    sec:'U', pip:3},
-  {id:'fours',  name:'Fours',         hint:'Count & add only Fours',     sec:'U', pip:4},
-  {id:'fives',  name:'Fives',         hint:'Count & add only Fives',     sec:'U', pip:5},
-  {id:'sixes',  name:'Sixes',         hint:'Count & add only Sixes',     sec:'U', pip:6},
-  // Lower section
-  {id:'threeKind',name:'3 of a Kind', hint:'Add total of all dice',      sec:'L'},
-  {id:'fourKind', name:'4 of a Kind', hint:'Add total of all dice',      sec:'L'},
-  {id:'fullHouse',name:'Full House',  hint:'Score 25',                   sec:'L', fixed:25},
-  {id:'smStr',    name:'Sm. Straight',hint:'Sequence of 4 — Score 30',  sec:'L', fixed:30},
-  {id:'lgStr',    name:'Lg. Straight',hint:'Sequence of 5 — Score 40',  sec:'L', fixed:40},
-  {id:'yahtzee',  name:'YAHTZEE',     hint:'5 of a kind — Score 50',    sec:'L', fixed:50},
-  {id:'chance',   name:'Chance',      hint:'Score total of all 5 dice',  sec:'L'},
+  {id:'aces',    name:'Aces',        hint:'Add 1s',         sec:'U'},
+  {id:'twos',    name:'Twos',        hint:'Add 2s',         sec:'U'},
+  {id:'threes',  name:'Threes',      hint:'Add 3s',         sec:'U'},
+  {id:'fours',   name:'Fours',       hint:'Add 4s',         sec:'U'},
+  {id:'fives',   name:'Fives',       hint:'Add 5s',         sec:'U'},
+  {id:'sixes',   name:'Sixes',       hint:'Add 6s',         sec:'U'},
+  {id:'threeK',  name:'3 of a kind', hint:'Total all dice', sec:'L'},
+  {id:'fourK',   name:'4 of a kind', hint:'Total all dice', sec:'L'},
+  {id:'fullH',   name:'Full House',  hint:'Score 25',       sec:'L',fixed:25},
+  {id:'smStr',   name:'Sm. Straight',hint:'Score 30',       sec:'L',fixed:30},
+  {id:'lgStr',   name:'Lg. Straight',hint:'Score 40',       sec:'L',fixed:40},
+  {id:'yahtzee', name:'YAHTZEE 🎲',  hint:'Score 50',       sec:'L',fixed:50},
+  {id:'chance',  name:'Chance',      hint:'Total all 5',    sec:'L'},
 ];
-// The 13 scored boxes (yBonus is tallied separately)
-const SCORED_IDS = CATS.map(c=>c.id);
-const UPPER_IDS  = CATS.filter(c=>c.sec==='U').map(c=>c.id);
-const LOWER_IDS  = CATS.filter(c=>c.sec==='L').map(c=>c.id);
+const U_IDS=CATS.filter(c=>c.sec==='U').map(c=>c.id);
+const L_IDS=CATS.filter(c=>c.sec==='L').map(c=>c.id);
+const ALL_IDS=CATS.map(c=>c.id);
 
-/* ══ STATE ════════════════════════════════════════ */
-let players=[],currentTurnIdx=0,gameStarted=false,gameOver=false;
-let ignoreRemote=false,qrDone=false,viewingPlayer=null;
+/* ── STATE ────────────────────────────── */
+let players=[],curIdx=0,started=false,over=false;
+let ignoreRemote=false,qrDone=false,viewPid=null;
 let setupInputs=[];
 
-/* ══ CLOCK ════════════════════════════════════════ */
-function tick(){
-  const n=new Date();
-  document.getElementById('date-disp').textContent=
-    n.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric',year:'numeric'});
-  document.getElementById('time-disp').textContent=
-    n.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
-}
-tick(); setInterval(tick,1000);
-
-/* ══ FIREBASE ════════════════════════════════════ */
+/* ── FIREBASE ─────────────────────────── */
 onValue(ref(db,'.info/connected'),s=>{
   const on=s.val();
-  document.getElementById('cdot').className='cdot '+(on?'on':'off');
-  document.getElementById('ctext').textContent=on?'Connected':'Offline…';
+  document.getElementById('cdot').className='conn-dot '+(on?'on':'off');
+  document.getElementById('ctext').textContent=on?'Live':'Offline';
 });
 onValue(ref(db,ROOT),s=>{
   if(ignoreRemote)return;
-  const d=s.val(); if(!d)return;
+  const d=s.val();if(!d)return;
   applyRemote(d);
-},e=>showErr(e.message));
+},e=>toast('DB error: '+e.message));
 
-function pushPartial(p){
-  ignoreRemote=true;
-  update(ref(db,ROOT),p).finally(()=>setTimeout(()=>ignoreRemote=false,400));
-}
-function pushAll(){
-  ignoreRemote=true;
-  set(ref(db,ROOT),{players,currentTurnIdx,gameStarted,gameOver})
-    .finally(()=>setTimeout(()=>ignoreRemote=false,400));
-}
+function pushP(p){ignoreRemote=true;update(ref(db,ROOT),p).finally(()=>setTimeout(()=>ignoreRemote=false,400));}
+function pushAll(){ignoreRemote=true;set(ref(db,ROOT),{players,curIdx,started,over}).finally(()=>setTimeout(()=>ignoreRemote=false,400));}
+
 function applyRemote(d){
-  if(d.players)             players=d.players;
-  if(d.currentTurnIdx!=null)currentTurnIdx=d.currentTurnIdx;
-  if(d.gameStarted!=null)   gameStarted=d.gameStarted;
-  if(d.gameOver!=null)      gameOver=d.gameOver;
-  if(gameOver){ hide('game-area');hide('setup-screen');show('gameover-area');renderGameOver();return; }
-  if(gameStarted){
-    hide('setup-screen');hide('gameover-area');show('game-area');
-    if(!viewingPlayer&&players.length)viewingPlayer=players[currentTurnIdx].id;
-    renderGame();
-  }
+  if(d.players)players=d.players;
+  if(d.curIdx!=null)curIdx=d.curIdx;
+  if(d.started!=null)started=d.started;
+  if(d.over!=null)over=d.over;
+  if(over){hide('setup-overlay');hide('sc-container');show('gameover-overlay');renderGameOver();return;}
+  if(started){hide('setup-overlay');show('sc-container');hide('gameover-overlay');
+    if(!viewPid&&players.length)viewPid=players[curIdx].id;
+    renderAll();}
 }
 
-/* ══ SETUP ════════════════════════════════════════ */
+/* ── SETUP ────────────────────────────── */
 function initSetup(){
   setupInputs=[{name:'',color:COLORS[0]},{name:'',color:COLORS[1]}];
-  renderSetupInputs();
+  renderSetup();
 }
-function renderSetupInputs(){
-  const c=document.getElementById('player-inputs'); c.innerHTML='';
+function renderSetup(){
+  const c=document.getElementById('setup-inputs');c.innerHTML='';
   setupInputs.forEach((p,i)=>{
-    const row=document.createElement('div'); row.className='pi-row';
-    const dot=document.createElement('div'); dot.className='color-swatch';
-    dot.style.background=p.color;
-    const inp=document.createElement('input'); inp.type='text';
-    inp.placeholder='Player '+(i+1)+' name'; inp.value=p.name; inp.maxLength=16;
+    const row=document.createElement('div');row.className='setup-row';
+    const dot=document.createElement('div');dot.className='color-dot';dot.style.background=p.color;
+    const inp=document.createElement('input');inp.type='text';inp.placeholder='Player '+(i+1);
+    inp.value=p.name;inp.maxLength=14;
     inp.addEventListener('input',()=>setupInputs[i].name=inp.value);
-    row.appendChild(dot); row.appendChild(inp);
-    if(setupInputs.length>1){
-      const del=document.createElement('button'); del.className='pi-del'; del.textContent='×';
-      del.addEventListener('click',()=>{ setupInputs.splice(i,1); renderSetupInputs(); });
-      row.appendChild(del);
-    }
+    row.appendChild(dot);row.appendChild(inp);
+    if(setupInputs.length>1){const d=document.createElement('button');d.className='del-btn';d.textContent='×';d.addEventListener('click',()=>{setupInputs.splice(i,1);renderSetup();});row.appendChild(d);}
     c.appendChild(row);
   });
 }
-
-/* ══ START GAME ═══════════════════════════════════ */
 function startGame(){
   const names=setupInputs.map((p,i)=>p.name.trim()||'Player '+(i+1));
   players=names.map((n,i)=>({
-    id:'p'+i, name:n, color:COLORS[i%COLORS.length],
-    scores:{},          // {catId: number} — only filled entries present
-    yBonusCount:0,      // number of extra Yahtzees (each worth 100)
-    rollsLeft:3,
-    dice:[1,1,1,1,1],
-    held:[false,false,false,false,false]
+    id:'p'+i,name:n,color:COLORS[i%COLORS.length],
+    scores:{},yBonus:0,rollsLeft:3,
+    dice:[1,1,1,1,1],held:[false,false,false,false,false]
   }));
-  viewingPlayer=players[0].id; currentTurnIdx=0;
-  gameStarted=true; gameOver=false;
-  hide('setup-screen'); show('game-area');
-  pushAll(); renderGame();
+  viewPid=players[0].id;curIdx=0;started=true;over=false;
+  hide('setup-overlay');show('sc-container');
+  pushAll();renderAll();
 }
 
-/* ══ RENDER GAME ══════════════════════════════════ */
-function renderGame(){
-  renderPlayersOverview();
-  renderDice();
-  renderPlayerTabs();
-  renderScorecard();
-  updateTurnUI();
-}
+/* ── RENDER ALL ───────────────────────── */
+function renderAll(){renderTabs();renderDice();renderScorecard();updateTurnUI();}
 
-/* Players overview bar */
-function renderPlayersOverview(){
-  const bar=document.getElementById('players-overview'); bar.innerHTML='';
+/* ── PLAYER TABS ──────────────────────── */
+function renderTabs(){
+  const bar=document.getElementById('player-tabs');bar.innerHTML='';
   players.forEach((p,i)=>{
-    const card=document.createElement('div');
-    card.className='ov-card'+(i===currentTurnIdx?' active-turn':'');
-    card.style.borderColor=p.color;
-    const done=countFilled(p);
-    card.innerHTML=
-      '<div class="ov-name" style="color:'+p.color+'">'+esc(p.name)+(i===currentTurnIdx?' ▶':'')+'</div>'+
-      '<div class="ov-score">'+calcGrand(p)+'</div>'+
-      '<div class="ov-progress">'+done+'/13 boxes</div>';
-    bar.appendChild(card);
+    const t=document.createElement('div');
+    t.className='ptab'+(p.id===viewPid?' active':'')+(i===curIdx?' cur-turn':'');
+    t.style.color=p.id===viewPid?p.color:'';
+    t.style.borderColor=p.id===viewPid?p.color:'';
+    t.innerHTML=esc(p.name)+'<br><span class="ptab-score">'+calcGrand(p)+'pt</span>';
+    t.addEventListener('click',()=>{viewPid=p.id;renderTabs();renderScorecard();});
+    bar.appendChild(t);
   });
+  // Update name display
+  const vp=getVP();
+  if(vp){
+    document.getElementById('viewing-name').textContent=vp.name;
+    document.getElementById('viewing-name').style.color=vp.color;
+    document.getElementById('viewing-score').textContent='Total: '+calcGrand(vp);
+  }
 }
 
-/* Turn UI */
+/* ── TURN UI ──────────────────────────── */
 function updateTurnUI(){
-  const cp=players[currentTurnIdx]; if(!cp) return;
-  document.getElementById('turn-badge').textContent=cp.name+"'s Turn";
-  document.getElementById('turn-badge').style.background=cp.color;
-  const rb=document.getElementById('roll-btn');
-  rb.disabled=cp.rollsLeft<=0;
-  document.getElementById('rolls-left').textContent=
+  const cp=players[curIdx];if(!cp)return;
+  document.getElementById('turn-info').textContent=cp.name+"'s Turn";
+  document.getElementById('turn-info').style.color=cp.color;
+  const rb=document.getElementById('roll-btn');rb.disabled=cp.rollsLeft<=0;
+  document.getElementById('roll-info').textContent=
     cp.rollsLeft>0?cp.rollsLeft+' roll'+(cp.rollsLeft!==1?'s':'')+' left':'No rolls left';
 }
 
-/* ══ DICE ═════════════════════════════════════════ */
+/* ── DICE ─────────────────────────────── */
 function renderDice(){
-  const cp=players[currentTurnIdx]; if(!cp) return;
-  const row=document.getElementById('dice-row'); row.innerHTML='';
+  const cp=players[curIdx];if(!cp)return;
+  const row=document.getElementById('dice-row');row.innerHTML='';
   for(let i=0;i<5;i++){
-    const wrap=document.createElement('div'); wrap.className='die-wrap';
-    const die=document.createElement('div'); die.className='die'+(cp.held[i]?' held':'');
-    die.appendChild(makePips(cp.dice[i]));
+    const wrap=document.createElement('div');wrap.className='die-wrap';
+    const die=document.createElement('div');die.className='die'+(cp.held[i]?' held':'');
+    die.appendChild(mkPips(cp.dice[i]));
     die.addEventListener('click',()=>toggleHold(i));
-    const lbl=document.createElement('div'); lbl.className='held-lbl';
+    const lbl=document.createElement('div');lbl.className='held-label';
     lbl.textContent=cp.held[i]?'HELD':'';
-    wrap.appendChild(die); wrap.appendChild(lbl);
-    row.appendChild(wrap);
+    wrap.appendChild(die);wrap.appendChild(lbl);row.appendChild(wrap);
   }
 }
-function makePips(val){
-  const g=document.createElement('div'); g.className='pip-grid p'+val;
-  for(let i=0;i<val;i++){const p=document.createElement('div');p.className='pip';g.appendChild(p);}
+function mkPips(v){
+  const g=document.createElement('div');g.className='pip-grid p'+v;
+  for(let i=0;i<v;i++){const p=document.createElement('div');p.className='pip';g.appendChild(p);}
   return g;
 }
 function toggleHold(i){
-  const cp=players[currentTurnIdx];
-  if(!cp||cp.rollsLeft===3){showToast('Roll first before holding dice!');return;}
-  cp.held[i]=!cp.held[i];
-  renderDice(); pushPartial({players});
+  const cp=players[curIdx];
+  if(!cp||cp.rollsLeft===3){toast('Roll first!');return;}
+  cp.held[i]=!cp.held[i];renderDice();pushP({players});
 }
 function rollDice(){
-  const cp=players[currentTurnIdx];
-  if(!cp||cp.rollsLeft<=0)return;
-  rollSound();
+  const cp=players[curIdx];if(!cp||cp.rollsLeft<=0)return;
+  rollSnd();
   document.querySelectorAll('.die').forEach((d,i)=>{if(!cp.held[i])d.classList.add('rolling');});
-  setTimeout(()=>document.querySelectorAll('.die').forEach(d=>d.classList.remove('rolling')),420);
+  setTimeout(()=>document.querySelectorAll('.die').forEach(d=>d.classList.remove('rolling')),400);
   cp.dice=cp.dice.map((v,i)=>cp.held[i]?v:Math.ceil(Math.random()*6));
   cp.rollsLeft--;
-  const infoEl=document.getElementById('dice-info');
-  if(cp.rollsLeft===0)
-    infoEl.innerHTML='<b>No rolls left</b> — choose a scoring box below';
-  else
-    infoEl.innerHTML='Tap dice to <b>hold</b> them, then roll again ('+(cp.rollsLeft===2?'2nd':'last')+' roll)';
-  setTimeout(()=>{ renderDice(); renderScorecard(); updateTurnUI(); pushPartial({players}); },50);
+  const h=document.getElementById('dice-hint');
+  h.innerHTML=cp.rollsLeft===0?'<b>Pick a scoring box!</b>':'Tap dice to <b>hold</b>, then roll again';
+  setTimeout(()=>{renderDice();renderScorecard();updateTurnUI();pushP({players});},55);
 }
 
-/* ══ PLAYER TABS ══════════════════════════════════ */
-function renderPlayerTabs(){
-  const tabs=document.getElementById('player-tabs'); tabs.innerHTML='';
-  players.forEach((p,i)=>{
-    const t=document.createElement('div');
-    let cls='ptab'+(p.id===viewingPlayer?' active':'');
-    if(i===currentTurnIdx)cls+=' active-turn';
-    t.className=cls; t.style.color=p.color;
-    if(p.id===viewingPlayer)t.style.borderColor=p.color;
-    t.innerHTML=esc(p.name)+'<span class="ptab-score">'+calcGrand(p)+' pts</span>';
-    t.addEventListener('click',()=>{ viewingPlayer=p.id; renderPlayerTabs(); renderScorecard(); });
-    tabs.appendChild(t);
-  });
-}
-
-/* ══ SCORECARD ════════════════════════════════════
-   Matches official layout from image:
-   Category | How to Score | [player cols]
-   ════════════════════════════════════════════════ */
+/* ── SCORECARD ────────────────────────── */
 function renderScorecard(){
-  const vp=players.find(p=>p.id===viewingPlayer)||players[0];
-  if(!vp)return;
-  const cp=players[currentTurnIdx];
-  const myTurn=cp&&cp.id===vp.id&&cp.rollsLeft<3; // has rolled at least once
+  const vp=getVP();if(!vp)return;
+  const cp=players[curIdx];
+  const myTurn=cp&&cp.id===vp.id&&cp.rollsLeft<3;
+  const body=document.getElementById('sc-body');body.innerHTML='';
 
-  // HEAD
-  const head=document.getElementById('sc-head');
-  head.innerHTML='';
-  const hr=document.createElement('tr');
-  hr.innerHTML='<th style="text-align:left;padding:6px 8px;min-width:120px">UPPER SECTION</th>'+
-    '<th class="how-col" style="max-width:80px;padding:4px">HOW TO SCORE</th>'+
-    '<th style="min-width:'+getColW()+'px;padding:4px">'+esc(vp.name)+'</th>';
-  head.appendChild(hr);
-
-  // BODY
-  const body=document.getElementById('sc-body'); body.innerHTML='';
-
-  /* ── UPPER SECTION ── */
+  // Upper section rows
   CATS.filter(c=>c.sec==='U').forEach(cat=>{
-    body.appendChild(makeScoreRow(cat,vp,cp,myTurn));
+    body.appendChild(mkRow(cat,vp,cp,myTurn));
   });
 
-  // Total Score row
-  const upperRaw=calcUpperRaw(vp);
-  body.appendChild(makeTotalRow('TOTAL SCORE','→ '+upperRaw,''));
+  // Upper totals
+  const uRaw=calcU(vp),bonus=uRaw>=63?35:0;
+  body.appendChild(mkTotalRow('TOTAL SCORE','→',uRaw,''));
+  body.appendChild(mkBonusRow('BONUS (if 63+)','Score 35',bonus));
+  body.appendChild(mkTotalRow('TOTAL (Upper)','→',uRaw+bonus,'total-row'));
 
-  // Bonus row
-  const bonus=upperRaw>=63?35:0;
-  const toBonus=Math.max(0,63-upperRaw);
-  const bonusHint=bonus?'SCORE 35':(toBonus>0?'Need '+toBonus+' more':'SCORE 35');
-  body.appendChild(makeTotalRow(
-    'BONUS <small style="font-size:.62rem;color:#666">If total score is 63 or over</small>',
-    bonusHint,
-    'tr-bonus',
-    bonus?'stat bonus-earned':'stat'
-  ));
+  // Lower section header
+  const lh=document.createElement('tr');
+  lh.innerHTML='<td colspan="3" class="section-header left-align" style="font-size:.7rem;padding-left:4px">Lower Section</td>';
+  body.appendChild(lh);
 
-  // Total of upper section
-  const upperTotal=upperRaw+bonus;
-  body.appendChild(makeTotalRow('TOTAL Of Upper Section','→ '+upperTotal,''));
-
-  /* ── LOWER SECTION HEADER ── */
-  const lsHdr=document.createElement('tr'); lsHdr.className='tr-section';
-  lsHdr.innerHTML='<td colspan="3" style="padding:5px 8px;font-family:Oswald,sans-serif;'+
-    'font-size:.75rem;letter-spacing:2px;text-transform:uppercase;color:#fff;font-weight:700">'+
-    'LOWER SECTION</td>';
-  body.appendChild(lsHdr);
-
-  /* ── LOWER SECTION ── */
+  // Lower section rows
   CATS.filter(c=>c.sec==='L').forEach(cat=>{
-    body.appendChild(makeScoreRow(cat,vp,cp,myTurn));
+    body.appendChild(mkRow(cat,vp,cp,myTurn));
   });
 
-  // Yahtzee Bonus rows
-  const yBonusCount=vp.yBonusCount||0;
-  body.appendChild(makeTotalRow(
-    'YAHTZEE BONUS <small style="font-size:.6rem;color:#666">✓ for each bonus</small>',
-    yBonusCount>0?'✓'.repeat(yBonusCount):'—',
-    'tr-bonus'
-  ));
-  body.appendChild(makeTotalRow(
-    '',
-    yBonusCount>0?(yBonusCount*100)+' pts':'SCORE 100 PER ✓',
-    'tr-bonus',
-    yBonusCount>0?'stat bonus-earned':'stat'
-  ));
+  // Yahtzee bonus
+  const yb=vp.yBonus||0;
+  const ybRow=document.createElement('tr');
+  ybRow.innerHTML=
+    '<td class="left-align" style="font-size:.65rem">YAHTZEE BONUS</td>'+
+    '<td style="font-size:.62rem">Score 100/✓</td>'+
+    '<td><button class="sc-btn stat'+(yb>0?' bonus-yes':'')+'">'+
+    (yb>0?'✓×'+yb+' = '+(yb*100):'—')+'</button></td>';
+  body.appendChild(ybRow);
 
-  /* ── GRAND TOTAL ── */
-  body.appendChild(makeTotalRow('GRAND TOTAL','→ '+calcGrand(vp),'total-grand'));
+  // Grand total
+  const grand=calcGrand(vp);
+  const gr=document.createElement('tr');gr.className='total-row';
+  gr.innerHTML='<td class="left-align" colspan="2"><b>GRAND TOTAL</b></td>'+
+    '<td><button class="sc-btn stat" style="font-weight:900;font-size:.88rem">'+grand+'</button></td>';
+  body.appendChild(gr);
 
-  // Style grand total row
-  const gt=body.querySelector('.total-grand');
-  if(gt){
-    gt.style.background='#1a1a1a';
-    gt.querySelectorAll('td').forEach(td=>{td.style.color='#fff';td.style.fontWeight='900';});
-    const sb=gt.querySelector('.score-btn,.stat');
-    if(sb)sb.style.color='#f5c842';
-  }
+  // Update name/score display
+  document.getElementById('viewing-name').textContent=vp.name;
+  document.getElementById('viewing-name').style.color=vp.color;
+  document.getElementById('viewing-score').textContent='Total: '+grand;
 }
 
-function getColW(){ return window.innerWidth<400?62:72; }
-
-function makeScoreRow(cat,vp,cp,myTurn){
-  const tr=document.createElement('tr'); tr.className='tr-score';
+function mkRow(cat,vp,cp,myTurn){
+  const tr=document.createElement('tr');
   const filled=vp.scores[cat.id]!==undefined;
-  const canScore=!filled&&myTurn;
+  const isYtz5=cp&&cp.dice.every(d=>d===cp.dice[0]);
+  const joker=isYtz5&&vp.scores.yahtzee!==undefined;
+  const sugg=(!filled&&myTurn&&cp)?calcScore(cat.id,cp.dice,vp,joker):null;
 
-  // Calculate suggested score
-  let sugg=null;
-  if(canScore&&cp){
-    sugg=calcScore(cat.id,cp.dice,vp);
-  }
+  // Cat cell — single td, no pip column
+  const td1=document.createElement('td');td1.className='left-align';td1.style.fontSize='.68rem';
+  td1.textContent=cat.name;
+  const td3=document.createElement('td');td3.style.fontSize='.6rem';td3.style.color='#666';td3.textContent=cat.hint;
+  const td4=document.createElement('td');td4.className='score-box';
 
-  // Category cell
-  const catTd=document.createElement('td'); catTd.className='cat-td';
-  catTd.innerHTML='<div class="cat-name-main">'+cat.name+'</div>'+
-    '<div class="cat-hint-text">'+cat.hint+'</div>';
-  // Highlight yahtzee name
-  if(cat.id==='yahtzee'){
-    catTd.querySelector('.cat-name-main').style.color=vp.color;
-    catTd.querySelector('.cat-name-main').style.fontWeight='900';
-  }
-  tr.appendChild(catTd);
-
-  // How-to cell (pip count or fixed score for mobile — keep compact)
-  const howTd=document.createElement('td');
-  howTd.style.cssText='text-align:center;padding:4px 3px;font-size:.68rem;color:#555;max-width:70px;line-height:1.3;';
-  howTd.innerHTML=cat.hint.replace('Count & add only ','').replace('Add total of all dice','Sum all dice').replace('Score total of all 5 dice','Sum all 5 dice');
-  tr.appendChild(howTd);
-
-  // Score cell
-  const scoreTd=document.createElement('td'); scoreTd.className='score-td';
   const btn=document.createElement('button');
-  let btnCls='score-btn';
+  let cls='sc-btn';
   if(filled){
-    btnCls+=' filled';
-    btn.textContent=vp.scores[cat.id]===0?'0':String(vp.scores[cat.id]);
-    btn.disabled=true;
-    if(cat.id==='yahtzee'&&vp.scores[cat.id]===50)btn.style.color=vp.color;
+    cls+=' filled';btn.textContent=vp.scores[cat.id]===0?'0':String(vp.scores[cat.id]);btn.disabled=true;
   } else if(sugg!==null){
-    if(sugg>0){
-      btnCls+=' suggested';
-      btn.textContent='+'+sugg;
-    } else {
-      btnCls+=' zero-suggest';
-      btn.textContent='0';
-    }
-    // Still clickable — scoring 0 is valid
-    btn.addEventListener('click',()=>scoreCategory(vp.id,cat.id));
+    cls+=sugg>0?' suggested':' zero-sug';
+    btn.textContent=sugg>0?'+'+sugg:'0';
+    btn.addEventListener('click',()=>scoreIt(vp.id,cat.id));
   } else {
-    btn.textContent='';
-    if(!canScore)btn.disabled=true;
-    else btn.addEventListener('click',()=>scoreCategory(vp.id,cat.id));
+    if(!myTurn||filled)btn.disabled=true;
+    else btn.addEventListener('click',()=>scoreIt(vp.id,cat.id));
   }
-  btn.className=btnCls;
-  scoreTd.appendChild(btn);
-  tr.appendChild(scoreTd);
+  btn.className=cls;td4.appendChild(btn);
+  tr.appendChild(td1);tr.appendChild(td3);tr.appendChild(td4);
   return tr;
 }
 
-function makeTotalRow(label,val,rowCls,btnCls='stat'){
-  const tr=document.createElement('tr'); tr.className='tr-total '+(rowCls||'');
-  const td1=document.createElement('td'); td1.className='cat-td'; td1.colSpan=2;
-  td1.innerHTML='<div class="cat-name-main" style="font-size:.78rem">'+label+'</div>';
-  const td2=document.createElement('td'); td2.className='score-td';
-  const btn=document.createElement('button');
-  btn.className='score-btn '+btnCls; btn.disabled=true; btn.textContent=val;
-  td2.appendChild(btn); tr.appendChild(td1); tr.appendChild(td2);
+function mkTotalRow(label,arrow,val,cls){
+  const tr=document.createElement('tr');tr.className='total-row '+(cls||'');
+  tr.innerHTML='<td class="left-align" colspan="2" style="font-size:.68rem"><b>'+label+'</b> <span style="color:#999">'+arrow+'</span></td>'+
+    '<td><button class="sc-btn stat">'+val+'</button></td>';
+  return tr;
+}
+function mkBonusRow(label,how,val){
+  const tr=document.createElement('tr');
+  tr.innerHTML='<td class="left-align" style="font-size:.68rem"><b>'+label+'</b></td>'+
+    '<td style="font-size:.6rem;color:#666">'+how+'</td>'+
+    '<td><button class="sc-btn stat'+(val>0?' bonus-yes':'')+'">'+
+    (val>0?'+'+val:'—')+'</button></td>';
   return tr;
 }
 
-/* ══ SCORING — FULL OFFICIAL RULES ════════════════
-
-   JOKER RULE (from rules p.2):
-   A Yahtzee may be used as a Joker ONLY when:
-   1. The Yahtzee box has been filled (50 or 0)
-   2. The appropriate upper section box is filled
-   Under Joker rules: Full House=25, Sm.Str=30, Lg.Str=40 always valid
-
-   YAHTZEE BONUS:
-   Player receives a bonus chip (+100) for each extra
-   Yahtzee IF the first Yahtzee box was scored 50.
-   ═════════════════════════════════════════════════ */
-function scoreCategory(pid,catId){
+/* ── SCORING ──────────────────────────── */
+function scoreIt(pid,catId){
   const p=players.find(x=>x.id===pid);
-  const cp=players[currentTurnIdx];
-  if(!p||!cp||cp.id!==pid)return;
-  if(p.scores[catId]!==undefined)return;
-  if(cp.rollsLeft===3){showToast('Roll the dice first!');return;}
+  const cp=players[curIdx];
+  if(!p||!cp||cp.id!==pid||p.scores[catId]!==undefined)return;
+  if(cp.rollsLeft===3){toast('Roll first!');return;}
 
-  // Check Joker conditions
-  const isYahtzee5=cp.dice.every(d=>d===cp.dice[0]);
-  const jokerActive=isYahtzee5&&p.scores.yahtzee!==undefined; // yahtzee box has been filled
-
-  const score=calcScore(catId,cp.dice,p,jokerActive);
+  const isYtz5=cp.dice.every(d=>d===cp.dice[0]);
+  const joker=isYtz5&&p.scores.yahtzee!==undefined;
+  const score=calcScore(catId,cp.dice,p,joker);
   p.scores[catId]=score;
   ding();
 
-  // First Yahtzee scored as 50
-  if(catId==='yahtzee'&&score===50){
-    fanfare();
-    showYtzBlast('5 OF A KIND • 50 POINTS');
+  if(catId==='yahtzee'&&score===50){fanfare();showBlast('5 OF A KIND • 50 POINTS');}
+  if(isYtz5&&catId!=='yahtzee'&&p.scores.yahtzee===50){
+    p.yBonus=(p.yBonus||0)+1;fanfare();showBlast('YAHTZEE BONUS! +100 POINTS');
+    toast(p.name+' gets Yahtzee Bonus! +100');
   }
 
-  // Extra Yahtzee bonus (only if first yahtzee box = 50)
-  if(isYahtzee5&&catId!=='yahtzee'&&p.scores.yahtzee===50){
-    p.yBonusCount=(p.yBonusCount||0)+1;
-    fanfare();
-    showYtzBlast('YAHTZEE BONUS! +100 POINTS');
-    showToast('YAHTZEE BONUS! +100 pts for '+p.name+'!');
+  cp.rollsLeft=3;cp.held=[false,false,false,false,false];
+  document.getElementById('dice-hint').textContent='Roll to start your turn';
+  curIdx=(curIdx+1)%players.length;
+  viewPid=players[curIdx].id;
+
+  if(players.every(pl=>countFilled(pl)>=13)){
+    over=true;pushAll();hide('sc-container');show('gameover-overlay');renderGameOver();return;
   }
-
-  // Reset for next turn
-  cp.rollsLeft=3;
-  cp.held=[false,false,false,false,false];
-  document.getElementById('dice-info').textContent='Roll all 5 dice to begin your turn';
-
-  // Advance turn
-  currentTurnIdx=(currentTurnIdx+1)%players.length;
-  viewingPlayer=players[currentTurnIdx].id;
-
-  // Check game over — every player has filled all 13 boxes
-  const allDone=players.every(pl=>countFilled(pl)>=13);
-  if(allDone){
-    gameOver=true; pushAll();
-    hide('game-area'); show('gameover-area');
-    renderGameOver(); return;
-  }
-
-  showToast(p.name+' scored '+score+' on '+catId);
-  pushAll(); renderGame();
+  toast(p.name+' scored '+score+' pts');
+  pushAll();renderAll();
 }
 
-/* ══ SCORE CALCULATIONS ═══════════════════════════
-   Full rules implementation including Joker
-   ═════════════════════════════════════════════════ */
-function calcScore(catId,dice,player,jokerMode=false){
-  const cnt=Array(7).fill(0); dice.forEach(d=>cnt[d]++);
+/* ── SCORE CALCULATION ────────────────── */
+function calcScore(id,dice,player,joker=false){
+  const cnt=Array(7).fill(0);dice.forEach(d=>cnt[d]++);
   const sum=dice.reduce((a,b)=>a+b,0);
-  const allSame=dice.every(d=>d===dice[0]);
-  const faceVal=dice[0]; // which face if all same (joker)
-
-  // Under Joker mode — certain lower section boxes score fixed amounts
-  if(jokerMode){
-    if(catId==='fullHouse')return 25;
-    if(catId==='smStr')return 30;
-    if(catId==='lgStr')return 40;
-    if(catId==='threeKind')return sum;
-    if(catId==='fourKind')return sum;
-    if(catId==='chance')return sum;
-    // Upper section under joker — score normally
+  if(joker){
+    if(id==='fullH')return 25;if(id==='smStr')return 30;if(id==='lgStr')return 40;
+    if(['threeK','fourK','chance'].includes(id))return sum;
   }
-
-  switch(catId){
-    case 'aces':    return dice.filter(d=>d===1).reduce((a,b)=>a+b,0);
-    case 'twos':    return dice.filter(d=>d===2).reduce((a,b)=>a+b,0);
-    case 'threes':  return dice.filter(d=>d===3).reduce((a,b)=>a+b,0);
-    case 'fours':   return dice.filter(d=>d===4).reduce((a,b)=>a+b,0);
-    case 'fives':   return dice.filter(d=>d===5).reduce((a,b)=>a+b,0);
-    case 'sixes':   return dice.filter(d=>d===6).reduce((a,b)=>a+b,0);
-    case 'threeKind': return cnt.some(c=>c>=3)?sum:0;
-    case 'fourKind':  return cnt.some(c=>c>=4)?sum:0;
-    case 'fullHouse':{
-      // Three of a kind + pair (or five of a kind counts too via Joker only)
-      const has3=cnt.some(c=>c===3), has2=cnt.some(c=>c===2);
-      return(has3&&has2)?25:0;
-    }
-    case 'smStr':{
-      // Any sequence of 4 consecutive numbers
-      const unique=[...new Set(dice)].sort((a,b)=>a-b);
-      let run=1,max=1;
-      for(let i=1;i<unique.length;i++){
-        run=unique[i]===unique[i-1]+1?run+1:1;
-        if(run>max)max=run;
-      }
-      return max>=4?30:0;
-    }
-    case 'lgStr':{
-      // Sequence of 5 consecutive numbers
-      const unique=[...new Set(dice)].sort((a,b)=>a-b);
-      if(unique.length<5)return 0;
-      let run=1,max=1;
-      for(let i=1;i<unique.length;i++){
-        run=unique[i]===unique[i-1]+1?run+1:1;
-        if(run>max)max=run;
-      }
-      return max>=5?40:0;
-    }
-    case 'yahtzee': return cnt.some(c=>c===5)?50:0;
-    case 'chance':  return sum;
-    default:        return 0;
+  switch(id){
+    case 'aces':return dice.filter(d=>d===1).reduce((a,b)=>a+b,0);
+    case 'twos':return dice.filter(d=>d===2).reduce((a,b)=>a+b,0);
+    case 'threes':return dice.filter(d=>d===3).reduce((a,b)=>a+b,0);
+    case 'fours':return dice.filter(d=>d===4).reduce((a,b)=>a+b,0);
+    case 'fives':return dice.filter(d=>d===5).reduce((a,b)=>a+b,0);
+    case 'sixes':return dice.filter(d=>d===6).reduce((a,b)=>a+b,0);
+    case 'threeK':return cnt.some(c=>c>=3)?sum:0;
+    case 'fourK':return cnt.some(c=>c>=4)?sum:0;
+    case 'fullH':{const h3=cnt.some(c=>c===3),h2=cnt.some(c=>c===2);return(h3&&h2)?25:0;}
+    case 'smStr':{const u=[...new Set(dice)].sort((a,b)=>a-b);let r=1,m=1;for(let i=1;i<u.length;i++){r=u[i]===u[i-1]+1?r+1:1;if(r>m)m=r;}return m>=4?30:0;}
+    case 'lgStr':{const u=[...new Set(dice)].sort((a,b)=>a-b);if(u.length<5)return 0;let r=1,m=1;for(let i=1;i<u.length;i++){r=u[i]===u[i-1]+1?r+1:1;if(r>m)m=r;}return m>=5?40:0;}
+    case 'yahtzee':return cnt.some(c=>c===5)?50:0;
+    case 'chance':return sum;
+    default:return 0;
   }
 }
-
-/* ══ TOTALS ════════════════════════════════════════ */
-function calcUpperRaw(p){
-  return UPPER_IDS.reduce((a,id)=>a+(p.scores[id]||0),0);
-}
+function calcU(p){return U_IDS.reduce((a,id)=>a+(p.scores[id]||0),0);}
 function calcGrand(p){
-  const u=calcUpperRaw(p);
-  const bonus=u>=63?35:0;
-  const lower=LOWER_IDS.reduce((a,id)=>a+(p.scores[id]||0),0);
-  const yb=(p.yBonusCount||0)*100;
-  return u+bonus+lower+yb;
+  const u=calcU(p),bonus=u>=63?35:0;
+  const l=L_IDS.reduce((a,id)=>a+(p.scores[id]||0),0);
+  return u+bonus+l+(p.yBonus||0)*100;
 }
-function countFilled(p){
-  return SCORED_IDS.filter(id=>p.scores[id]!==undefined).length;
-}
+function countFilled(p){return ALL_IDS.filter(id=>p.scores[id]!==undefined).length;}
 
-/* ══ GAME OVER SCREEN ═════════════════════════════ */
+/* ── GAME OVER ────────────────────────── */
 function renderGameOver(){
   const sorted=[...players].sort((a,b)=>calcGrand(b)-calcGrand(a));
-  const winner=sorted[0];
-  document.getElementById('winner-line').innerHTML=
-    '<span style="color:'+winner.color+'">'+esc(winner.name)+'</span> wins with '+calcGrand(winner)+' points!';
+  document.getElementById('go-winner').innerHTML=
+    '<span style="color:'+sorted[0].color+'">🏆 '+esc(sorted[0].name)+'</span> wins with '+calcGrand(sorted[0])+' pts!';
   const medals=['🥇','🥈','🥉','4th','5th','6th'];
-  document.getElementById('final-tbody').innerHTML=sorted.map((p,i)=>{
-    const u=calcUpperRaw(p), bonus=u>=63?35:0;
-    const lower=LOWER_IDS.reduce((a,id)=>a+(p.scores[id]||0),0);
-    const yb=(p.yBonusCount||0)*100;
-    return '<tr>'+'<td class="rank-td">'+medals[i]+'</td>'+
-      '<td style="font-weight:700;color:'+p.color+'">'+esc(p.name)+'</td>'+
-      '<td>'+u+'</td><td>'+bonus+'</td><td>'+(lower+yb)+'</td>'+
-      '<td class="score-td-f">'+calcGrand(p)+'</td></tr>';
+  document.getElementById('go-tbody').innerHTML=sorted.map((p,i)=>{
+    const u=calcU(p),bonus=u>=63?35:0;
+    const l=L_IDS.reduce((a,id)=>a+(p.scores[id]||0),0)+(p.yBonus||0)*100;
+    return'<tr><td>'+medals[i]+'</td><td style="color:'+p.color+';font-weight:700">'+esc(p.name)+'</td>'+
+      '<td>'+u+'</td><td>'+bonus+'</td><td>'+l+'</td>'+
+      '<td style="font-weight:900;color:'+p.color+'">'+calcGrand(p)+'</td></tr>';
   }).join('');
 }
 
-function newGame(){
-  gameStarted=false; gameOver=false; viewingPlayer=null;
-  hide('game-area'); hide('gameover-area'); show('setup-screen');
-  initSetup();
-  pushPartial({gameStarted:false,gameOver:false});
-}
+/* ── HELPERS ──────────────────────────── */
+function getVP(){return players.find(p=>p.id===viewPid)||players[0];}
+function newGame(){over=false;started=false;viewPid=null;
+  hide('gameover-overlay');hide('sc-container');show('setup-overlay');
+  initSetup();pushP({started:false,over:false});}
+function show(id){document.getElementById(id).style.display='block';}
+function hide(id){document.getElementById(id).style.display='none';}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;
+  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+function showBlast(sub){document.getElementById('ytz-sub').textContent=sub;
+  const el=document.getElementById('ytz-overlay');el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2000);}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
-/* ══ YAHTZEE BLAST ════════════════════════════════ */
-function showYtzBlast(sub){
-  document.getElementById('ytz-sub').textContent=sub||'5 OF A KIND • 50 POINTS';
-  const el=document.getElementById('ytz-blast');
-  el.classList.add('show');
-  setTimeout(()=>el.classList.remove('show'),2000);
-}
-
-/* ══ QR ════════════════════════════════════════════ */
+/* ── QR ───────────────────────────────── */
 function openQR(){
   const url=window.location.href;
   document.getElementById('qr-url').textContent=url;
   if(!qrDone){
     document.getElementById('qr-box').innerHTML='';
-    new QRCode(document.getElementById('qr-box'),{
-      text:url,width:180,height:180,
-      colorDark:'#1a1a1a',colorLight:'#fffef8',
-      correctLevel:QRCode.CorrectLevel.H});
+    new QRCode(document.getElementById('qr-box'),{text:url,width:160,height:160,
+      colorDark:'#333',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.H});
     qrDone=true;
   }
   document.getElementById('qr-modal').classList.add('show');
 }
-function closeQR(){ document.getElementById('qr-modal').classList.remove('show'); }
+function closeQR(){document.getElementById('qr-modal').classList.remove('show');}
 
-/* ══ UTILS ════════════════════════════════════════ */
-function show(id){document.getElementById(id).style.display='block';}
-function hide(id){document.getElementById(id).style.display='none';}
-function showToast(msg){
-  const t=document.getElementById('toast'); t.textContent=msg;
-  t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2600);
-}
-function showErr(msg){
-  document.getElementById('err-banner').textContent='⚠️ '+msg;
-  document.getElementById('err-banner').classList.add('show');
-}
-function esc(s){
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-/* ══ WIRE ALL BUTTONS (no onclick in HTML) ════════ */
+/* ── WIRE BUTTONS ─────────────────────── */
 document.getElementById('add-player-btn').addEventListener('click',()=>{
-  if(setupInputs.length>=6){showToast('Max 6 players');return;}
-  setupInputs.push({name:'',color:COLORS[setupInputs.length%COLORS.length]});
-  renderSetupInputs();
+  if(setupInputs.length>=6){toast('Max 6 players');return;}
+  setupInputs.push({name:'',color:COLORS[setupInputs.length%COLORS.length]});renderSetup();
 });
-document.getElementById('start-game-btn').addEventListener('click',startGame);
+document.getElementById('start-btn').addEventListener('click',startGame);
 document.getElementById('roll-btn').addEventListener('click',rollDice);
 document.getElementById('new-game-btn').addEventListener('click',newGame);
 document.getElementById('play-again-btn').addEventListener('click',newGame);
 document.getElementById('qr-btn').addEventListener('click',openQR);
 document.getElementById('close-qr-btn').addEventListener('click',closeQR);
 document.getElementById('qr-modal').addEventListener('click',e=>{
-  if(e.target===document.getElementById('qr-modal'))closeQR();
-});
+  if(e.target===document.getElementById('qr-modal'))closeQR();});
 
-/* ══ INIT ════════════════════════════════════════= */
+/* ── INIT ─────────────────────────────── */
+hide('sc-container');
+hide('gameover-overlay');
 initSetup();
 </script>
 </body>
