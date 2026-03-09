@@ -59,8 +59,9 @@ body{
 .die.mine{cursor:pointer;}
 .die.mine:hover{box-shadow:3px 3px 0 #777;transform:translateY(-1px);}
 .die.held{background:#fffbeb;border-color:var(--gold);box-shadow:2px 2px 0 var(--gold);}
-.die.rolling{animation:shake .38s ease-in-out;}
-@keyframes shake{0%,100%{transform:rotate(0) scale(1)}20%{transform:rotate(-13deg) scale(1.1)}40%{transform:rotate(10deg) scale(.92)}60%{transform:rotate(-7deg) scale(1.07)}80%{transform:rotate(5deg) scale(.96)}}
+.die.rolling{animation:shake .42s ease-in-out,rollFlash .42s ease-in-out;}
+@keyframes shake{0%,100%{transform:rotate(0) scale(1)}15%{transform:rotate(-15deg) scale(1.12) translateY(-4px)}35%{transform:rotate(12deg) scale(.9) translateY(2px)}55%{transform:rotate(-9deg) scale(1.08) translateY(-3px)}75%{transform:rotate(6deg) scale(.95) translateY(1px)}}
+@keyframes rollFlash{0%,100%{filter:brightness(1)}30%{filter:brightness(1.3) saturate(1.4)}60%{filter:brightness(.85)}}
 .held-lbl{font-size:clamp(.48rem,1.1vw,.62rem);font-weight:900;color:var(--gold);text-transform:uppercase;height:clamp(8px,1.4vw,12px);line-height:1;}
 .pg{display:grid;padding:clamp(2px,.5vw,5px);gap:clamp(1px,.3vw,3px);width:calc(var(--die)*.74);height:calc(var(--die)*.74);}
 .pip{width:var(--pip);height:var(--pip);border-radius:50%;background:#111;}
@@ -187,11 +188,55 @@ thead th{background:var(--hbg);font-size:var(--fxs);text-transform:uppercase;}
 .go-tbl th{background:#222;color:#fff;padding:clamp(5px,1.2vw,8px);font-size:var(--fxs);text-transform:uppercase;}
 .go-tbl td{padding:clamp(6px,1.4vw,10px);border-bottom:1px solid #ddd;text-align:center;}
 
+/* ── DARK MODE (Midnight Mode) ── */
+body.dark{--ink:#e8e8e8;--bg:#0a0a0a;--hbg:#1a1a1a;--card:#111;--sbg:#052e16;--zbg:#3f0a0a;--green:#4ade80;--gold:#fbbf24;--red:#f87171;}
+body.dark .card{background:#0d0d0d;border-color:#333;box-shadow:0 4px 32px rgba(0,0,0,.7);}
+body.dark .die{background:#1a1a1a;border-color:#555;box-shadow:2px 2px 0 #000;}
+body.dark .die.held{background:#1a0f00;border-color:var(--gold);box-shadow:2px 2px 0 var(--gold);}
+body.dark .pip{background:#e8e8e8;}
+body.dark .dice-panel{background:#111;border-color:#333;}
+body.dark .tab{background:#1a1a1a;border-color:#444;color:#666;}
+body.dark .tab.active{background:#0d0d0d;border-color:var(--ink);color:var(--ink);}
+body.dark table th,body.dark table td{border-color:#333;}
+body.dark thead th{background:#1a1a1a;}
+body.dark .sh{background:#111;}
+body.dark .tr{background:#0f0f0f;}
+body.dark .sb{background:#0d0d0d;}
+body.dark .code-badge{background:#1a1a1a;border-color:#444;}
+body.dark .namebar{border-color:#333;}
+body.dark .nb-edit{border-color:#444;color:#aaa;}
+body.dark .nb-edit:hover{background:#1a1a1a;}
+body.dark .sbb.sug{background:#052e16;color:#4ade80;}
+body.dark .sbb.zsug{background:#3f0a0a;color:#f87171;}
+body.dark .toolbar{border-color:#333;}
+body.dark .btn-gray{background:#1e1e1e;color:#ccc;border-color:#444;}
+body.dark .toast{background:#e8e8e8;color:#111;}
+body.dark #ov-over{background:rgba(10,10,10,.97);}
+body.dark #ov-over h2{color:#f87171;}
+
+/* ── YAHTZEE BONUS CHIPS ── */
+.ybonus-chips{display:flex;align-items:center;gap:4px;flex-wrap:wrap;}
+.ybonus-chip{display:inline-flex;align-items:center;justify-content:center;width:clamp(18px,3.5vw,24px);height:clamp(18px,3.5vw,24px);border-radius:50%;background:var(--gold);border:2px solid var(--ink);font-size:clamp(.48rem,1vw,.62rem);font-weight:900;color:#fff;box-shadow:1px 1px 0 rgba(0,0,0,.3);}
+
+/* ── CONFIRM OVERLAY ── */
+#ov-confirm{background:rgba(0,0,0,.72);z-index:850;}
+.confirm-box{background:#fff;border:2px solid var(--ink);border-radius:6px;padding:clamp(14px,3vw,24px);width:100%;max-width:min(96vw,340px);box-shadow:5px 5px 0 rgba(0,0,0,.3);text-align:center;}
+body.dark .confirm-box{background:#0d0d0d;border-color:#444;}
+.confirm-box h3{font-family:'Permanent Marker',cursive;font-size:1.2rem;margin-bottom:6px;}
+.confirm-cat{font-size:var(--fmd);font-weight:800;margin:8px 0 4px;}
+.confirm-pts{font-size:clamp(1.6rem,5vw,2.4rem);font-weight:900;color:var(--green);margin-bottom:14px;}
+.confirm-pts.zero{color:var(--red);}
+.confirm-btns{display:flex;gap:10px;justify-content:center;}
+
+/* ── DARK MODE TOGGLE BTN ── */
+.btn-dark{background:none;border:1.5px solid #bbb;border-radius:20px;padding:3px 10px;font-size:var(--fxs);cursor:pointer;color:#555;font-family:inherit;transition:all .15s;white-space:nowrap;}
+.btn-dark:hover{background:#f0f0f0;}
+body.dark .btn-dark{border-color:#555;color:#aaa;}
+body.dark .btn-dark:hover{background:#1a1a1a;}
+
 /* TOAST */
 .toast{position:fixed;bottom:clamp(14px,3vw,24px);left:50%;transform:translateX(-50%) translateY(70px);background:#1a1a1a;color:#fff;padding:clamp(6px,1.2vw,10px) clamp(14px,3vw,22px);border-radius:4px;font-size:var(--fsm);font-weight:700;z-index:900;transition:transform .26s;pointer-events:none;max-width:90vw;text-align:center;}
 .toast.show{transform:translateX(-50%) translateY(0);}
-
-/* RESPONSIVE */
 @media(max-width:374px){:root{--fxs:.68rem;--fsm:.76rem;--fmd:.86rem;--flg:.95rem;--die:38px;--pip:5px;--row:20px;}}
 @media(max-height:480px) and (orientation:landscape){:root{--fxs:.62rem;--fsm:.7rem;--fmd:.8rem;--flg:.88rem;--die:34px;--pip:4px;--row:17px;--gap:2px;--pad:4px;}body{padding:3px;}.dice-panel{margin-bottom:3px;}}
 @media(min-width:600px){:root{--fxs:.82rem;--fsm:.96rem;--fmd:1.06rem;--flg:1.18rem;--die:58px;--pip:9px;--row:29px;--pad:16px;}body{padding:18px;}}
@@ -296,6 +341,19 @@ thead th{background:var(--hbg);font-size:var(--fxs);text-transform:uppercase;}
   <button class="btn btn-red" id="btn-again">🎲 New Game</button>
 </div>
 
+<!-- ══ CONFIRM SCORE MODAL ══ -->
+<div class="ov" id="ov-confirm">
+  <div class="confirm-box">
+    <h3>✅ Confirm Score?</h3>
+    <div class="confirm-cat" id="confirm-cat-name">—</div>
+    <div class="confirm-pts" id="confirm-pts">0</div>
+    <div class="confirm-btns">
+      <button class="btn btn-gray" id="btn-confirm-cancel">✕ Cancel</button>
+      <button class="btn btn-grn"  id="btn-confirm-ok">✔ Confirm</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
@@ -338,6 +396,7 @@ thead th{background:var(--hbg);font-size:var(--fxs);text-transform:uppercase;}
   <div class="toolbar">
     <button class="btn btn-gray" id="btn-qr">📲 QR / Invite</button>
     <button class="btn btn-red"  id="btn-new" style="display:none">↺ Reset Game</button>
+    <button class="btn-dark" id="btn-dark-mode" title="Toggle Midnight Mode">🌙 Dark</button>
   </div>
 </div>
 
@@ -819,7 +878,7 @@ function renderScorecard(){
 
   const uRaw=calcU(vp), upperBonus=uRaw>=63?35:0;
   body.appendChild(mkStatRow('Upper Total',uRaw,false));
-  body.appendChild(mkBonusRow(upperBonus));
+  body.appendChild(mkBonusRow(uRaw,upperBonus));
   body.appendChild(mkStatRow('Upper + Bonus',uRaw+upperBonus,true));
 
   /* Lower section header */
@@ -831,13 +890,18 @@ function renderScorecard(){
   CATS.filter(c=>c.sec==='L').forEach(cat=>
     body.appendChild(mkRow(cat,vp,cp,showSugg,canScore)));
 
-  /* Yahtzee bonus row */
+  /* Yahtzee bonus row — visual chips */
   const yb=vp.yBonus||0;
   const ybr=document.createElement('tr');
+  let chipHtml='';
+  if(yb>0){
+    for(let i=0;i<yb;i++) chipHtml+='<span class="ybonus-chip">+100</span>';
+    chipHtml='<div class="ybonus-chips">'+chipHtml+'</div>';
+  }
   ybr.innerHTML='<td class="la" style="font-size:var(--fxs)">Yahtzee Bonus</td>'
     +'<td style="font-size:var(--fxs);color:#777">+100 each extra</td>'
     +'<td><button class="sbb stat'+(yb>0?' bon':'')+'">'+
-    (yb>0 ? '×'+yb+' = '+(yb*100) : '—')+'</button></td>';
+    (yb>0 ? chipHtml+'<span style="font-size:var(--fxs);display:block">= '+(yb*100)+' pts</span>' : '—')+'</button></td>';
   body.appendChild(ybr);
 
   /* Grand total */
@@ -853,36 +917,27 @@ function renderScorecard(){
   document.getElementById('vscore').textContent='Total: '+grand;
 }
 
-/*
- * mkRow — builds one scorecard row.
- *
- * JOKER RULE (official Yahtzee):
- *   A joker applies when you roll a 5-of-a-kind AND the Yahtzee box is
- *   already filled (50 or 0).  You MUST first try to score in the upper
- *   section matching the face value.  Only if THAT upper box is also filled
- *   may you use the joker in a lower-section box for full points.
- *   (We handle this by calculating the joker-score and only showing it as
- *   a suggestion; the player still must click the box.)
- */
 function mkRow(cat,vp,cp,showSugg,canScore){
   const tr=document.createElement('tr');
   const filled=(vp.scores[cat.id]!==undefined);
 
-  /* Is the current roll a five-of-a-kind? */
   const isYtz5=cp && cp.dice.every(d=>d===cp.dice[0]);
-  /*
-   * Joker conditions:
-   *  - Five-of-a-kind rolled
-   *  - Yahtzee box already filled (score 50 or forced 0)
-   *  - Upper section box for that face is also already filled
-   */
   const faceValue=cp ? cp.dice[0] : 0;
   const upperIdForFace=['','aces','twos','threes','fours','fives','sixes'][faceValue]||'';
   const yahtzeeBoxFilled=(vp.scores['yahtzee']!==undefined);
   const upperBoxFilled=(vp.scores[upperIdForFace]!==undefined);
   const joker=isYtz5 && yahtzeeBoxFilled && upperBoxFilled;
 
-  const sugg=(!filled && showSugg && cp)
+  /*
+   * JOKER RULE enforcement:
+   * If it's a joker situation, the upper section box for the face value MUST be
+   * scored first (if it's still open). If that upper box is the current row and
+   * it's open, force it to be the only available option.
+   * If the upper box is already filled, only then can lower section be used as Joker.
+   */
+  const mustScoreUpper = isYtz5 && yahtzeeBoxFilled && !upperBoxFilled && cat.sec==='L';
+
+  const sugg=(!filled && showSugg && cp && !mustScoreUpper)
     ? calcScore(cat.id, cp.dice, vp, joker)
     : null;
 
@@ -895,11 +950,16 @@ function mkRow(cat,vp,cp,showSugg,canScore){
     btn.classList.add('filled');
     btn.textContent=String(vp.scores[cat.id]);
     btn.disabled=true;
+  } else if(mustScoreUpper && showSugg){
+    /* Blocked — must score upper section first per Joker rule */
+    btn.disabled=true;
+    btn.textContent='';
+    btn.title='Score the upper section for this face value first (Joker rule)';
   } else if(sugg!==null && canScore){
     btn.classList.add(sugg>0?'sug':'zsug');
     btn.textContent=sugg>0 ? '+'+sugg : '0';
     btn.title=sugg>0 ? 'Score '+sugg+' pts' : 'Score 0 (enter zero)';
-    btn.addEventListener('click',()=>scoreIt(vp.id,cat.id));
+    btn.addEventListener('click',()=>scoreIt(vp.id,cat.id,cat.name));
   } else {
     btn.disabled=true;
     btn.textContent='';
@@ -916,10 +976,17 @@ function mkStatRow(label,val,bold){
     +'<td><button class="sbb stat">'+val+'</button></td>';
   return tr;
 }
-function mkBonusRow(val){
+function mkBonusRow(uRaw,val){
   const tr=document.createElement('tr');
-  tr.innerHTML='<td class="la" style="font-size:var(--fxs)"><b>Upper Bonus (≥63)</b></td>'
-    +'<td style="font-size:var(--fxs);color:#777">+35 pts</td>'
+  const progress=Math.min(uRaw,63);
+  const needsMore=63-uRaw;
+  let hintTxt='';
+  if(val===0 && needsMore>0) hintTxt=' <span style="font-size:var(--fxs);color:#999">(need '+needsMore+' more)</span>';
+  tr.innerHTML='<td class="la" style="font-size:var(--fxs)"><b>Upper Bonus (≥63)</b>'
+    +'<div style="margin-top:3px;height:4px;background:#ddd;border-radius:2px;width:80%;max-width:120px">'
+    +'<div style="height:4px;background:'+(val>0?'var(--green)':'var(--gold)')
+    +';border-radius:2px;width:'+Math.round(progress/63*100)+'%;transition:width .4s"></div></div></td>'
+    +'<td style="font-size:var(--fxs);color:#777">+35 pts'+hintTxt+'</td>'
     +'<td><button class="sbb stat'+(val>0?' bon':'')+'">'+
     (val>0?'+35':'—')+'</button></td>';
   return tr;
@@ -962,32 +1029,47 @@ function rollDice(){
   pushState(state);
 }
 
-/*
- * scoreIt — record score for a category.
- *
- * Yahtzee Bonus rule:
- *   A second (or subsequent) YAHTZEE in the same game scores +100 bonus
- *   IF AND ONLY IF the first YAHTZEE was scored 50 in the Yahtzee box.
- *   If the Yahtzee box was scored 0 (forced zero), no bonus chips are awarded.
- */
-function scoreIt(pid,catId){
+/* ── Confirm score dialog ── */
+let _pendingScore={pid:null,catId:null,catName:null,score:null};
+
+function scoreIt(pid,catId,catName){
   if(!isMyTurn()){ toast("It's not your turn!"); return; }
   const cp=curP();
   if(!cp || cp.id!==pid){ toast("Not the current player!"); return; }
   if(cp.rollsLeft===3){ toast('You must roll at least once before scoring!'); return; }
 
   const p=state.players.find(x=>x.id===pid);
-  if(!p || p.scores[catId]!==undefined) return; /* already scored */
+  if(!p || p.scores[catId]!==undefined) return;
 
-  /* Joker logic (same as mkRow) */
+  /* Calculate actual score with joker logic */
   const isYtz5=cp.dice.every(d=>d===cp.dice[0]);
   const faceValue=cp.dice[0];
   const upperIdForFace=['','aces','twos','threes','fours','fives','sixes'][faceValue]||'';
   const yahtzeeBoxFilled=(p.scores['yahtzee']!==undefined);
   const upperBoxFilled=(p.scores[upperIdForFace]!==undefined);
   const joker=isYtz5 && yahtzeeBoxFilled && upperBoxFilled;
-
   const score=calcScore(catId,cp.dice,p,joker);
+
+  _pendingScore={pid,catId,catName,score};
+  document.getElementById('confirm-cat-name').textContent=catName;
+  const ptsEl=document.getElementById('confirm-pts');
+  ptsEl.textContent=score>0?'+'+score+'pts':'0 pts (zero scored)';
+  ptsEl.className='confirm-pts'+(score===0?' zero':'');
+  showOv('ov-confirm');
+}
+
+function commitScore(){
+  const {pid,catId,score}=_pendingScore;
+  if(!pid||!catId) return;
+  hideAllOv();
+
+  if(!isMyTurn()){ toast("It's not your turn!"); return; }
+  const cp=curP();
+  if(!cp || cp.id!==pid){ toast("Not the current player!"); return; }
+
+  const p=state.players.find(x=>x.id===pid);
+  if(!p || p.scores[catId]!==undefined) return;
+
   p.scores[catId]=score;
   ding();
 
@@ -996,19 +1078,19 @@ function scoreIt(pid,catId){
     fanfare(); blast('YAHTZEE! 5 OF A KIND • 50 PTS');
   }
 
-  /* Extra Yahtzee bonus — only awarded if FIRST yahtzee was scored 50 */
+  /* Extra Yahtzee bonus — only if first Yahtzee was scored 50 */
+  const isYtz5=cp.dice.every(d=>d===cp.dice[0]);
   if(isYtz5 && catId!=='yahtzee' && p.scores['yahtzee']===50){
     p.yBonus=(p.yBonus||0)+1;
     fanfare(); blast('YAHTZEE BONUS! +100 PTS');
     toast(p.name+' earns a Yahtzee Bonus! +100');
   }
 
-  /* End of turn: reset dice state, advance player */
+  /* End of turn */
   cp.rollsLeft=3;
   cp.held=[false,false,false,false,false];
   state.curIdx=(state.curIdx+1)%state.players.length;
 
-  /* Check if all 13 categories filled for every player → game over */
   if(state.players.every(pl=>countFilled(pl)>=13)){
     state.over=true;
     pushState(state);
@@ -1018,9 +1100,10 @@ function scoreIt(pid,catId){
   }
 
   toast(p.name+' scored '+score+' in '+catId);
-  viewPid=curP().id;  /* auto-switch view to next player */
+  viewPid=curP().id;
   pushState(state);
   renderAll();
+  _pendingScore={pid:null,catId:null,catName:null,score:null};
 }
 
 /* ══════════════════════════════════════════
@@ -1114,7 +1197,7 @@ function calcScore(id,dice,player,joker=false){
     case 'threeK': return cnt.some(c=>c>=3) ? sum : 0;
     case 'fourK':  return cnt.some(c=>c>=4) ? sum : 0;
     case 'fullH': {
-      /* Exactly a 3-of-a-kind and a pair */
+      /* Strictly 3-of-a-kind AND a pair; 5-of-a-kind does NOT qualify without Joker */
       const vals=cnt.filter(c=>c>0);
       return (vals.includes(3) && vals.includes(2)) ? 25 : 0;
     }
@@ -1161,12 +1244,12 @@ function isMyTurn(){ const cp=curP(); return !!(cp && myPid && cp.id===myPid && 
 function saveSession(){ try{sessionStorage.setItem('ytz_session',JSON.stringify({gameCode,myPid,isHost}));}catch(e){} }
 
 function showOv(id){
-  ['ov-host','ov-join','ov-lobby','ov-wait','ov-rename','ov-ytz','ov-qr','ov-over'].forEach(oid=>{
+  ['ov-host','ov-join','ov-lobby','ov-wait','ov-rename','ov-ytz','ov-qr','ov-over','ov-confirm'].forEach(oid=>{
     document.getElementById(oid).classList.toggle('vis',oid===id);
   });
 }
 function hideAllOv(){
-  ['ov-host','ov-join','ov-lobby','ov-wait','ov-rename','ov-ytz','ov-qr','ov-over'].forEach(oid=>{
+  ['ov-host','ov-join','ov-lobby','ov-wait','ov-rename','ov-ytz','ov-qr','ov-over','ov-confirm'].forEach(oid=>{
     document.getElementById(oid).classList.remove('vis');
   });
 }
@@ -1183,6 +1266,15 @@ function toast(msg){
   t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2700);
 }
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function fallbackCopy(text){
+  try{
+    const ta=document.createElement('textarea');
+    ta.value=text; ta.style.cssText='position:fixed;top:-9999px;opacity:0';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta); toast('Link copied!');
+  }catch(e){ toast('Copy: '+text); }
+}
 
 function openQR(){
   if(!gameCode)return;
@@ -1215,8 +1307,10 @@ document.getElementById('ov-qr').addEventListener('click',e=>{
 
 document.getElementById('btn-lobby-copy').addEventListener('click',()=>{
   if(!gameCode)return;
-  try{ navigator.clipboard.writeText(joinUrl(gameCode)).then(()=>toast('Link copied!')); }
-  catch(e){ toast(joinUrl(gameCode)); }
+  const url=joinUrl(gameCode);
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(url).then(()=>toast('Link copied!')).catch(()=>fallbackCopy(url));
+  } else { fallbackCopy(url); }
 });
 document.getElementById('btn-lobby-start-now').addEventListener('click',startGameNow);
 
@@ -1227,8 +1321,9 @@ document.getElementById('join-name').addEventListener('keydown',e=>{
 
 document.getElementById('code-badge').addEventListener('click',()=>{
   if(!gameCode)return;
-  try{ navigator.clipboard.writeText(gameCode).then(()=>toast('Code copied: '+gameCode)); }
-  catch(e){ toast('Code: '+gameCode); }
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(gameCode).then(()=>toast('Code copied: '+gameCode)).catch(()=>fallbackCopy(gameCode));
+  } else { fallbackCopy(gameCode); }
 });
 
 document.getElementById('btn-edit-name').addEventListener('click',openRename);
@@ -1242,6 +1337,27 @@ document.getElementById('btn-rename-cancel').addEventListener('click',()=>{
 document.getElementById('rename-input').addEventListener('keydown',e=>{
   if(e.key==='Enter') saveRename();
 });
+
+document.getElementById('btn-confirm-cancel').addEventListener('click',()=>{
+  _pendingScore={pid:null,catId:null,catName:null,score:null};
+  hideAllOv();
+  if(state?.started) renderAll();
+});
+document.getElementById('btn-confirm-ok').addEventListener('click',commitScore);
+
+/* Dark mode toggle */
+(()=>{
+  const btn=document.getElementById('btn-dark-mode');
+  const saved=localStorage.getItem('ytz_dark');
+  if(saved==='1') document.body.classList.add('dark');
+  btn.textContent=document.body.classList.contains('dark')?'☀️ Light':'🌙 Dark';
+  btn.addEventListener('click',()=>{
+    document.body.classList.toggle('dark');
+    const on=document.body.classList.contains('dark');
+    btn.textContent=on?'☀️ Light':'🌙 Dark';
+    try{localStorage.setItem('ytz_dark',on?'1':'0');}catch(e){}
+  });
+})();
 
 /* ── Go! ── */
 init();
