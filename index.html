@@ -375,7 +375,7 @@ body.dark .btn-dark:hover{background:#1a1a1a;}
     <button class="nb-edit" id="btn-edit-name" style="display:none">✏️ Edit</button>
     <span class="nb-score" id="vscore"></span>
   </div>
-  <div class="dice-panel">
+  <div class="dice-panel" id="dice-panel-el">
     <div class="dice-top">
       <div class="turn-lbl" id="turn-lbl">—</div>
       <div class="roll-lbl" id="roll-lbl">3 rolls left</div>
@@ -445,6 +445,7 @@ const ALL_IDS=CATS.map(c=>c.id);
 let gameCode=null, myPid=null, isHost=false, state=null, viewPid=null;
 let qrDone=false, lobbyQrDone=false, unsub=null;
 let _lastCurIdx=-1; /* track turn changes so we know when a new turn starts */
+let _lastDice=null;  /* cache last seen dice to detect rolls on spectator devices */
 
 try{
   const s=JSON.parse(sessionStorage.getItem('ytz_session')||'null');
@@ -545,14 +546,31 @@ function onStateChange(){
 
     const cp = curP();
 
-    /* Auto-follow the active player's card for ALL players (spectator mode).
-       When the turn changes everyone's view switches to the new active player
-       so they can see the dice and score suggestions live.
-       Exception: if a player is deliberately viewing someone else's card
-       (they clicked a tab), don't override — only auto-follow on turn change. */
-    if(turnChanged || !state.players.find(p=>p.id===viewPid)){
-      viewPid = cp?.id || state.players[0]?.id || null;
+    /* Always follow the active player — on every Firebase update, not just turn changes.
+       This means spectators always see the active player's card with live dice + scores.
+       A player can still click a tab to browse others; the NEXT dice/hold/score update
+       will pull them back to the active player automatically. */
+    viewPid = cp?.id || state.players[0]?.id || null;
+
+    /* Trigger roll animation on spectator devices when dice change.
+       We detect this by comparing incoming dice to our cached copy. */
+    if(!isMyTurn() && cp){
+      const cached = _lastDice;
+      const incoming = cp.dice;
+      const diceChanged = cached && incoming &&
+        incoming.some((v,i) => v !== cached[i] && !cp.held[i]);
+      if(diceChanged){
+        /* Fire animation after the DOM re-renders (next microtask) */
+        setTimeout(()=>{
+          document.querySelectorAll('.die').forEach((d,idx)=>{
+            if(!cp.held[idx]) d.classList.add('rolling');
+          });
+          setTimeout(()=>document.querySelectorAll('.die').forEach(d=>d.classList.remove('rolling')),420);
+        },0);
+      }
     }
+    /* Cache current dice for next comparison */
+    _lastDice = cp ? [...cp.dice] : null;
 
     renderAll();
     return;
@@ -804,18 +822,42 @@ function updateCodeBadge(){
 function renderTabs(){
   const bar=document.getElementById('tabs');bar.innerHTML='';
   if(!state)return;
+  let activeTabEl=null;
   state.players.forEach((p,i)=>{
     const active=(p.id===viewPid), isCurrentTurn=(i===state.curIdx&&state.started);
     const t=document.createElement('div');
     t.className='tab'+(active?' active':'')+(isCurrentTurn?' myturn':'');
-    if(active){t.style.color=p.color;t.style.borderColor=p.color;}
+
+    /* Active tab: player's own color border + background tint */
+    if(active){
+      t.style.color=p.color;
+      t.style.borderColor=p.color;
+      t.style.borderBottomColor='var(--bg)';
+    }
+    /* Currently-rolling tab (when not the active view): colored outline so it pops */
+    if(isCurrentTurn && !active){
+      t.style.outline='2px solid '+p.color;
+      t.style.outlineOffset='-2px';
+    }
+    /* Always color the current-turn tab text with player color */
+    if(isCurrentTurn){
+      t.style.color=p.color;
+    }
+
     const youTxt=(p.id===myPid)?' (you)':'';
-    /* Show LIVE badge on the current player's tab for all spectators */
+    /* LIVE indicator for spectators watching someone else roll */
     const liveTxt=isCurrentTurn&&p.id!==myPid?' 🔴':'';
     t.innerHTML=esc(p.name)+youTxt+liveTxt+'<br><span class="tab-pts">'+calcGrand(p)+'pt</span>';
     t.addEventListener('click',()=>{viewPid=p.id;renderAll();});
     bar.appendChild(t);
+    if(active) activeTabEl=t;
   });
+
+  /* Scroll the active tab into view (important on mobile with 4-6 players) */
+  if(activeTabEl){
+    activeTabEl.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'});
+  }
+
   const vp=getVP();
   if(vp){
     document.getElementById('vname').textContent=vp.name+(vp.id===myPid?' (you)':'');
@@ -835,12 +877,16 @@ function renderDicePanel(){
     cp.rollsLeft>0 ? cp.rollsLeft+' roll'+(cp.rollsLeft!==1?'s':'')+' left'
                    : 'No rolls left — pick a box!';
 
-  /* Roll button: enabled only when it's my turn AND rolls remain.
-     rollsLeft of 0 at turn start is a stale-state artifact — treat it as 3
-     only if the scorecard for this player is otherwise empty this turn
-     (i.e. rollsLeft being 0 while it's the start of a turn means a bad write). */
-  const effectiveRollsLeft = cp.rollsLeft;
-  document.getElementById('btn-roll').disabled=(!imt || effectiveRollsLeft<=0);
+  /* Tint the dice panel border with the current player's color so everyone
+     knows at a glance whose turn it is, even when watching from another tab */
+  const panel=document.getElementById('dice-panel-el');
+  if(panel) panel.style.borderColor=cp.color;
+
+  /* Roll button: enabled only when game started + it IS my turn + rolls remain.
+     The stale-rollsLeft=0 race is prevented upstream: rollDice now uses update()
+     (not pushState) so it only patches dice/held/rollsLeft for THIS player,
+     and commitScore resets rollsLeft=3 in the full pushState at end of turn. */
+  document.getElementById('btn-roll').disabled=(!imt || cp.rollsLeft<=0);
 
   const row=document.getElementById('dice-row');row.innerHTML='';
   for(let i=0;i<5;i++){
@@ -975,19 +1021,28 @@ function mkRow(cat,vp,cp,showSugg,canScore){
   const btn=document.createElement('button');btn.className='sbb';
 
   if(filled){
+    /* Already scored */
     btn.classList.add('filled');
     btn.textContent=String(vp.scores[cat.id]);
     btn.disabled=true;
   } else if(mustScoreUpper && showSugg){
-    /* Blocked — must score upper section first per Joker rule */
+    /* Joker rule — must score upper section first */
     btn.disabled=true;
-    btn.textContent='';
+    btn.textContent='🔒';
     btn.title='Score the upper section for this face value first (Joker rule)';
   } else if(sugg!==null && canScore){
+    /* Active player — clickable suggestion */
     btn.classList.add(sugg>0?'sug':'zsug');
-    btn.textContent=sugg>0 ? '+'+sugg : '0';
-    btn.title=sugg>0 ? 'Score '+sugg+' pts' : 'Score 0 (enter zero)';
+    btn.textContent=sugg>0?'+'+sugg:'0';
+    btn.title=sugg>0?'Score '+sugg+' pts':'Score 0 (enter zero)';
     btn.addEventListener('click',()=>scoreIt(vp.id,cat.id,cat.name));
+  } else if(sugg!==null && showSugg){
+    /* Spectator — same colour coding but read-only, slightly muted */
+    btn.classList.add(sugg>0?'sug':'zsug');
+    btn.style.opacity='0.55';
+    btn.style.cursor='default';
+    btn.style.pointerEvents='none';
+    btn.textContent=sugg>0?'+'+sugg:'0';
   } else {
     btn.disabled=true;
     btn.textContent='';
@@ -1024,16 +1079,15 @@ function mkBonusRow(uRaw,val){
    PLAYER ACTIONS
 ══════════════════════════════════════════ */
 
-/* Toggle hold on a die — only available after first roll, on your turn.
-   Hold state is kept LOCAL (no Firebase push) until the player commits a score.
-   This prevents other clients from seeing stale rollsLeft during the turn. */
+/* Toggle hold on a die — syncs live to Firebase so all spectators see held state. */
 function toggleHold(i){
   const cp=curP();
   if(!cp || !isMyTurn()) return;
   if(cp.rollsLeft===3){ toast('Roll first before holding dice!'); return; }
   cp.held[i]=!cp.held[i];
   renderDicePanel();
-  /* No pushState here — held state is local until end of turn */
+  /* Surgical update — only held array, no rollsLeft touch */
+  update(gameRef('players/'+state.curIdx),{ held:[...cp.held] });
 }
 
 /* Roll dice — gate: must be started, my turn, rolls remaining */
@@ -1178,7 +1232,7 @@ function newGame(){
   if(!isHost){ toast('Only the host can start a new game.'); return; }
   if(unsub){unsub();unsub=null;}
   gameCode=null; myPid=null; state=null; viewPid=null;
-  qrDone=false; lobbyQrDone=false; isHost=false; _lastCurIdx=-1;
+  qrDone=false; lobbyQrDone=false; isHost=false; _lastCurIdx=-1; _lastDice=null;
   try{sessionStorage.removeItem('ytz_session');}catch(e){}
   try{window.history.replaceState({},'',window.location.pathname);}catch(e){}
   hide('main-card'); hideAllOv(); showOv('ov-host');
